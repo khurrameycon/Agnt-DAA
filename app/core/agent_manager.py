@@ -9,7 +9,6 @@ from typing import Dict, Any, List, Optional, Callable
 
 from app.core.config_manager import ConfigManager
 from app.core.model_manager import ModelManager
-# from app.agents.base_agent import BaseAgent
 from app.agents.local_model_agent import LocalModelAgent
 from app.agents.web_browsing_agent import WebBrowsingAgent
 from app.agents.visual_web_agent import VisualWebAgent
@@ -150,42 +149,36 @@ class AgentManager:
         
         # Create the agent instance
         try:
-            # For local model agent, inject tool instances
-            if agent_type == "local_model":
-                # Create a local model agent
-                agent = AgentRegistry.create_agent(agent_id, agent_type, {
-                    **model_config,
-                    **additional_config
-                })
-            elif agent_type == "web_browsing":
+            # For specific agent types, handle specialized configuration
+            if agent_type == "web_browsing":
                 # Create a web browsing agent
-                agent = AgentRegistry.create_agent(agent_id, agent_type, {
-                    **model_config,
-                    **additional_config
-                })
-            elif agent_type == "visual_web":
-                # Create a visual web agent
-                agent = AgentRegistry.create_agent(agent_id, agent_type, {
-                    **model_config,
-                    **additional_config
-                })
-            elif agent_type == "code_generation":
-                # Create a code generation agent
-                agent = AgentRegistry.create_agent(agent_id, agent_type, {
-                    **model_config,
-                    **additional_config
-                })
-            else:
-                self.logger.warning(f"Agent type {agent_type} not recognized")
-                return None
-
-            if agent:
-                self.active_agents[agent_id] = agent
-                self.logger.info(f"Created agent with ID {agent_id} of type {agent_type}")
+                agent_instance = WebBrowsingAgent(
+                    agent_id=agent_id,
+                    config={
+                        **model_config,
+                        # Support multi-agent architecture for web browsing
+                        "multi_agent": additional_config.get("multi_agent", False),
+                        **additional_config
+                    }
+                )
+                self.active_agents[agent_id] = agent_instance
+                self.logger.info(f"Created web browsing agent with ID {agent_id}" + 
+                                 (" (multi-agent)" if additional_config.get("multi_agent") else ""))
                 return agent_id
             else:
-                self.logger.error(f"Failed to create agent with ID {agent_id}")
-                return None
+                # Use the registry for other agent types
+                agent = AgentRegistry.create_agent(agent_id, agent_type, {
+                    **model_config,
+                    **additional_config
+                })
+                
+                if agent:
+                    self.active_agents[agent_id] = agent
+                    self.logger.info(f"Created agent with ID {agent_id} of type {agent_type}")
+                    return agent_id
+                else:
+                    self.logger.error(f"Failed to create agent with ID {agent_id}")
+                    return None
                 
         except Exception as e:
             self.logger.error(f"Error creating agent: {str(e)}")
@@ -262,7 +255,9 @@ class AgentManager:
                 "agent_id": agent_id,
                 "agent_type": self.agent_configs[agent_id]["agent_type"],
                 "model_id": self.agent_configs[agent_id]["model_config"].get("model_id", "unknown"),
-                "tools": self.agent_configs[agent_id]["tools"]
+                "tools": self.agent_configs[agent_id]["tools"],
+                "multi_agent": self.agent_configs[agent_id]["additional_config"].get("multi_agent", False) 
+                if self.agent_configs[agent_id]["agent_type"] == "web_browsing" else False
             }
             for agent_id in self.active_agents.keys()
         ]

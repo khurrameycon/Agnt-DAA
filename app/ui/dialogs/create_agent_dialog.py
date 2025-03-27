@@ -58,6 +58,9 @@ class CreateAgentDialog(QDialog):
         # Create advanced tab
         self.create_advanced_tab()
         
+        # Create agent-specific tab
+        self.create_agent_specific_tab()
+        
         # Create button box
         self.button_box = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | 
@@ -183,6 +186,67 @@ class CreateAgentDialog(QDialog):
         
         self.tabs.addTab(advanced_tab, "Advanced")
     
+    def create_agent_specific_tab(self):
+        """Create agent-specific configuration tab"""
+        agent_specific_tab = QWidget()
+        self.agent_specific_layout = QVBoxLayout(agent_specific_tab)
+        
+        # Web Browsing Agent Options
+        self.web_browsing_options = QGroupBox("Web Browsing Agent Options")
+        web_browsing_layout = QFormLayout(self.web_browsing_options)
+        
+        # Multi-agent option
+        self.multi_agent_check = QCheckBox("Use multi-agent architecture")
+        self.multi_agent_check.setToolTip("Enable to use a planner and browser agent working together")
+        web_browsing_layout.addRow("", self.multi_agent_check)
+        
+        # Add description of multi-agent
+        multi_agent_desc = QLabel(
+            "Multi-agent architecture uses a planner agent to break down complex tasks\n"
+            "and a browser agent to execute the plan. This is recommended for complex\n"
+            "web tasks that involve multiple steps or websites."
+        )
+        multi_agent_desc.setWordWrap(True)
+        web_browsing_layout.addRow("", multi_agent_desc)
+        
+        self.agent_specific_layout.addWidget(self.web_browsing_options)
+        self.web_browsing_options.setVisible(False)
+        
+        # Visual Web Agent Options
+        self.visual_web_options = QGroupBox("Visual Web Agent Options")
+        visual_web_layout = QFormLayout(self.visual_web_options)
+        
+        # Browser dimensions
+        self.browser_width_spin = QSpinBox()
+        self.browser_width_spin.setRange(800, 1920)
+        self.browser_width_spin.setSingleStep(50)
+        self.browser_width_spin.setValue(1280)
+        visual_web_layout.addRow("Browser Width:", self.browser_width_spin)
+        
+        self.browser_height_spin = QSpinBox()
+        self.browser_height_spin.setRange(600, 1080)
+        self.browser_height_spin.setSingleStep(50)
+        self.browser_height_spin.setValue(800)
+        visual_web_layout.addRow("Browser Height:", self.browser_height_spin)
+        
+        self.agent_specific_layout.addWidget(self.visual_web_options)
+        self.visual_web_options.setVisible(False)
+        
+        # Code Generation Agent Options
+        self.code_gen_options = QGroupBox("Code Generation Agent Options")
+        code_gen_layout = QFormLayout(self.code_gen_options)
+        
+        # Sandbox option
+        self.sandbox_check = QCheckBox("Run code in sandbox (safer but more limited)")
+        self.sandbox_check.setChecked(True)
+        code_gen_layout.addRow("", self.sandbox_check)
+        
+        self.agent_specific_layout.addWidget(self.code_gen_options)
+        self.code_gen_options.setVisible(False)
+        
+        # Add to tabs
+        self.tabs.addTab(agent_specific_tab, "Agent Options")
+    
     def load_available_models(self):
         """Load available models"""
         # Load cached models first
@@ -241,8 +305,22 @@ class CreateAgentDialog(QDialog):
         Args:
             agent_type: New agent type
         """
-        # Enable/disable certain options based on agent type
-        if agent_type == "local_model":
+        # Hide all agent-specific option groups
+        self.web_browsing_options.setVisible(False)
+        self.visual_web_options.setVisible(False)
+        self.code_gen_options.setVisible(False)
+        
+        # Show specific options based on agent type
+        if agent_type == "web_browsing":
+            self.web_browsing_options.setVisible(True)
+            self.authorized_imports_edit.setEnabled(True)
+        elif agent_type == "visual_web":
+            self.visual_web_options.setVisible(True)
+            self.authorized_imports_edit.setEnabled(True)
+        elif agent_type == "code_generation":
+            self.code_gen_options.setVisible(True)
+            self.authorized_imports_edit.setEnabled(True)
+        elif agent_type == "local_model":
             self.authorized_imports_edit.setEnabled(True)
         else:
             self.authorized_imports_edit.setEnabled(False)
@@ -279,7 +357,8 @@ class CreateAgentDialog(QDialog):
         agent_name = self.agent_name_edit.text().strip()
         agent_id = agent_name if agent_name else f"agent_{uuid.uuid4().hex[:8]}"
         
-        return {
+        # Base configuration
+        config = {
             "agent_id": agent_id,
             "agent_type": self.agent_type_combo.currentText(),
             "model_config": {
@@ -296,3 +375,16 @@ class CreateAgentDialog(QDialog):
                 "is_default": self.default_agent_check.isChecked()
             }
         }
+        
+        # Add agent-specific configuration
+        agent_type = self.agent_type_combo.currentText()
+        
+        if agent_type == "web_browsing":
+            config["additional_config"]["multi_agent"] = self.multi_agent_check.isChecked()
+        elif agent_type == "visual_web":
+            config["additional_config"]["browser_width"] = self.browser_width_spin.value()
+            config["additional_config"]["browser_height"] = self.browser_height_spin.value()
+        elif agent_type == "code_generation":
+            config["additional_config"]["sandbox"] = self.sandbox_check.isChecked()
+        
+        return config

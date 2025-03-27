@@ -75,3 +75,166 @@ Access to model mistralai/Mistral-7B-Instruct-v0.2 is restricted and you are not
 2025-03-27 08:18:02,987 - app.agents.agent_registry - INFO - Registered agent type: code_generation
 2025-03-27 08:18:03,075 - sagax1 - INFO - Application started
 2025-03-27 08:18:19,322 - app.core.agent_manager - INFO - Created agent with ID as of type code_generation
+2025-03-27 15:22:37,720 - sagax1 - INFO - Logging initialized
+2025-03-27 15:22:38,032 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 15:22:38,032 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 15:22:38,032 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 15:22:38,032 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 15:22:38,510 - sagax1 - ERROR - Unhandled exception: 'MainWindow' object has no attribute 'load_web_agents'
+Traceback (most recent call last):
+  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\main.py", line 47, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\app\ui\main_window.py", line 134, in __init__
+    self.create_web_browsing_tab()
+  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\app\ui\main_window.py", line 780, in create_web_browsing_tab
+    refresh_button.clicked.connect(self.load_web_agents)
+                                   ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MainWindow' object has no attribute 'load_web_agents'. Did you mean: 'load_agents'?
+2025-03-27 15:40:55,322 - sagax1 - INFO - Logging initialized
+2025-03-27 15:40:55,346 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 15:40:55,347 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 15:40:55,347 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 15:40:55,347 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 15:40:55,386 - sagax1 - ERROR - Unhandled exception: 'MainWindow' object has no attribute 'create_web_browsing_tab'
+Traceback (most recent call last):
+  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\main.py", line 47, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\app\ui\main_window.py", line 134, in __init__
+    self.create_web_browsing_tab()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MainWindow' object has no attribute 'create_web_browsing_tab'
+2025-03-27 15:43:43,917 - sagax1 - INFO - Logging initialized
+2025-03-27 15:43:43,940 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 15:43:43,940 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 15:43:43,940 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 15:43:43,940 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 15:43:43,982 - sagax1 - ERROR - Unhandled exception: name 'QCheckBox' is not defined
+Traceback (most recent call last):
+  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\main.py", line 47, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\app\ui\main_window.py", line 134, in __init__
+    self.create_web_browsing_tab()
+  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\app\ui\main_window.py", line 789, in create_web_browsing_tab
+    self.multi_agent_toggle = QCheckBox("Use Multi-Agent Mode")
+                              ^^^^^^^^^
+NameError: name 'QCheckBox' is not defined
+2025-03-27 15:44:21,624 - sagax1 - INFO - Logging initialized
+2025-03-27 15:44:21,646 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 15:44:21,646 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 15:44:21,646 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 15:44:21,646 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 15:44:21,726 - sagax1 - INFO - Application started
+2025-03-27 15:44:45,822 - app.core.agent_manager - INFO - Created web browsing agent with ID Wbe
+2025-03-27 15:44:49,472 - app.core.agent_manager - WARNING - Agent with ID Wbe already exists. It will be replaced.
+2025-03-27 15:44:49,473 - app.core.agent_manager - INFO - Created web browsing agent with ID Wbe (multi-agent)
+2025-03-27 15:47:35,133 - sagax1 - INFO - Logging initialized
+2025-03-27 15:47:35,156 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 15:47:35,157 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 15:47:35,157 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 15:47:35,157 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 15:47:35,244 - sagax1 - INFO - Application started
+2025-03-27 15:47:52,397 - app.core.agent_manager - INFO - Created web browsing agent with ID wevvv
+2025-03-27 15:48:15,192 - app.core.agent_manager - INFO - Running agent wevvv with input: Browse https://www.remitly.com/us/en/pakistan...
+2025-03-27 15:48:15,193 - agent.wevvv - INFO - Initializing web browsing agent with model mistralai/Mistral-7B-Instruct-v0.2
+2025-03-27 15:48:28,980 - smolagents.models - INFO - Using device: auto
+2025-03-27 15:48:30,012 - agent.wevvv - WARNING - Failed to load model with TransformersModel: Failed to load tokenizer and model for model_id='mistralai/Mistral-7B-Instruct-v0.2': You are trying to access a gated repo.
+Make sure to have access to it at https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2.
+403 Client Error. (Request ID: Root=1-67e52cfd-576be2c62e6ca6e4717638e4;fb1d3f82-0f76-45b1-b169-b6bddecda6cc)
+
+Cannot access gated repo for url https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/config.json.
+Access to model mistralai/Mistral-7B-Instruct-v0.2 is restricted and you are not in the authorized list. Visit https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2 to ask for access.
+2025-03-27 15:48:30,012 - agent.wevvv - INFO - Using HfApiModel for mistralai/Mistral-7B-Instruct-v0.2
+2025-03-27 15:48:30,036 - agent.wevvv - INFO - Web browsing agent wevvv initialized successfully
+2025-03-27 15:48:35,579 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-03-27 15:48:40,717 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-03-27 15:48:46,164 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-03-27 15:48:52,862 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-27 15:48:58,246 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-03-27 15:49:03,683 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-27 15:49:08,906 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-03-27 15:49:15,115 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-03-27 15:49:20,679 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-27 15:49:26,180 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-27 15:49:31,714 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-27 15:49:37,784 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-03-27 15:49:43,679 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-27 15:49:49,198 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-03-27 15:49:55,141 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-03-27 15:50:00,728 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-27 15:50:06,009 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-27 15:50:11,932 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-27 15:50:17,711 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-27 15:50:24,308 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-03-27 15:50:38,052 - sagax1 - INFO - Logging initialized
+2025-03-27 15:50:38,076 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 15:50:38,076 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 15:50:38,077 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 15:50:38,077 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 15:50:38,164 - sagax1 - INFO - Application started
+2025-03-27 15:50:45,624 - app.core.agent_manager - INFO - Created web browsing agent with ID we
+2025-03-27 15:50:46,765 - app.core.agent_manager - WARNING - Agent with ID we already exists. It will be replaced.
+2025-03-27 15:50:46,765 - app.core.agent_manager - INFO - Created web browsing agent with ID we (multi-agent)
+2025-03-27 15:51:02,233 - sagax1 - INFO - Logging initialized
+2025-03-27 15:51:02,256 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 15:51:02,256 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 15:51:02,257 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 15:51:02,257 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 15:51:02,340 - sagax1 - INFO - Application started
+2025-03-27 15:51:13,471 - app.core.agent_manager - INFO - Created web browsing agent with ID we
+2025-03-27 15:51:15,198 - app.core.agent_manager - WARNING - Agent with ID we already exists. It will be replaced.
+2025-03-27 15:51:15,198 - app.core.agent_manager - INFO - Created web browsing agent with ID we (multi-agent)
+2025-03-27 15:51:27,545 - sagax1 - INFO - Logging initialized
+2025-03-27 15:51:27,570 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 15:51:27,570 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 15:51:27,570 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 15:51:27,571 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 15:51:27,657 - sagax1 - INFO - Application started
+2025-03-27 15:51:39,504 - app.core.agent_manager - INFO - Created web browsing agent with ID we
+2025-03-27 15:51:46,252 - app.core.agent_manager - INFO - Running agent we with input: Search for information about Remitly money transfe...
+2025-03-27 15:51:46,253 - agent.we - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 15:51:49,273 - smolagents.models - INFO - Using device: auto
+2025-03-27 16:10:20,004 - sagax1 - INFO - Logging initialized
+2025-03-27 16:10:20,027 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 16:10:20,027 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 16:10:20,027 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 16:10:20,027 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 16:10:20,117 - sagax1 - INFO - Application started
+2025-03-27 16:10:45,948 - app.core.agent_manager - INFO - Created web browsing agent with ID asdf
+2025-03-27 16:11:08,019 - app.core.agent_manager - INFO - Running agent asdf with input: lets browse remitly for pakistan...
+2025-03-27 16:11:08,020 - agent.asdf - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 16:11:11,080 - smolagents.models - INFO - Using device: auto
+2025-03-27 16:11:24,728 - app.core.agent_manager - WARNING - Agent with ID asdf already exists. It will be replaced.
+2025-03-27 16:11:24,729 - app.core.agent_manager - INFO - Created web browsing agent with ID asdf (multi-agent)
+2025-03-27 16:11:37,941 - sagax1 - INFO - Logging initialized
+2025-03-27 16:11:37,964 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 16:11:37,965 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 16:11:37,965 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 16:11:37,965 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 16:11:38,051 - sagax1 - INFO - Application started
+2025-03-27 16:11:46,875 - app.core.agent_manager - INFO - Created web browsing agent with ID asssd
+2025-03-27 16:11:47,657 - app.core.agent_manager - WARNING - Agent with ID asssd already exists. It will be replaced.
+2025-03-27 16:11:47,657 - app.core.agent_manager - INFO - Created web browsing agent with ID asssd (multi-agent)
+2025-03-27 16:14:36,790 - sagax1 - INFO - Logging initialized
+2025-03-27 16:14:36,811 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 16:14:36,811 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 16:14:36,811 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 16:14:36,811 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 16:14:36,901 - sagax1 - INFO - Application started
+2025-03-27 16:14:48,151 - app.core.agent_manager - INFO - Created web browsing agent with ID asdf
+2025-03-27 16:14:49,551 - app.core.agent_manager - WARNING - Agent with ID asdf already exists. It will be replaced.
+2025-03-27 16:14:49,552 - app.core.agent_manager - INFO - Created web browsing agent with ID asdf (multi-agent)
+2025-03-27 16:15:31,469 - sagax1 - INFO - Logging initialized
+2025-03-27 16:15:31,493 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 16:15:31,494 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 16:15:31,494 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 16:15:31,494 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 16:15:31,585 - sagax1 - INFO - Application started
+2025-03-27 16:15:38,991 - app.core.agent_manager - INFO - Created web browsing agent with ID asad
+2025-03-27 16:15:40,309 - app.core.agent_manager - WARNING - Agent with ID asad already exists. It will be replaced.
+2025-03-27 16:15:40,309 - app.core.agent_manager - INFO - Created web browsing agent with ID asad (multi-agent)
+2025-03-27 16:15:52,629 - app.core.agent_manager - INFO - Running agent asad with input: browse information about Trump and Pakistan...
+2025-03-27 16:15:52,630 - agent.asad - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 16:15:55,666 - smolagents.models - INFO - Using device: auto

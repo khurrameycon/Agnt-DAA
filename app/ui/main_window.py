@@ -12,7 +12,7 @@ from PyQt6.QtWidgets import (
     QPushButton, QLabel, QTextEdit, QComboBox,
     QStatusBar, QTabWidget, QLineEdit, QMessageBox,
     QMenuBar, QMenu, QDialog, QDialogButtonBox, QFormLayout,
-    QListWidget, QListWidgetItem, QSplitter
+    QListWidget, QListWidgetItem, QSplitter, QCheckBox
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QSize, QThread, pyqtSlot
 from PyQt6.QtGui import QIcon, QAction, QFont
@@ -642,6 +642,113 @@ class MainWindow(QMainWindow):
             "<p>&copy; 2025 sagax1 Team</p>"
         )
 
+
+    def on_web_agent_selected(self, index):
+        """Handle web agent selection
+        
+        Args:
+            index: Index of the selected agent
+        """
+        if index < 0 or self.web_agent_selector.currentText() == "No web browsing agents available":
+            self.multi_agent_toggle.setEnabled(False)
+            self.web_send_button.setEnabled(False)
+            return
+        
+        # Get the selected agent ID from item data
+        agent_id = self.web_agent_selector.itemData(index)
+        
+        if not agent_id:
+            return
+        
+        try:
+            # Get agent config
+            agent_config = self.agent_manager.get_agent_config(agent_id)
+            
+            # Update multi-agent toggle
+            is_multi_agent = agent_config["additional_config"].get("multi_agent", False)
+            self.multi_agent_toggle.setChecked(is_multi_agent)
+            self.multi_agent_toggle.setEnabled(True)
+            
+            # Enable send button
+            self.web_send_button.setEnabled(True)
+        except Exception as e:
+            self.logger.error(f"Error getting web agent config: {str(e)}")
+            self.multi_agent_toggle.setEnabled(False)
+
+    def toggle_multi_agent_mode(self, state):
+        """Toggle multi-agent mode for web browsing agent
+        
+        Args:
+            state: Checkbox state
+        """
+        if self.web_agent_selector.currentText() == "No web browsing agents available":
+            return
+        
+        # Get the selected agent ID from item data
+        agent_id = self.web_agent_selector.itemData(self.web_agent_selector.currentIndex())
+        
+        if not agent_id:
+            return
+        
+        try:
+            # Get agent config
+            agent_config = self.agent_manager.get_agent_config(agent_id)
+            
+            # Update multi-agent setting
+            agent_config["additional_config"]["multi_agent"] = bool(state)
+            
+            # Update agent config
+            self.agent_manager.agent_configs[agent_id] = agent_config
+            
+            # If agent is active, recreate it
+            if agent_id in self.agent_manager.active_agents:
+                self.agent_manager.create_agent(
+                    agent_id=agent_id,
+                    agent_type="web_browsing",
+                    model_config=agent_config["model_config"],
+                    tools=agent_config["tools"],
+                    additional_config=agent_config["additional_config"]
+                )
+            
+            # Update display name in selector
+            current_index = self.web_agent_selector.currentIndex()
+            display_name = f"{agent_id}{' (Multi-Agent)' if bool(state) else ''}"
+            self.web_agent_selector.setItemText(current_index, display_name)
+            
+            # Show status message
+            mode_name = "Multi-Agent" if bool(state) else "Single-Agent"
+            self.status_bar.showMessage(f"Web Browsing Agent switched to {mode_name} mode", 3000)
+        except Exception as e:
+            self.logger.error(f"Error updating web agent config: {str(e)}")
+
+    def save_web_content(self):
+        """Save web content to a file"""
+        if not self.web_content_display.toPlainText():
+            self.status_bar.showMessage("No web content to save", 3000)
+            return
+        
+        from PyQt6.QtWidgets import QFileDialog
+        
+        # Get file name
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Web Content",
+            "",
+            "Text Files (*.txt);;HTML Files (*.html);;All Files (*.*)"
+        )
+        
+        if not file_path:
+            return
+        
+        try:
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(self.web_content_display.toPlainText())
+            
+            self.status_bar.showMessage(f"Web content saved to {file_path}", 3000)
+        except Exception as e:
+            self.logger.error(f"Error saving web content: {str(e)}")
+            self.status_bar.showMessage(f"Error saving web content: {str(e)}", 3000)
+
     def create_web_browsing_tab(self):
         """Create the web browsing tab"""
         web_tab = QWidget()
@@ -655,12 +762,14 @@ class MainWindow(QMainWindow):
         # Filter to web browsing agents
         active_agents = self.agent_manager.get_active_agents()
         web_agents = [
-            agent["agent_id"] for agent in active_agents
+            agent for agent in active_agents
             if agent["agent_type"] == "web_browsing"
         ]
         
         if web_agents:
-            self.web_agent_selector.addItems(web_agents)
+            for agent in web_agents:
+                display_name = f"{agent['agent_id']}{' (Multi-Agent)' if agent.get('multi_agent', False) else ''}"
+                self.web_agent_selector.addItem(display_name, agent['agent_id'])
         else:
             self.web_agent_selector.addItem("No web browsing agents available")
         
@@ -676,12 +785,43 @@ class MainWindow(QMainWindow):
         create_button.clicked.connect(self.create_web_browsing_agent)
         agent_layout.addWidget(create_button)
         
+        # Multi-agent toggle (if supported)
+        self.multi_agent_toggle = QCheckBox("Use Multi-Agent Mode")
+        self.multi_agent_toggle.setEnabled(False)
+        self.multi_agent_toggle.stateChanged.connect(self.toggle_multi_agent_mode)
+        agent_layout.addWidget(self.multi_agent_toggle)
+        
         agent_layout.addStretch()
         layout.addLayout(agent_layout)
         
+        # Create splitter for content and conversation
+        splitter = QSplitter(Qt.Orientation.Vertical)
+        
+        # Top panel for web content display
+        web_content_panel = QWidget()
+        web_content_layout = QVBoxLayout(web_content_panel)
+        
+        # Create a read-only text area for showing web content
+        self.web_content_display = QTextEdit()
+        self.web_content_display.setReadOnly(True)
+        self.web_content_display.setPlaceholderText("Web content will be displayed here")
+        web_content_layout.addWidget(QLabel("Web Content:"))
+        web_content_layout.addWidget(self.web_content_display)
+        
+        # Add save button for content
+        save_button = QPushButton("Save Content")
+        save_button.clicked.connect(self.save_web_content)
+        web_content_layout.addWidget(save_button)
+        
+        # Add to splitter
+        splitter.addWidget(web_content_panel)
+        
         # Conversation widget
         self.web_conversation = ConversationWidget()
-        layout.addWidget(self.web_conversation)
+        splitter.addWidget(self.web_conversation)
+        
+        # Add splitter to layout
+        layout.addWidget(splitter, stretch=1)
         
         # Input area
         input_layout = QHBoxLayout()
@@ -697,8 +837,71 @@ class MainWindow(QMainWindow):
         input_layout.addWidget(self.web_send_button)
         layout.addLayout(input_layout)
         
+        # Connect signals
+        self.web_agent_selector.currentIndexChanged.connect(self.on_web_agent_selected)
+        
         self.tabs.addTab(web_tab, "Web Browsing")
-    
+        
+    def send_web_command(self):
+        """Send command to web browsing agent"""
+        if self.web_agent_selector.currentText() == "No web browsing agents available":
+            return
+        
+        # Get agent ID from combo box data
+        agent_id = self.web_agent_selector.itemData(self.web_agent_selector.currentIndex())
+        if not agent_id:
+            return
+        
+        # Get command
+        command = self.web_input.toPlainText().strip()
+        if not command:
+            return
+        
+        # Add to conversation
+        self.web_conversation.add_message(command, is_user=True)
+        
+        # Clear input
+        self.web_input.clear()
+        
+        # Disable input
+        self.web_input.setEnabled(False)
+        self.web_send_button.setEnabled(False)
+        
+        # Run agent in thread
+        self.run_agent_in_thread(
+            agent_id, 
+            command,
+            self.handle_web_result
+        )
+
+    def handle_web_result(self, result: str):
+        """Handle web browsing agent result
+        
+        Args:
+            result: Agent result
+        """
+        # Add to conversation
+        self.web_conversation.add_message(result, is_user=False)
+        
+        # Extract webpage content if available
+        import re
+        
+        # Look for extracted content markers
+        content_match = re.search(r"EXTRACTED CONTENT:(.*?)(?=\n\n|$)", result, re.DOTALL)
+        if content_match:
+            content = content_match.group(1).strip()
+            self.web_content_display.setText(content)
+        else:
+            # Look for webpage visit content
+            visit_match = re.search(r"Webpage content:(.*?)(?=\n\n|$)", result, re.DOTALL)
+            if visit_match:
+                content = visit_match.group(1).strip()
+                self.web_content_display.setText(content)
+        
+        # Enable input
+        self.web_input.setEnabled(True)
+        self.web_send_button.setEnabled(True)
+
     def create_visual_web_tab(self):
         """Create the visual web automation tab"""
         from app.ui.components.visual_web_tab import VisualWebTab
@@ -711,7 +914,7 @@ class MainWindow(QMainWindow):
         
         # Add tab
         self.tabs.addTab(self.visual_web_tab, "Visual Web")
-    
+
     def create_code_gen_tab(self):
         """Create the code generation tab"""
         from app.ui.components.code_gen_tab import CodeGenTab
@@ -724,7 +927,7 @@ class MainWindow(QMainWindow):
         
         # Add tab
         self.tabs.addTab(self.code_gen_tab, "Code Generation")
-    
+
     def load_web_agents(self):
         """Load web browsing agents"""
         # Clear existing items
@@ -733,17 +936,23 @@ class MainWindow(QMainWindow):
         # Filter to web browsing agents
         active_agents = self.agent_manager.get_active_agents()
         web_agents = [
-            agent["agent_id"] for agent in active_agents
+            agent for agent in active_agents
             if agent["agent_type"] == "web_browsing"
         ]
         
         if web_agents:
-            self.web_agent_selector.addItems(web_agents)
+            for agent in web_agents:
+                display_name = f"{agent['agent_id']}{' (Multi-Agent)' if agent.get('multi_agent', False) else ''}"
+                self.web_agent_selector.addItem(display_name, agent['agent_id'])
             self.web_send_button.setEnabled(True)
+            
+            # Select first agent
+            self.on_web_agent_selected(0)
         else:
             self.web_agent_selector.addItem("No web browsing agents available")
             self.web_send_button.setEnabled(False)
-    
+            self.multi_agent_toggle.setEnabled(False)
+        
     def create_web_browsing_agent(self):
         """Create a new web browsing agent"""
         from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
@@ -772,16 +981,18 @@ class MainWindow(QMainWindow):
             
             if agent_id:
                 # Show success message
-                self.status_bar.showMessage(f"Web browsing agent '{agent_id}' created", 3000)
+                multi_agent_msg = " (Multi-Agent)" if agent_config["additional_config"].get("multi_agent", False) else ""
+                self.status_bar.showMessage(f"Web browsing agent '{agent_id}'{multi_agent_msg} created", 3000)
                 
                 # Reload agents
                 self.load_web_agents()
                 
                 # Set as current agent
-                index = self.web_agent_selector.findText(agent_id)
-                if index >= 0:
-                    self.web_agent_selector.setCurrentIndex(index)
-    
+                for i in range(self.web_agent_selector.count()):
+                    if self.web_agent_selector.itemData(i) == agent_id:
+                        self.web_agent_selector.setCurrentIndex(i)
+                        break
+
     def create_visual_web_agent(self):
         """Create a new visual web agent"""
         from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
@@ -817,7 +1028,7 @@ class MainWindow(QMainWindow):
                 
                 # Switch to visual web tab
                 self.tabs.setCurrentWidget(self.visual_web_tab)
-    
+
     def create_code_generation_agent(self):
         """Create a new code generation agent"""
         from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
@@ -853,48 +1064,11 @@ class MainWindow(QMainWindow):
                 
                 # Switch to code generation tab
                 self.tabs.setCurrentWidget(self.code_gen_tab)
+
     
-    def send_web_command(self):
-        """Send command to web browsing agent"""
-        agent_id = self.web_agent_selector.currentText()
-        if agent_id == "No web browsing agents available":
-            return
-        
-        # Get command
-        command = self.web_input.toPlainText().strip()
-        if not command:
-            return
-        
-        # Add to conversation
-        self.web_conversation.add_message(command, is_user=True)
-        
-        # Clear input
-        self.web_input.clear()
-        
-        # Disable input
-        self.web_input.setEnabled(False)
-        self.web_send_button.setEnabled(False)
-        
-        # Run agent in thread
-        self.run_agent_in_thread(
-            agent_id, 
-            command,
-            self.handle_web_result
-        )
+
     
-    def handle_web_result(self, result: str):
-        """Handle web browsing agent result
-        
-        Args:
-            result: Agent result
-        """
-        # Add to conversation
-        self.web_conversation.add_message(result, is_user=False)
-        
-        # Enable input
-        self.web_input.setEnabled(True)
-        self.web_send_button.setEnabled(True)
-    
+
     def run_agent_in_thread(self, agent_id: str, input_text: str, callback: Callable[[str], None]):
         """Run an agent in a thread
         
