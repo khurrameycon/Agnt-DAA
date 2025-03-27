@@ -1,0 +1,40 @@
+{
+    "api_keys": {
+        "huggingface": "hf_Ezte"
+    },
+    "models": {
+        "default_model": "meta-llama/Llama-3-8B-Instruct",
+        "cache_dir": "~/.cache/sagax1/models"
+    },
+    "ui": {
+        "theme": "light",
+        "font_size": 12
+    },
+    "agents": {
+        "default_agent": "text_completion",
+        "max_history": 100
+    },
+    "execution": {
+        "python_executor": "local",
+        "max_execution_time": 30,
+        "authorized_imports": [
+            "numpy",
+            "pandas",
+            "matplotlib",
+            "PIL",
+            "requests",
+            "bs4",
+            "datetime",
+            "math",
+            "re",
+            "os",
+            "csv",
+            "json"
+        ]
+    },
+    "web": {
+        "browser_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "browser_width": 1280,
+        "browser_height": 800
+    }
+}
