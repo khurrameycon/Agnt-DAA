@@ -134,6 +134,7 @@ class MainWindow(QMainWindow):
         self.create_web_browsing_tab()
         self.create_visual_web_tab()
         self.create_code_gen_tab()
+        self.create_media_gen_tab()
         self.create_settings_tab()
         
         # Create status bar
@@ -1064,8 +1065,67 @@ class MainWindow(QMainWindow):
                 
                 # Switch to code generation tab
                 self.tabs.setCurrentWidget(self.code_gen_tab)
-
     
+
+
+    def create_media_gen_tab(self):
+        """Create the media generation tab"""
+        try:
+            # Import needs to be here to avoid circular imports
+            from app.ui.components.media_gen_tab import MediaGenTab
+            
+            # Create tab as a direct child of the main window, not the tab widget
+            self.media_gen_tab = MediaGenTab(self.agent_manager, self)
+            
+            # Load agents
+            self.media_gen_tab.load_agents()
+            
+            # Add tab to the tab widget
+            self.tabs.addTab(self.media_gen_tab, "Media Generation")
+            
+            self.logger.info("Media generation tab created successfully")
+        except Exception as e:
+            self.logger.error(f"Error creating media generation tab: {str(e)}")
+            import traceback
+            self.logger.error(traceback.format_exc())
+
+    def create_media_generation_agent(self):
+        """Create a new media generation agent"""
+        from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
+        
+        # Create dialog
+        dialog = CreateAgentDialog(self.agent_manager, self)
+        
+        # Set agent type to media_generation
+        index = dialog.agent_type_combo.findText("media_generation")
+        if index >= 0:
+            dialog.agent_type_combo.setCurrentIndex(index)
+        
+        # Show dialog
+        if dialog.exec():
+            # Get agent configuration
+            agent_config = dialog.get_agent_config()
+            
+            # Create agent
+            agent_id = self.agent_manager.create_agent(
+                agent_id=agent_config["agent_id"],
+                agent_type=agent_config["agent_type"],
+                model_config=agent_config["model_config"],
+                tools=agent_config["tools"],
+                additional_config=agent_config["additional_config"]
+            )
+            
+            if agent_id:
+                # Show success message
+                self.status_bar.showMessage(f"Media generation agent '{agent_id}' created", 3000)
+                
+                # Reload agents
+                self.media_gen_tab.load_agents()
+                
+                # Switch to media generation tab
+                self.tabs.setCurrentWidget(self.media_gen_tab)
+
+        
 
     
 
@@ -1082,3 +1142,4 @@ class MainWindow(QMainWindow):
         self.agent_thread.result_ready.connect(callback)
         self.agent_thread.progress_update.connect(lambda text: self.status_bar.showMessage(f"Processing: {text}"))
         self.agent_thread.start()
+

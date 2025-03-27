@@ -246,6 +246,29 @@ class CreateAgentDialog(QDialog):
         
         # Add to tabs
         self.tabs.addTab(agent_specific_tab, "Agent Options")
+
+
+        # For app/ui/dialogs/create_agent_dialog.py
+        # Add the media generation options to the create_agent_specific_tab method after the code_gen_options section:
+
+        # Media Generation Agent Options
+        self.media_gen_options = QGroupBox("Media Generation Agent Options")
+        media_gen_layout = QFormLayout(self.media_gen_options)
+
+        # Image Space
+        self.image_space_edit = QLineEdit()
+        self.image_space_edit.setText("stabilityai/stable-diffusion-xl-base-1.0")
+        media_gen_layout.addRow("Image Space ID:", self.image_space_edit)
+
+        # Video Space
+        self.video_space_edit = QLineEdit()
+        self.video_space_edit.setText("damo-vilab/text-to-video-ms")
+        media_gen_layout.addRow("Video Space ID:", self.video_space_edit)
+
+        self.agent_specific_layout.addWidget(self.media_gen_options)
+        self.media_gen_options.setVisible(False)
+
+        
     
     def load_available_models(self):
         """Load available models"""
@@ -322,8 +345,14 @@ class CreateAgentDialog(QDialog):
             self.authorized_imports_edit.setEnabled(True)
         elif agent_type == "local_model":
             self.authorized_imports_edit.setEnabled(True)
+
+        elif agent_type == "media_generation":
+            self.media_gen_options.setVisible(True)
+            self.authorized_imports_edit.setEnabled(True)
+
         else:
             self.authorized_imports_edit.setEnabled(False)
+        
     
     def get_agent_config(self) -> Dict[str, Any]:
         """Get the agent configuration from the dialog
@@ -386,5 +415,9 @@ class CreateAgentDialog(QDialog):
             config["additional_config"]["browser_height"] = self.browser_height_spin.value()
         elif agent_type == "code_generation":
             config["additional_config"]["sandbox"] = self.sandbox_check.isChecked()
+        
+        elif agent_type == "media_generation":
+            config["additional_config"]["image_space_id"] = self.image_space_edit.text().strip()
+            config["additional_config"]["video_space_id"] = self.video_space_edit.text().strip()
         
         return config

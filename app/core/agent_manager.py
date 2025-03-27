@@ -13,6 +13,7 @@ from app.agents.local_model_agent import LocalModelAgent
 from app.agents.web_browsing_agent import WebBrowsingAgent
 from app.agents.visual_web_agent import VisualWebAgent
 from app.agents.code_gen_agent import CodeGenerationAgent
+from app.agents.media_generation_agent import MediaGenerationAgent
 from app.agents.agent_registry import AgentRegistry
 from smolagents import Tool, DuckDuckGoSearchTool
 
@@ -62,7 +63,9 @@ class AgentManager:
         AgentRegistry.register("web_browsing", WebBrowsingAgent)
         AgentRegistry.register("visual_web", VisualWebAgent)
         AgentRegistry.register("code_generation", CodeGenerationAgent)
-    
+        AgentRegistry.register("media_generation", MediaGenerationAgent)
+
+
     def _create_default_agent(self) -> None:
         """Create default agent if specified in config"""
         default_agent = self.config_manager.get("agents.default_agent")

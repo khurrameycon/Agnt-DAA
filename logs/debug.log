@@ -238,3 +238,104 @@ Access to model mistralai/Mistral-7B-Instruct-v0.2 is restricted and you are not
 2025-03-27 16:15:52,629 - app.core.agent_manager - INFO - Running agent asad with input: browse information about Trump and Pakistan...
 2025-03-27 16:15:52,630 - agent.asad - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
 2025-03-27 16:15:55,666 - smolagents.models - INFO - Using device: auto
+2025-03-27 17:02:18,894 - accelerate.big_modeling - WARNING - Some parameters are on the meta device because they were offloaded to the cpu and disk.
+2025-03-27 17:02:24,601 - agent.asad - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 17:02:24,652 - agent.asad - ERROR - Error initializing web browsing agent: MultiStepAgent.__init__() got an unexpected keyword argument 'system_prompt'
+2025-03-27 17:02:24,654 - app.core.agent_manager - ERROR - Error running agent asad: MultiStepAgent.__init__() got an unexpected keyword argument 'system_prompt'
+2025-03-27 17:11:20,627 - sagax1 - INFO - Logging initialized
+2025-03-27 17:11:20,685 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 17:11:20,685 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 17:11:20,685 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 17:11:20,685 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 17:11:20,829 - sagax1 - INFO - Application started
+2025-03-27 17:11:32,642 - app.core.agent_manager - INFO - Created web browsing agent with ID asda
+2025-03-27 17:11:34,171 - app.core.agent_manager - WARNING - Agent with ID asda already exists. It will be replaced.
+2025-03-27 17:11:34,171 - app.core.agent_manager - INFO - Created web browsing agent with ID asda (multi-agent)
+2025-03-27 17:11:51,162 - app.core.agent_manager - INFO - Running agent asda with input: browse information about Trump and Pakistan...
+2025-03-27 17:11:51,162 - agent.asda - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 17:11:55,681 - smolagents.models - INFO - Using device: auto
+2025-03-27 17:12:00,064 - agent.asda - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 17:12:00,105 - agent.asda - INFO - Web browsing agent asda initialized successfully
+2025-03-27 17:14:55,689 - sagax1 - INFO - Logging initialized
+2025-03-27 17:14:55,714 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 17:14:55,715 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 17:14:55,715 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 17:14:55,715 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 17:14:55,806 - sagax1 - INFO - Application started
+2025-03-27 17:15:09,156 - app.core.agent_manager - INFO - Created agent with ID as of type local_model
+2025-03-27 17:15:19,812 - app.core.agent_manager - INFO - Running agent as with input: hey what is Pakistan...
+2025-03-27 17:15:20,187 - agent.as - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct is available
+2025-03-27 17:15:20,188 - agent.as - INFO - Initializing model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 17:15:23,855 - smolagents.models - INFO - Using device: auto
+2025-03-27 17:15:28,147 - agent.as - INFO - Agent as initialized successfully
+2025-03-27 17:15:28,165 - agent.as - ERROR - Error running agent: Error in generating model output:
+The following `model_kwargs` are not used by the model: ['max_tokens'] (note: typos in the generate arguments will also show up in this list)
+2025-03-27 17:16:51,768 - app.core.agent_manager - WARNING - Agent with ID as already exists. It will be replaced.
+2025-03-27 17:16:51,989 - app.core.agent_manager - INFO - Created web browsing agent with ID as
+2025-03-27 17:17:02,156 - app.core.agent_manager - INFO - Running agent as with input: Pakistan currency devaluation...
+2025-03-27 17:17:02,156 - agent.as - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 17:17:02,157 - smolagents.models - INFO - Using device: auto
+2025-03-27 17:17:05,927 - accelerate.big_modeling - WARNING - Some parameters are on the meta device because they were offloaded to the cpu and disk.
+2025-03-27 17:17:06,288 - agent.as - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 17:17:06,312 - agent.as - INFO - Web browsing agent as initialized successfully
+2025-03-27 17:36:06,951 - sagax1 - INFO - Logging initialized
+2025-03-27 17:36:06,974 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 17:36:06,974 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 17:36:06,974 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 17:36:06,974 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 17:36:07,070 - sagax1 - INFO - Application started
+2025-03-27 17:36:33,890 - app.core.agent_manager - INFO - Created web browsing agent with ID sdf
+2025-03-27 17:36:49,098 - app.core.agent_manager - INFO - Running agent sdf with input: What is pakistan national food ?...
+2025-03-27 17:36:49,099 - agent.sdf - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 17:36:53,282 - smolagents.models - INFO - Using device: cpu
+2025-03-27 17:36:56,329 - agent.sdf - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 17:36:56,340 - agent.sdf - INFO - Web browsing agent sdf initialized successfully
+2025-03-27 17:41:25,185 - sagax1 - INFO - Logging initialized
+2025-03-27 17:41:25,209 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 17:41:25,209 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 17:41:25,209 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 17:41:25,210 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 17:41:25,300 - sagax1 - INFO - Application started
+2025-03-27 17:41:34,481 - app.core.agent_manager - INFO - Created web browsing agent with ID as
+2025-03-27 17:41:47,025 - app.core.agent_manager - INFO - Running agent as with input: whatis paksitan national food?...
+2025-03-27 17:41:47,025 - agent.as - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 17:41:50,784 - smolagents.models - INFO - Using device: auto
+2025-03-27 17:41:54,203 - agent.as - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 17:41:54,216 - agent.as - INFO - Web browsing agent as initialized successfully
+2025-03-27 17:48:56,520 - sagax1 - INFO - Logging initialized
+2025-03-27 17:48:56,545 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 17:48:56,545 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 17:48:56,545 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 17:48:56,545 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 17:48:56,643 - sagax1 - INFO - Application started
+2025-03-27 17:49:07,885 - app.core.agent_manager - INFO - Created web browsing agent with ID Myagent
+2025-03-27 17:49:17,321 - app.core.agent_manager - INFO - Running agent Myagent with input: what is capital of pakistan ?...
+2025-03-27 17:49:17,321 - agent.Myagent - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 17:49:20,898 - smolagents.models - INFO - Using device: auto
+2025-03-27 17:49:24,160 - agent.Myagent - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 17:49:24,172 - agent.Myagent - INFO - Web browsing agent Myagent initialized successfully
+2025-03-27 17:51:25,472 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-03-27 18:06:35,622 - sagax1 - INFO - Logging initialized
+2025-03-27 18:06:35,647 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 18:06:35,648 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 18:06:35,648 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 18:06:35,648 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 18:06:35,648 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-03-27 18:06:35,752 - sagax1 - INFO - Application started
+2025-03-27 18:13:02,293 - sagax1 - INFO - Logging initialized
+2025-03-27 18:13:02,317 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 18:13:02,318 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 18:13:02,318 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 18:13:02,319 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 18:13:02,319 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-03-27 18:13:02,367 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-03-27 18:13:02,411 - sagax1 - INFO - Application started
+2025-03-27 18:13:29,496 - app.core.agent_manager - INFO - Created web browsing agent with ID my-researcher
+2025-03-27 18:13:53,235 - app.core.agent_manager - INFO - Created agent with ID local-LLM of type local_model
+2025-03-27 18:14:20,115 - app.core.agent_manager - INFO - Created agent with ID somemedia of type media_generation
+2025-03-27 18:16:50,789 - app.core.agent_manager - INFO - Running agent somemedia with input: Generate an image: image of a lady reading a book...
+2025-03-27 18:16:50,790 - agent.somemedia - INFO - Initializing media generation agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 18:16:54,825 - smolagents.models - INFO - Using device: auto
+2025-03-27 18:16:59,997 - agent.somemedia - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 18:16:59,998 - agent.somemedia - ERROR - Error initializing media generation agent: Nullable argument 'negative_prompt' in function signature should have key 'nullable' set to True in inputs.
+2025-03-27 18:16:59,998 - app.core.agent_manager - ERROR - Error running agent somemedia: Nullable argument 'negative_prompt' in function signature should have key 'nullable' set to True in inputs.

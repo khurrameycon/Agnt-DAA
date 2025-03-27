@@ -43,3 +43,9 @@ Traceback (most recent call last):
     self.multi_agent_toggle = QCheckBox("Use Multi-Agent Mode")
                               ^^^^^^^^^
 NameError: name 'QCheckBox' is not defined
+2025-03-27 17:02:24,652 - agent.asad - ERROR - Error initializing web browsing agent: MultiStepAgent.__init__() got an unexpected keyword argument 'system_prompt'
+2025-03-27 17:02:24,654 - app.core.agent_manager - ERROR - Error running agent asad: MultiStepAgent.__init__() got an unexpected keyword argument 'system_prompt'
+2025-03-27 17:15:28,165 - agent.as - ERROR - Error running agent: Error in generating model output:
+The following `model_kwargs` are not used by the model: ['max_tokens'] (note: typos in the generate arguments will also show up in this list)
+2025-03-27 18:16:59,998 - agent.somemedia - ERROR - Error initializing media generation agent: Nullable argument 'negative_prompt' in function signature should have key 'nullable' set to True in inputs.
+2025-03-27 18:16:59,998 - app.core.agent_manager - ERROR - Error running agent somemedia: Nullable argument 'negative_prompt' in function signature should have key 'nullable' set to True in inputs.

@@ -1,7 +1,7 @@
 """
 Web Browsing Agent for SagaX1
 Agent for browsing the web, searching for information, and visiting webpages
-Supports multi-agent collaboration for complex web tasks
+Based on the multi-agent architecture from the notebook
 """
 
 import os
@@ -14,7 +14,8 @@ from smolagents import (
     Tool, 
     DuckDuckGoSearchTool, 
     VisitWebpageTool, 
-    CodeAgent
+    CodeAgent,
+    ToolCallingAgent
 )
 
 class ExtractWebContentTool(Tool):
@@ -149,12 +150,16 @@ class WebBrowsingAgent(BaseAgent):
         self.max_tokens = config.get("max_tokens", 2048)
         self.temperature = config.get("temperature", 0.1)
         self.authorized_imports = config.get("authorized_imports", [])
+        # Add required imports for web tools
+        for import_name in ["requests", "bs4", "json", "re", "os"]:
+            if import_name not in self.authorized_imports:
+                self.authorized_imports.append(import_name)
+                
         self.use_multi_agent = config.get("multi_agent", False)
         
         self.main_agent = None
-        self.planner_agent = None
-        self.browser_agent = None
-        self.summary_agent = None
+        self.web_agent = None
+        self.manager_agent = None
         self.is_initialized = False
     
     def initialize(self) -> None:
@@ -173,24 +178,14 @@ class WebBrowsingAgent(BaseAgent):
             # Initialize tools
             tools = self._initialize_tools()
 
-            # If multi-agent mode is enabled, initialize multiple agents
+            # If multi-agent mode is enabled, initialize multi-agent system
             if self.use_multi_agent:
-                self._initialize_multi_agents(model, tools)
+                self._initialize_multi_agent(model, tools)
             else:
-                # Use a single agent
+                # Create a single agent
                 self.main_agent = CodeAgent(
                     tools=tools,
                     model=model,
-                    system_prompt="""You are a web browsing agent that can search the web and visit webpages to find information.
-You have access to these tools:
-- web_search: Search the web for information
-- visit_webpage: Visit a specific webpage and read its content
-- extract_content: Extract specific content from a webpage using CSS selectors
-- save_content: Save important content to files for future reference
-
-ALWAYS REMEMBER: When visiting a webpage, use the full URL including http:// or https://
-For any search or browsing task, first search for relevant information, then visit specific pages if needed.
-When extracting content, use specific CSS selectors like 'h1', 'div.content', 'p.summary', etc.""",
                     additional_authorized_imports=self.authorized_imports,
                     verbosity_level=1
                 )
@@ -262,62 +257,28 @@ When extracting content, use specific CSS selectors like 'h1', 'div.content', 'p
             SaveWebContentTool()
         ]
     
-    def _initialize_multi_agents(self, model, tools: List[Tool]) -> None:
-        """Initialize multiple specialized agents
+    def _initialize_multi_agent(self, model, tools: List[Tool]) -> None:
+        """Initialize the multi-agent setup following the notebook approach
         
         Args:
             model: Language model to use
             tools: List of tools to use
         """
-        # Create a planner agent with specific system prompt for planning tasks
-        self.planner_agent = CodeAgent(
-            tools=[],  # No tools for the planner
-            model=model,
-            system_prompt="""You are a planning agent that breaks down complex web browsing tasks into simple steps.
-Your job is to create a plan to accomplish a task by:
-1. Understanding what information is needed 
-2. Deciding which websites need to be visited
-3. Determining what information needs to be extracted
-4. Planning how to process and combine the information
-
-Output your plan as a numbered list of specific steps for a web browsing agent to follow.
-Be specific about URLs to visit and what to look for on each page.""",
-            additional_authorized_imports=self.authorized_imports,
-            verbosity_level=1
-        )
-
-        # Create the browser agent for executing the plan
-        self.browser_agent = CodeAgent(
+        # Create a web agent that handles search and browsing (using ToolCallingAgent)
+        self.web_agent = ToolCallingAgent(
             tools=tools,
             model=model,
-            system_prompt="""You are a web browsing agent that can search the web and visit webpages to find information.
-You can use tools to:
-- Search the web for information
-- Visit specific webpages and read their content
-- Extract specific content from webpages using CSS selectors
-- Save important content to files for future reference
-
-ALWAYS REMEMBER: When visiting a webpage, use the full URL including http:// or https://
-When extracting content, use specific CSS selectors like 'h1', 'div.content', 'p.summary', etc.
-Follow the plan provided to you step by step and report what you find at each step.""",
-            additional_authorized_imports=self.authorized_imports,
-            verbosity_level=1
+            max_steps=10,  # Allow for more steps as web search may require several iterations
+            name="web_search_agent",
+            description="Runs web searches and visits webpages for you."
         )
-
-        # Create a summary agent for synthesizing the gathered content
-        self.summary_agent = CodeAgent(
-            tools=[],  # No tools for the summary agent
+        
+        # Create a manager agent that handles the overall task (using CodeAgent)
+        self.manager_agent = CodeAgent(
+            tools=[],  # No direct tools, will use the web_agent
             model=model,
-            system_prompt="""You are a summary agent that synthesizes information gathered from the web.
-Your job is to:
-1. Review all the information collected by the browser agent
-2. Organize the information in a clear, logical structure
-3. Create a concise but comprehensive summary
-4. Identify any additional information that might be needed
-
-Present your summary in a well-formatted way with appropriate headings and sections.""",
-            additional_authorized_imports=self.authorized_imports,
-            verbosity_level=1
+            managed_agents=[self.web_agent],  # This is how we connect the agents
+            additional_authorized_imports=self.authorized_imports
         )
     
     def run(self, input_text: str, callback: Optional[Callable[[str], None]] = None) -> str:
@@ -334,26 +295,46 @@ Present your summary in a well-formatted way with appropriate headings and secti
             self.initialize()
         
         try:
-            if self.use_multi_agent:
-                # Use multiple agents in sequence
-                result = self._run_multi_agent(input_text, callback)
-            else:
-                # Run the single agent
-                enhanced_prompt = f"""
-You are a web browsing agent that can search the web and visit webpages to find information.
-You have access to these tools:
-- web_search: Search the web for information
-- visit_webpage: Visit a specific webpage and read its content
-- extract_content: Extract specific content from a webpage using CSS selectors
-- save_content: Save important content to files for future reference
+            if self.use_multi_agent and self.manager_agent:
+                # Format the prompt for the multi-agent setup
+                prompt = f"""
+I need information about the following topic. Please search the web and gather relevant details:
 
-ALWAYS REMEMBER: When visiting a webpage, use the full URL including http:// or https://
-For any search or browsing task, first search for relevant information, then visit specific pages if needed.
-When extracting content, use specific CSS selectors like 'h1', 'div.content', 'p.summary', etc.
+{input_text}
 
-USER QUERY: {input_text}
+Please provide a comprehensive answer with facts and information from reliable sources.
 """
-                result = self.main_agent.run(enhanced_prompt)
+                # Run the manager agent which will delegate to the web agent as needed
+                result = self.manager_agent.run(prompt)
+            else:
+                # Format prompt for single agent
+                prompt = f"""
+I need to find information about: {input_text}
+
+DO NOT try to import any packages directly like 'duckduckgo_search'. Instead, use the tools that are already provided:
+
+1. Use web_search(query="your search query") to search the web 
+2. Use visit_webpage(url="full URL") to visit specific webpages
+3. Use extract_content(url="full URL", css_selector="selector") to extract specific content
+
+Here's an example of how to use these tools correctly:
+
+```python
+# Search the web for information
+results = web_search(query="Capital of Pakistan")
+print("Search results:", results)
+
+# Visit the most relevant page from the results
+if results:
+    first_result = results[0]
+    webpage_content = visit_webpage(url=first_result["href"])
+    print("Found information:", webpage_content[:500])  # Print first 500 chars
+```
+
+Please provide a comprehensive answer based on the information you find.
+"""
+                # Run the single agent
+                result = self.main_agent.run(prompt)
             
             # Add to history
             self.add_to_history(input_text, str(result))
@@ -365,87 +346,13 @@ USER QUERY: {input_text}
             self.logger.error(error_msg)
             return f"Sorry, I encountered an error while browsing the web: {error_msg}"
     
-    def _run_multi_agent(self, input_text: str, callback: Optional[Callable[[str], None]] = None) -> str:
-        """Run the multi-agent workflow
-        
-        Args:
-            input_text: Input text
-            callback: Optional callback
-            
-        Returns:
-            Combined result from all agents
-        """
-        # 1. First, have the planner create a plan
-        planner_prompt = f"""I need help with the following web browsing task:
-
-{input_text}
-
-Please create a detailed plan with specific steps to accomplish this task. 
-Break it down into clear, actionable steps that a web browsing agent can follow.
-"""
-        planner_result = self.planner_agent.run(planner_prompt)
-        
-        # 2. Next, have the browser agent execute the plan
-        browser_prompt = f"""Here's a task I need help with:
-
-{input_text}
-
-A planning agent has created the following plan to accomplish this task:
-
-{planner_result}
-
-Please execute this plan step by step using your web browsing tools. 
-For each step, report what you find before moving to the next step.
-"""
-        browser_result = self.browser_agent.run(browser_prompt)
-        
-        # 3. Finally, have the summary agent create a summary
-        summary_prompt = f"""Here's a web browsing task:
-
-{input_text}
-
-The planning agent created this plan:
-
-{planner_result}
-
-The browser agent executed the plan and found the following information:
-
-{browser_result}
-
-Please create a well-organized summary of all the information found.
-Focus on providing a comprehensive answer to the original query.
-Use headings and sections to organize the information clearly.
-"""
-        summary_result = self.summary_agent.run(summary_prompt)
-        
-        # 4. Combine the results
-        combined_result = f"""## Multi-Agent Web Browsing Results
-
-### Original Task
-{input_text}
-
-### Planning Phase
-{planner_result}
-
-### Information Gathering Phase
-{browser_result}
-
-### Summary
-{summary_result}
-"""
-        
-        return combined_result
-    
     def reset(self) -> None:
         """Reset the agent's state"""
         if self.use_multi_agent:
-            # Reset each agent
-            if self.planner_agent:
-                self.planner_agent.memory.reset()
-            if self.browser_agent:
-                self.browser_agent.memory.reset()
-            if self.summary_agent:
-                self.summary_agent.memory.reset()
+            if self.web_agent:
+                self.web_agent.memory.reset()
+            if self.manager_agent:
+                self.manager_agent.memory.reset()
         elif self.main_agent:
             self.main_agent.memory.reset()
         
