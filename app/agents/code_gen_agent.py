@@ -12,9 +12,10 @@ import traceback
 from typing import Dict, Any, List, Optional, Callable
 
 from app.agents.base_agent import BaseAgent
-from smolagents import CodeAgent, tool
+from smolagents import CodeAgent
 
-class PythonExecutionTool(tool):
+# Define PythonExecutionTool as a regular class
+class PythonExecutionTool:
     """Tool for executing Python code"""
     
     def __init__(self, sandbox=True):
@@ -25,6 +26,10 @@ class PythonExecutionTool(tool):
         """
         self.sandbox = sandbox
         self.logger = logging.getLogger(__name__)
+        
+        # Define the tool's name, description, etc.
+        self.name = "python_execution"
+        self.description = "Execute Python code and return the result"
     
     def __call__(self, code: str) -> str:
         """Execute Python code and return the result

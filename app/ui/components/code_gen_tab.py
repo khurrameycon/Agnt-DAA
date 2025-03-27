@@ -273,8 +273,20 @@ class CodeGenTab(QWidget):
     
     def create_new_agent(self):
         """Create a new code generation agent"""
-        # Signal to main window to open the create agent dialog with code_generation type
-        self.parent().create_code_generation_agent()
+        # Get the main window
+        main_window = self.window()
+        
+        # Check if main_window has the method
+        if hasattr(main_window, 'create_code_generation_agent'):
+            main_window.create_code_generation_agent()
+        else:
+            # Fallback if we can't find the method
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.warning(
+                self,
+                "Not Implemented",
+                "Create code generation agent functionality not found in main window."
+            )
     
     def show_options(self):
         """Show options dialog"""

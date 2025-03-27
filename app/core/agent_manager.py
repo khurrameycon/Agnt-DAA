@@ -152,30 +152,40 @@ class AgentManager:
         try:
             # For local model agent, inject tool instances
             if agent_type == "local_model":
-                # Add tools dictionary to config
-                if tools:
-                    tool_instances = []
-                    for tool_name in tools:
-                        if tool_name in self.available_tools:
-                            tool_instances.append(self.available_tools[tool_name])
-                
-                # Create the agent
+                # Create a local model agent
                 agent = AgentRegistry.create_agent(agent_id, agent_type, {
                     **model_config,
                     **additional_config
                 })
-                
-                if agent:
-                    self.active_agents[agent_id] = agent
-                    self.logger.info(f"Created agent with ID {agent_id} of type {agent_type}")
-                    return agent_id
-                else:
-                    self.logger.error(f"Failed to create agent with ID {agent_id}")
-                    return None
+            elif agent_type == "web_browsing":
+                # Create a web browsing agent
+                agent = AgentRegistry.create_agent(agent_id, agent_type, {
+                    **model_config,
+                    **additional_config
+                })
+            elif agent_type == "visual_web":
+                # Create a visual web agent
+                agent = AgentRegistry.create_agent(agent_id, agent_type, {
+                    **model_config,
+                    **additional_config
+                })
+            elif agent_type == "code_generation":
+                # Create a code generation agent
+                agent = AgentRegistry.create_agent(agent_id, agent_type, {
+                    **model_config,
+                    **additional_config
+                })
             else:
-                # For future agent types
-                self.logger.warning(f"Agent type {agent_type} not fully implemented yet")
+                self.logger.warning(f"Agent type {agent_type} not recognized")
+                return None
+
+            if agent:
+                self.active_agents[agent_id] = agent
+                self.logger.info(f"Created agent with ID {agent_id} of type {agent_type}")
                 return agent_id
+            else:
+                self.logger.error(f"Failed to create agent with ID {agent_id}")
+                return None
                 
         except Exception as e:
             self.logger.error(f"Error creating agent: {str(e)}")

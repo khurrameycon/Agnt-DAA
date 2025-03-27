@@ -1,6 +1,6 @@
 {
     "api_keys": {
-        "huggingface": "hf_Ezte"
+        "huggingface": "hf_Ee"
     },
     "models": {
         "default_model": "meta-llama/Llama-3-8B-Instruct",

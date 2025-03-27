@@ -38,3 +38,40 @@ Access to model mistralai/Mistral-7B-Instruct-v0.2 is restricted and you are not
 2025-03-27 06:50:09,069 - sagax1 - INFO - Logging initialized
 2025-03-27 06:50:09,093 - app.agents.agent_registry - INFO - Registered agent type: local_model
 2025-03-27 06:50:09,178 - sagax1 - INFO - Application started
+2025-03-27 08:07:00,089 - sagax1 - INFO - Logging initialized
+2025-03-27 08:07:00,112 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 08:07:00,112 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 08:07:00,112 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 08:07:00,112 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 08:07:00,201 - sagax1 - INFO - Application started
+2025-03-27 08:07:43,485 - app.core.agent_manager - WARNING - Agent type code_generation not fully implemented yet
+2025-03-27 08:08:14,126 - app.core.agent_manager - WARNING - Agent type web_browsing not fully implemented yet
+2025-03-27 08:08:38,643 - app.core.agent_manager - INFO - Created agent with ID asdf of type local_model
+2025-03-27 08:08:58,694 - app.core.agent_manager - INFO - Running agent asdf with input: asdf...
+2025-03-27 08:08:58,695 - agent.asdf - ERROR - Error checking model availability: Repo id must be a string, not <class 'NoneType'>: 'None'.
+2025-03-27 08:08:58,696 - app.core.agent_manager - ERROR - Error running agent asdf: Repo id must be a string, not <class 'NoneType'>: 'None'.
+2025-03-27 08:09:10,086 - app.core.agent_manager - WARNING - Agent with ID asdf already exists. It will be replaced.
+2025-03-27 08:09:10,087 - app.core.agent_manager - INFO - Created agent with ID asdf of type local_model
+2025-03-27 08:09:17,563 - app.core.agent_manager - INFO - Running agent asdf with input: adsf...
+2025-03-27 08:09:17,992 - agent.asdf - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct is available
+2025-03-27 08:09:17,993 - agent.asdf - INFO - Initializing model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-27 08:09:20,826 - smolagents.models - INFO - Using device: auto
+2025-03-27 08:12:26,870 - sagax1 - INFO - Logging initialized
+2025-03-27 08:12:26,891 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 08:12:26,891 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 08:12:26,892 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 08:12:26,892 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 08:12:26,978 - sagax1 - INFO - Application started
+2025-03-27 08:12:47,277 - sagax1 - INFO - Logging initialized
+2025-03-27 08:12:47,296 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 08:12:47,297 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 08:12:47,297 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 08:12:47,297 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 08:12:47,383 - sagax1 - INFO - Application started
+2025-03-27 08:18:02,963 - sagax1 - INFO - Logging initialized
+2025-03-27 08:18:02,985 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-27 08:18:02,986 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-27 08:18:02,986 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-27 08:18:02,987 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-27 08:18:03,075 - sagax1 - INFO - Application started
+2025-03-27 08:18:19,322 - app.core.agent_manager - INFO - Created agent with ID as of type code_generation
