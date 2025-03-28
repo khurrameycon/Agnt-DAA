@@ -1,51 +1,7 @@
-2025-03-27 06:36:41,366 - app.core.model_manager - ERROR - Error searching models: 'ModelInfo' object has no attribute 'name'
-2025-03-27 06:36:48,042 - app.core.model_manager - ERROR - Error searching models: 'ModelInfo' object has no attribute 'name'
-2025-03-27 06:36:48,393 - app.core.model_manager - ERROR - Error searching models: 'ModelInfo' object has no attribute 'name'
-2025-03-27 06:37:34,618 - app.ui.main_window - ERROR - Error getting agent config: Agent with ID  does not exist
-2025-03-27 06:40:35,628 - agent.123 - ERROR - Error checking model availability: 403 Client Error. (Request ID: Root=1-67e4ac93-0f230e2710c4d2ca69bf9d66;0152c679-ab94-48c1-9011-0f52be815a5c)
-
-Cannot access gated repo for url https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/config.json.
-Access to model mistralai/Mistral-7B-Instruct-v0.2 is restricted and you are not in the authorized list. Visit https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2 to ask for access.
-2025-03-27 06:40:35,630 - app.core.agent_manager - ERROR - Error running agent 123: 403 Client Error. (Request ID: Root=1-67e4ac93-0f230e2710c4d2ca69bf9d66;0152c679-ab94-48c1-9011-0f52be815a5c)
-
-Cannot access gated repo for url https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/config.json.
-Access to model mistralai/Mistral-7B-Instruct-v0.2 is restricted and you are not in the authorized list. Visit https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2 to ask for access.
-2025-03-27 08:08:58,695 - agent.asdf - ERROR - Error checking model availability: Repo id must be a string, not <class 'NoneType'>: 'None'.
-2025-03-27 08:08:58,696 - app.core.agent_manager - ERROR - Error running agent asdf: Repo id must be a string, not <class 'NoneType'>: 'None'.
-2025-03-27 15:22:38,510 - sagax1 - ERROR - Unhandled exception: 'MainWindow' object has no attribute 'load_web_agents'
-Traceback (most recent call last):
-  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\main.py", line 47, in main
-    window = MainWindow(agent_manager, config_manager)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\app\ui\main_window.py", line 134, in __init__
-    self.create_web_browsing_tab()
-  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\app\ui\main_window.py", line 780, in create_web_browsing_tab
-    refresh_button.clicked.connect(self.load_web_agents)
-                                   ^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'MainWindow' object has no attribute 'load_web_agents'. Did you mean: 'load_agents'?
-2025-03-27 15:40:55,386 - sagax1 - ERROR - Unhandled exception: 'MainWindow' object has no attribute 'create_web_browsing_tab'
-Traceback (most recent call last):
-  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\main.py", line 47, in main
-    window = MainWindow(agent_manager, config_manager)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\app\ui\main_window.py", line 134, in __init__
-    self.create_web_browsing_tab()
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'MainWindow' object has no attribute 'create_web_browsing_tab'
-2025-03-27 15:43:43,982 - sagax1 - ERROR - Unhandled exception: name 'QCheckBox' is not defined
-Traceback (most recent call last):
-  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\main.py", line 47, in main
-    window = MainWindow(agent_manager, config_manager)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\app\ui\main_window.py", line 134, in __init__
-    self.create_web_browsing_tab()
-  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\app\ui\main_window.py", line 789, in create_web_browsing_tab
-    self.multi_agent_toggle = QCheckBox("Use Multi-Agent Mode")
-                              ^^^^^^^^^
-NameError: name 'QCheckBox' is not defined
-2025-03-27 17:02:24,652 - agent.asad - ERROR - Error initializing web browsing agent: MultiStepAgent.__init__() got an unexpected keyword argument 'system_prompt'
-2025-03-27 17:02:24,654 - app.core.agent_manager - ERROR - Error running agent asad: MultiStepAgent.__init__() got an unexpected keyword argument 'system_prompt'
-2025-03-27 17:15:28,165 - agent.as - ERROR - Error running agent: Error in generating model output:
-The following `model_kwargs` are not used by the model: ['max_tokens'] (note: typos in the generate arguments will also show up in this list)
-2025-03-27 18:16:59,998 - agent.somemedia - ERROR - Error initializing media generation agent: Nullable argument 'negative_prompt' in function signature should have key 'nullable' set to True in inputs.
-2025-03-27 18:16:59,998 - app.core.agent_manager - ERROR - Error running agent somemedia: Nullable argument 'negative_prompt' in function signature should have key 'nullable' set to True in inputs.
+2025-03-28 05:23:55,523 - agent.asdf - ERROR - Error generating response: string indices must be integers, not 'str'
+2025-03-28 05:35:28,905 - agent.adchat - ERROR - Error initializing web browsing agent: DDGS.__init__() got an unexpected keyword argument 'name'
+2025-03-28 05:35:28,906 - app.core.agent_manager - ERROR - Error running agent adchat: DDGS.__init__() got an unexpected keyword argument 'name'
+2025-03-28 05:37:16,774 - agent.hhasdf - ERROR - Error generating response: string indices must be integers, not 'str'
+2025-03-28 05:38:35,160 - agent.myagnet - ERROR - Error generating response: string indices must be integers, not 'str'
+2025-03-28 05:41:12,482 - agent.myagnet - ERROR - Error generating response: string indices must be integers, not 'str'
+2025-03-28 05:47:53,984 - agent.sdf - ERROR - Error generating response: string indices must be integers, not 'str'

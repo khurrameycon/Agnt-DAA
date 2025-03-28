@@ -1,6 +1,6 @@
 """
 Media Generation Agent for SagaX1
-Agent for generating images and videos from text prompts using Hugging Face spaces
+Agent for generating images from text prompts using Hugging Face spaces
 """
 
 import os
@@ -14,193 +14,16 @@ import base64
 from app.agents.base_agent import BaseAgent
 from smolagents import Tool, CodeAgent
 
-class ImageGenerationTool(Tool):
-    """Tool for generating images from text prompts using Hugging Face spaces"""
-    
-    name = "image_generator"
-    description = "Generate an image from a text prompt"
-    inputs = {
-        "prompt": {
-            "type": "string", 
-            "description": "Text prompt describing the image to generate"
-        },
-        "negative_prompt": {
-            "type": "string", 
-            "description": "Text describing what you don't want in the image (optional)"
-        },
-        "style": {
-            "type": "string", 
-            "description": "Style for the image generation (optional)"
-        }
-    }
-    output_type = "image"
-    
-    def __init__(self, space_id: str = "stabilityai/stable-diffusion-xl-base-1.0"):
-        """Initialize the image generation tool
-        
-        Args:
-            space_id: ID of the Hugging Face space to use for image generation
-        """
-        super().__init__()
-        self.space_id = space_id
-        self.logger = logging.getLogger(__name__)
-        self._client = None
-    
-    @property
-    def client(self):
-        """Lazy-load the gradio client"""
-        if self._client is None:
-            try:
-                from gradio_client import Client
-                self._client = Client(self.space_id)
-                self.logger.info(f"Connected to Hugging Face space: {self.space_id}")
-            except Exception as e:
-                self.logger.error(f"Error connecting to Hugging Face space: {str(e)}")
-                raise
-        return self._client
-    
-    def forward(self, prompt: str, negative_prompt: str = "", style: str = "") -> Image.Image:
-        """Generate an image from a prompt
-        
-        Args:
-            prompt: Text prompt describing the image to generate
-            negative_prompt: Text describing what you don't want in the image
-            style: Style for the image generation
-            
-        Returns:
-            Generated image
-        """
-        try:
-            # Prepare inputs based on the space's requirements
-            # This may need to be adjusted for different spaces
-            inputs = [prompt]
-            if negative_prompt:
-                inputs.append(negative_prompt)
-            if style:
-                inputs.append(style)
-            
-            # Call the space API
-            result = self.client.predict(*inputs)
-            
-            # Process the result based on the space's output format
-            # This may return a path to an image file, an image object, or a base64 string
-            if isinstance(result, str):
-                if result.startswith("data:image"):
-                    # Handle base64 encoded image
-                    base64_data = result.split(",")[1]
-                    image_data = base64.b64decode(base64_data)
-                    return Image.open(io.BytesIO(image_data))
-                elif os.path.isfile(result):
-                    # Handle file path
-                    return Image.open(result)
-            elif isinstance(result, Image.Image):
-                # Already an image
-                return result
-            else:
-                # Try to convert to an image if possible
-                try:
-                    return Image.open(io.BytesIO(result))
-                except:
-                    self.logger.error(f"Unexpected result type from space: {type(result)}")
-                    # Create a dummy image with error message
-                    img = Image.new('RGB', (400, 100), color='red')
-                    return img
-            
-        except Exception as e:
-            self.logger.error(f"Error generating image: {str(e)}")
-            # Create a dummy image with error message
-            img = Image.new('RGB', (400, 100), color='red')
-            return img
-
-class VideoGenerationTool(Tool):
-    """Tool for generating videos from text prompts using Hugging Face spaces"""
-    
-    name = "video_generator"
-    description = "Generate a video from a text prompt"
-    inputs = {
-        "prompt": {
-            "type": "string", 
-            "description": "Text prompt describing the video to generate"
-        },
-        "duration": {
-            "type": "number", 
-            "description": "Duration of the video in seconds (optional)"
-        }
-    }
-    output_type = "string"  # We return a path to the video file
-    
-    def __init__(self, space_id: str = "damo-vilab/text-to-video-ms"):
-        """Initialize the video generation tool
-        
-        Args:
-            space_id: ID of the Hugging Face space to use for video generation
-        """
-        super().__init__()
-        self.space_id = space_id
-        self.logger = logging.getLogger(__name__)
-        self._client = None
-    
-    @property
-    def client(self):
-        """Lazy-load the gradio client"""
-        if self._client is None:
-            try:
-                from gradio_client import Client
-                self._client = Client(self.space_id)
-                self.logger.info(f"Connected to Hugging Face space: {self.space_id}")
-            except Exception as e:
-                self.logger.error(f"Error connecting to Hugging Face space: {str(e)}")
-                raise
-        return self._client
-    
-    def forward(self, prompt: str, duration: float = 3.0) -> str:
-        """Generate a video from a prompt
-        
-        Args:
-            prompt: Text prompt describing the video to generate
-            duration: Duration of the video in seconds
-            
-        Returns:
-            Path to the generated video file
-        """
-        try:
-            # Call the space API
-            result = self.client.predict(prompt, duration)
-            
-            # Process the result based on the space's output format
-            # This may return a path to a video file or a file object
-            if isinstance(result, str) and os.path.isfile(result):
-                return result
-            else:
-                # Create a temporary file to save the video
-                with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as temp_file:
-                    temp_path = temp_file.name
-                
-                # Try to save the result to the temporary file
-                try:
-                    if hasattr(result, 'read'):
-                        # If result is a file-like object
-                        with open(temp_path, 'wb') as f:
-                            f.write(result.read())
-                    elif isinstance(result, bytes):
-                        # If result is bytes
-                        with open(temp_path, 'wb') as f:
-                            f.write(result)
-                    else:
-                        self.logger.error(f"Unexpected result type from space: {type(result)}")
-                        return "Error: Unable to process video result"
-                    
-                    return temp_path
-                except Exception as e:
-                    self.logger.error(f"Error saving video: {str(e)}")
-                    return f"Error generating video: {str(e)}"
-            
-        except Exception as e:
-            self.logger.error(f"Error generating video: {str(e)}")
-            return f"Error generating video: {str(e)}"
+# Known working image generation spaces
+FALLBACK_SPACES = [
+    "black-forest-labs/FLUX.1-schnell",  # Fast version
+    "black-forest-labs/FLUX.1-dev",      # Higher quality version
+    "stabilityai/sdxl",                  # Another alternative
+    "runwayml/stable-diffusion-v1-5"     # Last resort fallback
+]
 
 class MediaGenerationAgent(BaseAgent):
-    """Agent for generating images and videos from text prompts"""
+    """Agent for generating images from text prompts"""
     
     def __init__(self, agent_id: str, config: Dict[str, Any]):
         """Initialize the media generation agent
@@ -213,7 +36,6 @@ class MediaGenerationAgent(BaseAgent):
                 max_tokens: Maximum number of tokens to generate
                 temperature: Temperature for generation
                 image_space_id: Hugging Face space ID for image generation
-                video_space_id: Hugging Face space ID for video generation
         """
         super().__init__(agent_id, config)
         
@@ -221,12 +43,15 @@ class MediaGenerationAgent(BaseAgent):
         self.device = config.get("device", "auto")
         self.max_tokens = config.get("max_tokens", 2048)
         self.temperature = config.get("temperature", 0.7)
-        self.image_space_id = config.get("image_space_id", "stabilityai/stable-diffusion-xl-base-1.0")
-        self.video_space_id = config.get("video_space_id", "damo-vilab/text-to-video-ms")
+        
+        # CRITICAL: Override the image_space_id here, regardless of what's in config
+        # This ensures we use a working space even if old config is loaded
+        config["image_space_id"] = "black-forest-labs/FLUX.1-schnell"
+        self.image_space_id = "black-forest-labs/FLUX.1-schnell"  # Use the fast version by default
+        
         self.authorized_imports = config.get("authorized_imports", [])
         
         self.image_tool = None
-        self.video_tool = None
         self.agent = None
         self.is_initialized = False
         
@@ -241,7 +66,7 @@ class MediaGenerationAgent(BaseAgent):
         try:
             from smolagents import TransformersModel, HfApiModel, OpenAIServerModel, LiteLLMModel
             
-            self.logger.info(f"Initializing media generation agent with model {self.model_id}")
+            self.logger.info(f"Initializing image generation agent with model {self.model_id}")
             
             # Try to create the model based on the model_id
             try:
@@ -251,6 +76,7 @@ class MediaGenerationAgent(BaseAgent):
                     device_map=self.device,
                     max_new_tokens=self.max_tokens,
                     temperature=self.temperature,
+                    do_sample=True,
                     trust_remote_code=True
                 )
                 self.logger.info(f"Using TransformersModel for {self.model_id}")
@@ -287,40 +113,63 @@ class MediaGenerationAgent(BaseAgent):
                         )
                         self.logger.info(f"Using LiteLLMModel for {self.model_id}")
             
-            # Initialize tools
-            self.image_tool = ImageGenerationTool(space_id=self.image_space_id)
-            self.video_tool = VideoGenerationTool(space_id=self.video_space_id)
+            # Initialize image generation tool
+            self._initialize_tools_with_failsafe()
             
             # Create the agent
             self.agent = CodeAgent(
-                tools=[self.image_tool, self.video_tool],
+                tools=[self.image_tool],
                 model=model,
-                system_prompt="""You are a media generation agent that can create images and videos from text prompts.
-You have access to these tools:
-- image_generator: Generate an image from a text prompt
-- video_generator: Generate a video from a text prompt
-
-For creating images, focus on:
-- Providing clear, detailed descriptions
-- Specifying style, mood, lighting, and composition
-- Using negative prompts to exclude unwanted elements
-
-For creating videos, focus on:
-- Describing the scene and action clearly
-- Keeping prompts concise but descriptive
-- Specifying duration when needed
-
-Always return the generated media to the user.""",
                 additional_authorized_imports=["PIL", "gradio_client"] + self.authorized_imports,
                 verbosity_level=1
             )
             
             self.is_initialized = True
-            self.logger.info(f"Media generation agent {self.agent_id} initialized successfully")
+            self.logger.info(f"Image generation agent {self.agent_id} initialized successfully")
             
         except Exception as e:
-            self.logger.error(f"Error initializing media generation agent: {str(e)}")
+            self.logger.error(f"Error initializing image generation agent: {str(e)}")
             raise
+    
+    def _initialize_tools_with_failsafe(self) -> None:
+        """Initialize image generation tool with failsafe fallbacks"""
+        from smolagents import Tool
+        
+        # First try the specified space
+        self.logger.info(f"Attempting to initialize image tool from {self.image_space_id}")
+        
+        try:
+            self.image_tool = Tool.from_space(
+                self.image_space_id,
+                name="image_generator",
+                description="Generate an image from a text prompt"
+            )
+            self.logger.info(f"Successfully initialized image tool from {self.image_space_id}")
+            return
+        except Exception as e:
+            self.logger.warning(f"Failed to initialize image tool from {self.image_space_id}: {str(e)}")
+        
+        # Try each fallback space until one works
+        for space in FALLBACK_SPACES:
+            if space == self.image_space_id:
+                continue  # Skip if it's the same as the one we already tried
+                
+            self.logger.info(f"Attempting fallback: initializing image tool from {space}")
+            try:
+                self.image_tool = Tool.from_space(
+                    space,
+                    name="image_generator",
+                    description="Generate an image from a text prompt"
+                )
+                self.logger.info(f"Successfully initialized image tool from fallback space {space}")
+                self.image_space_id = space  # Update the space ID to the one that worked
+                return
+            except Exception as e:
+                self.logger.warning(f"Failed to initialize image tool from fallback space {space}: {str(e)}")
+        
+        # If all fallbacks fail, create a dummy tool that returns an error message
+        self.logger.error("All image generation spaces failed to initialize")
+        raise RuntimeError("Failed to initialize any image generation space")
     
     def run(self, input_text: str, callback: Optional[Callable[[str], None]] = None) -> str:
         """Run the agent with the given input
@@ -336,34 +185,63 @@ Always return the generated media to the user.""",
             self.initialize()
         
         try:
-            # Enhance the prompt for media generation
-            enhanced_prompt = f"""
-You are a media generation agent that can create images and videos from text prompts.
-You have access to image and video generation tools.
+            # Extract the prompt part after "Generate an image:" if present
+            prompt = input_text
+            if ":" in input_text:
+                prompt = input_text.split(":", 1)[1].strip()
+            
+            # Log the prompt
+            self.logger.info(f"Generating image with prompt: {prompt}")
+            
+            # Simplified direct tool usage to bypass CodeAgent complexities
+            try:
+                # Try direct tool usage first (most reliable approach)
+                self.logger.info(f"Directly using image_generator tool with prompt: {prompt}")
+                image_result = self.image_tool(prompt)
+                
+                # Save image to temp file if it's a PIL Image
+                if isinstance(image_result, Image.Image):
+                    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
+                        image_path = temp_file.name
+                        image_result.save(image_path)
+                        self.generated_media.append(image_path)
+                        
+                        result_message = f"""
+I've generated an image based on your prompt: "{prompt}"
 
-USER REQUEST: {input_text}
+The image has been created using the {self.image_space_id} model.
+Image saved to: {image_path}
 
-Analyze the user's request and determine if they want an image or video. Then:
-1. Improve the prompt to create high-quality media
-2. Use the appropriate tool to generate the requested media
-3. Return the result to the user with an explanation
+You can view the image in the display area above and save it using the 'Save Media' button.
 """
-            
-            # Run the agent
-            result = self.agent.run(enhanced_prompt)
-            
-            # Add to history
-            self.add_to_history(input_text, str(result))
-            
-            # Check if we need to clean up old media files
-            self._clean_old_media()
-            
-            return str(result)
+                        # Add to history
+                        self.add_to_history(input_text, result_message)
+                        return result_message
+                else:
+                    # Handle other return types (like URLs or base64)
+                    return f"Image generated successfully using {self.image_space_id}. Result: {str(image_result)}"
+                    
+            except Exception as direct_error:
+                self.logger.warning(f"Direct tool usage failed: {str(direct_error)}. Falling back to agent.")
+                
+                # Fall back to using the agent
+                # Fall back to using the agent
+                result = self.agent.run(
+                    f"""Generate an image based on this prompt: '{prompt}'
+                    Use the image_generator tool to create the image.
+                    When complete, combine the description and file location into a single string 
+                    like "The image shows [description]. It has been saved to [location]." 
+                    and pass that to final_answer()."""
+                )
+                
+                # Add to history
+                self.add_to_history(input_text, str(result))
+                return str(result)
             
         except Exception as e:
-            error_msg = f"Error running media generation agent: {str(e)}"
+            error_msg = f"Error running image generation agent: {str(e)}"
             self.logger.error(error_msg)
-            return f"Sorry, I encountered an error while generating media: {error_msg}"
+            return f"Sorry, I encountered an error while generating the image: {error_msg}"
     
     def _clean_old_media(self, max_files: int = 20):
         """Clean up old media files to avoid filling up disk space
@@ -401,7 +279,7 @@ Analyze the user's request and determine if they want an image or video. Then:
         Returns:
             List of capability names
         """
-        return ["image_generation", "video_generation", "prompt_improvement"]
+        return ["image_generation", "prompt_improvement"]
     
     def cleanup(self) -> None:
         """Clean up resources"""

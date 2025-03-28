@@ -64,6 +64,7 @@ class AgentManager:
         AgentRegistry.register("visual_web", VisualWebAgent)
         AgentRegistry.register("code_generation", CodeGenerationAgent)
         AgentRegistry.register("media_generation", MediaGenerationAgent)
+        # AgentRegistry.register("chat", LocalModelAgent)
 
 
     def _create_default_agent(self) -> None:

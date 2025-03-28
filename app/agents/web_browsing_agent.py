@@ -208,7 +208,8 @@ class WebBrowsingAgent(BaseAgent):
                 device_map=self.device,
                 max_new_tokens=self.max_tokens,
                 temperature=self.temperature,
-                trust_remote_code=True
+                trust_remote_code=True,
+                do_sample=True
             )
             self.logger.info(f"Using TransformersModel for {self.model_id}")
             return model
@@ -251,7 +252,7 @@ class WebBrowsingAgent(BaseAgent):
     def _initialize_tools(self) -> List[Tool]:
         """Initialize tools for the agent"""
         return [
-            DuckDuckGoSearchTool(),
+            DuckDuckGoSearchTool(name="web_search"),
             VisitWebpageTool(),
             ExtractWebContentTool(),
             SaveWebContentTool()
