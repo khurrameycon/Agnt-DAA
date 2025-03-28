@@ -87,3 +87,135 @@
 2025-03-28 05:57:28,620 - agent.sadf - INFO - Initializing model HuggingFaceTB/SmolLM2-1.7B-Instruct
 2025-03-28 05:57:31,966 - smolagents.models - INFO - Using device: auto
 2025-03-28 05:57:35,745 - agent.sadf - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct initialized successfully
+2025-03-28 08:59:55,912 - sagax1 - INFO - Logging initialized
+2025-03-28 08:59:55,972 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-28 08:59:55,972 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-28 08:59:55,972 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-28 08:59:55,972 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-28 08:59:55,972 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-03-28 08:59:56,100 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-03-28 08:59:56,171 - sagax1 - INFO - Application started
+2025-03-28 09:01:39,525 - app.core.agent_manager - INFO - Created agent with ID MyChat of type local_model
+2025-03-28 09:01:56,709 - app.core.agent_manager - INFO - Running agent MyChat with input: What is capital of France ?...
+2025-03-28 09:01:57,510 - agent.MyChat - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct is available
+2025-03-28 09:01:57,510 - agent.MyChat - INFO - Initializing model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:02:02,328 - smolagents.models - INFO - Using device: auto
+2025-03-28 09:02:08,808 - agent.MyChat - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct initialized successfully
+2025-03-28 09:03:26,076 - app.core.agent_manager - INFO - Created web browsing agent with ID MyResearchAssistant
+2025-03-28 09:03:40,439 - app.core.agent_manager - INFO - Running agent MyResearchAssistant with input: What is currency devaluation ?...
+2025-03-28 09:03:40,440 - agent.MyResearchAssistant - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:03:40,441 - smolagents.models - INFO - Using device: auto
+2025-03-28 09:03:45,788 - accelerate.big_modeling - WARNING - Some parameters are on the meta device because they were offloaded to the cpu and disk.
+2025-03-28 09:03:46,130 - agent.MyResearchAssistant - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:03:46,132 - agent.MyResearchAssistant - ERROR - Error initializing web browsing agent: DDGS.__init__() got an unexpected keyword argument 'name'
+2025-03-28 09:03:46,133 - app.core.agent_manager - ERROR - Error running agent MyResearchAssistant: DDGS.__init__() got an unexpected keyword argument 'name'
+2025-03-28 09:16:06,564 - app.core.agent_manager - INFO - Running agent MyResearchAssistant with input: what is islam and how are things going on in pakis...
+2025-03-28 09:16:06,564 - agent.MyResearchAssistant - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:16:06,566 - smolagents.models - INFO - Using device: auto
+2025-03-28 09:16:12,033 - accelerate.big_modeling - WARNING - Some parameters are on the meta device because they were offloaded to the cpu and disk.
+2025-03-28 09:16:12,379 - agent.MyResearchAssistant - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:16:12,381 - agent.MyResearchAssistant - ERROR - Error initializing web browsing agent: DDGS.__init__() got an unexpected keyword argument 'name'
+2025-03-28 09:16:12,382 - app.core.agent_manager - ERROR - Error running agent MyResearchAssistant: DDGS.__init__() got an unexpected keyword argument 'name'
+2025-03-28 09:18:43,015 - sagax1 - INFO - Logging initialized
+2025-03-28 09:18:43,070 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-28 09:18:43,070 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-28 09:18:43,070 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-28 09:18:43,070 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-28 09:18:43,071 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-03-28 09:18:43,175 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-03-28 09:18:43,238 - sagax1 - INFO - Application started
+2025-03-28 09:19:12,394 - app.core.agent_manager - INFO - Created web browsing agent with ID Browsing
+2025-03-28 09:19:14,511 - app.core.agent_manager - INFO - Running agent Browsing with input: what is currency rate of USD in PKR...
+2025-03-28 09:19:14,511 - agent.Browsing - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:19:18,674 - smolagents.models - INFO - Using device: auto
+2025-03-28 09:19:21,518 - agent.Browsing - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:19:21,532 - agent.Browsing - INFO - Web browsing agent Browsing initialized successfully
+2025-03-28 09:23:51,792 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-03-28 09:30:55,854 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-28 09:39:25,858 - sagax1 - INFO - Logging initialized
+2025-03-28 09:39:26,117 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-28 09:39:26,118 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-28 09:39:26,118 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-28 09:39:26,118 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-28 09:39:26,118 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-03-28 09:39:26,528 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-03-28 09:39:26,585 - sagax1 - INFO - Application started
+2025-03-28 09:39:41,334 - app.core.agent_manager - INFO - Created web browsing agent with ID webagent
+2025-03-28 09:40:08,257 - app.core.agent_manager - INFO - Running agent webagent with input: what is higher education policy of Germany ?...
+2025-03-28 09:40:08,257 - agent.webagent - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:40:23,883 - smolagents.models - INFO - Using device: auto
+2025-03-28 09:40:29,338 - agent.webagent - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:40:29,387 - agent.webagent - INFO - Web browsing agent webagent initialized successfully
+2025-03-28 09:40:29,387 - agent.webagent - ERROR - Error running web browsing agent: 'WebBrowsingAgent' object has no attribute 'agent'
+2025-03-28 09:42:23,518 - sagax1 - INFO - Logging initialized
+2025-03-28 09:42:23,542 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-28 09:42:23,543 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-28 09:42:23,543 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-28 09:42:23,543 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-28 09:42:23,543 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-03-28 09:42:23,590 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-03-28 09:42:23,633 - sagax1 - INFO - Application started
+2025-03-28 09:42:30,104 - app.core.agent_manager - INFO - Created web browsing agent with ID asd
+2025-03-28 09:42:49,585 - app.core.agent_manager - INFO - Created web browsing agent with ID ssdd
+2025-03-28 09:43:09,425 - app.core.agent_manager - INFO - Running agent ssdd with input: what are five pillars of islam ?...
+2025-03-28 09:43:09,425 - agent.ssdd - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:43:12,466 - smolagents.models - INFO - Using device: auto
+2025-03-28 09:43:15,762 - agent.ssdd - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:43:15,774 - agent.ssdd - INFO - Web browsing agent ssdd initialized successfully
+2025-03-28 09:44:41,479 - sagax1 - INFO - Logging initialized
+2025-03-28 09:44:41,508 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-28 09:44:41,508 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-28 09:44:41,508 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-28 09:44:41,508 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-28 09:44:41,509 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-03-28 09:44:41,564 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-03-28 09:44:41,616 - sagax1 - INFO - Application started
+2025-03-28 09:44:54,833 - app.core.agent_manager - INFO - Created web browsing agent with ID sdf
+2025-03-28 09:45:05,779 - app.core.agent_manager - INFO - Running agent sdf with input: what are five pillars of islam ?...
+2025-03-28 09:45:05,779 - agent.sdf - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:45:09,417 - smolagents.models - INFO - Using device: auto
+2025-03-28 09:45:11,998 - agent.sdf - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:45:12,013 - agent.sdf - INFO - Web browsing agent sdf initialized successfully
+2025-03-28 09:50:16,227 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-28 09:57:23,823 - sagax1 - INFO - Logging initialized
+2025-03-28 09:57:23,850 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-03-28 09:57:23,850 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-03-28 09:57:23,851 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-03-28 09:57:23,851 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-03-28 09:57:23,851 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-03-28 09:57:23,901 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-03-28 09:57:23,941 - sagax1 - INFO - Application started
+2025-03-28 09:57:31,780 - app.core.agent_manager - INFO - Created web browsing agent with ID asdf
+2025-03-28 09:57:53,383 - app.core.agent_manager - INFO - Running agent asdf with input: Trump policies on Open source AI models and Deepse...
+2025-03-28 09:57:53,384 - agent.asdf - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:57:56,960 - smolagents.models - INFO - Using device: auto
+2025-03-28 09:58:00,915 - agent.asdf - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 09:58:00,925 - agent.asdf - INFO - Web browsing agent asdf initialized successfully
+2025-03-28 10:02:26,181 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-28 10:02:27,959 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-03-28 10:04:19,076 - app.core.agent_manager - INFO - Created agent with ID 123 of type media_generation
+2025-03-28 10:04:49,323 - app.core.agent_manager - INFO - Running agent 123 with input: Generate an image: A lady, studying a book enjoyin...
+2025-03-28 10:04:49,324 - agent.123 - INFO - Initializing image generation agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 10:04:49,324 - smolagents.models - INFO - Using device: auto
+2025-03-28 10:04:57,691 - accelerate.big_modeling - WARNING - Some parameters are on the meta device because they were offloaded to the disk and cpu.
+2025-03-28 10:04:58,080 - agent.123 - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 10:04:58,080 - agent.123 - INFO - Attempting to initialize image tool from black-forest-labs/FLUX.1-schnell
+2025-03-28 10:05:02,768 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2025-03-28 10:05:03,928 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/info?serialize=False "HTTP/1.1 200 OK"
+2025-03-28 10:05:04,036 - smolagents.tools - WARNING - Since `api_name` was not defined, it was automatically set to the first available API: `/infer`.
+2025-03-28 10:05:04,037 - agent.123 - INFO - Successfully initialized image tool from black-forest-labs/FLUX.1-schnell
+2025-03-28 10:05:04,047 - agent.123 - INFO - Image generation agent 123 initialized successfully
+2025-03-28 10:05:04,047 - agent.123 - INFO - Generating image with prompt: A lady, studying a book enjoying sunshine in park
+2025-03-28 10:05:04,048 - agent.123 - INFO - Directly using image_generator tool with prompt: A lady, studying a book enjoying sunshine in park
+2025-03-28 10:05:05,160 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/heartbeat/93d63699-6477-4550-9bb7-d9dc7dc9307b "HTTP/1.1 200 OK"
+2025-03-28 10:05:07,588 - httpx - INFO - HTTP Request: GET https://api.gradio.app/gradio-messaging/en "HTTP/1.1 200 OK"
+2025-03-28 10:05:10,346 - httpx - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/queue/join "HTTP/1.1 200 OK"
+2025-03-28 10:05:11,528 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/queue/data?session_hash=93d63699-6477-4550-9bb7-d9dc7dc9307b "HTTP/1.1 200 OK"
+2025-03-28 10:05:17,717 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/file=/tmp/gradio/56b60a80de30eef584a70df17a455f2eabd8d41a/image.webp "HTTP/1.1 200 OK"
+2025-03-28 10:15:25,251 - app.core.agent_manager - INFO - Created agent with ID MyChat of type local_model
+2025-03-28 10:15:38,104 - app.core.agent_manager - INFO - Running agent MyChat with input: What is the currency of Pakistan...
+2025-03-28 10:15:38,548 - agent.MyChat - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct is available
+2025-03-28 10:15:38,549 - agent.MyChat - INFO - Initializing model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-03-28 10:15:38,549 - smolagents.models - INFO - Using device: auto
+2025-03-28 10:15:46,474 - accelerate.big_modeling - WARNING - Some parameters are on the meta device because they were offloaded to the disk and cpu.
+2025-03-28 10:15:47,235 - agent.MyChat - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct initialized successfully

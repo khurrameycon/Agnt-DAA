@@ -252,7 +252,7 @@ class WebBrowsingAgent(BaseAgent):
     def _initialize_tools(self) -> List[Tool]:
         """Initialize tools for the agent"""
         return [
-            DuckDuckGoSearchTool(name="web_search"),
+            DuckDuckGoSearchTool(),
             VisitWebpageTool(),
             ExtractWebContentTool(),
             SaveWebContentTool()
@@ -328,7 +328,7 @@ print("Search results:", results)
 # Visit the most relevant page from the results
 if results:
     first_result = results[0]
-    webpage_content = visit_webpage(url=first_result["href"])
+    webpage_content = visit_webpage(url=first_result[0])
     print("Found information:", webpage_content[:500])  # Print first 500 chars
 ```
 

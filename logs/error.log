@@ -5,3 +5,8 @@
 2025-03-28 05:38:35,160 - agent.myagnet - ERROR - Error generating response: string indices must be integers, not 'str'
 2025-03-28 05:41:12,482 - agent.myagnet - ERROR - Error generating response: string indices must be integers, not 'str'
 2025-03-28 05:47:53,984 - agent.sdf - ERROR - Error generating response: string indices must be integers, not 'str'
+2025-03-28 09:03:46,132 - agent.MyResearchAssistant - ERROR - Error initializing web browsing agent: DDGS.__init__() got an unexpected keyword argument 'name'
+2025-03-28 09:03:46,133 - app.core.agent_manager - ERROR - Error running agent MyResearchAssistant: DDGS.__init__() got an unexpected keyword argument 'name'
+2025-03-28 09:16:12,381 - agent.MyResearchAssistant - ERROR - Error initializing web browsing agent: DDGS.__init__() got an unexpected keyword argument 'name'
+2025-03-28 09:16:12,382 - app.core.agent_manager - ERROR - Error running agent MyResearchAssistant: DDGS.__init__() got an unexpected keyword argument 'name'
+2025-03-28 09:40:29,387 - agent.webagent - ERROR - Error running web browsing agent: 'WebBrowsingAgent' object has no attribute 'agent'
