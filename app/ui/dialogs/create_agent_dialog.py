@@ -255,6 +255,28 @@ class CreateAgentDialog(QDialog):
         self.media_gen_options = QGroupBox("Media Generation Agent Options")
         media_gen_layout = QFormLayout(self.media_gen_options)
 
+        # Fine-tuning Agent Options
+        self.fine_tuning_options = QGroupBox("Fine-tuning Agent Options")
+        fine_tuning_layout = QFormLayout(self.fine_tuning_options)
+
+        # Output directory
+        self.ft_output_dir_layout = QHBoxLayout()
+        self.ft_output_dir_edit = QLineEdit("./fine_tuned_models")
+        self.ft_output_dir_layout.addWidget(self.ft_output_dir_edit)
+
+        self.ft_output_dir_button = QPushButton("Browse...")
+        self.ft_output_dir_button.clicked.connect(self.browse_ft_output_dir)
+        self.ft_output_dir_layout.addWidget(self.ft_output_dir_button)
+
+        fine_tuning_layout.addRow("Output Directory:", self.ft_output_dir_layout)
+
+        # Push to Hub checkbox
+        self.ft_push_to_hub_check = QCheckBox()
+        fine_tuning_layout.addRow("Push to Hub:", self.ft_push_to_hub_check)
+
+        self.agent_specific_layout.addWidget(self.fine_tuning_options)
+        self.fine_tuning_options.setVisible(False)
+
         # Image Space
         self.image_space_edit = QLineEdit()
         self.image_space_edit.setText("stabilityai/stable-diffusion-xl-base-1.0")
@@ -322,6 +344,20 @@ class CreateAgentDialog(QDialog):
             item.setData(Qt.ItemDataRole.UserRole, tool)
             self.tools_list.addItem(item)
     
+
+    def browse_ft_output_dir(self):
+        """Browse for fine-tuning output directory"""
+        from PyQt6.QtWidgets import QFileDialog
+        
+        dir_path = QFileDialog.getExistingDirectory(
+            self,
+            "Select Output Directory",
+            self.ft_output_dir_edit.text()
+        )
+        
+        if dir_path:
+            self.ft_output_dir_edit.setText(dir_path)
+
     def on_agent_type_changed(self, agent_type):
         """Handle agent type change
         
@@ -332,6 +368,8 @@ class CreateAgentDialog(QDialog):
         self.web_browsing_options.setVisible(False)
         self.visual_web_options.setVisible(False)
         self.code_gen_options.setVisible(False)
+        self.media_gen_options.setVisible(False)
+        self.fine_tuning_options.setVisible(False)
         
         # Show specific options based on agent type
         if agent_type == "web_browsing":
@@ -345,11 +383,12 @@ class CreateAgentDialog(QDialog):
             self.authorized_imports_edit.setEnabled(True)
         elif agent_type == "local_model":
             self.authorized_imports_edit.setEnabled(True)
-
         elif agent_type == "media_generation":
             self.media_gen_options.setVisible(True)
             self.authorized_imports_edit.setEnabled(True)
-
+        elif agent_type == "fine_tuning":
+            self.fine_tuning_options.setVisible(True)
+            self.authorized_imports_edit.setEnabled(True)
         else:
             self.authorized_imports_edit.setEnabled(False)
         
@@ -419,5 +458,7 @@ class CreateAgentDialog(QDialog):
         elif agent_type == "media_generation":
             config["additional_config"]["image_space_id"] = self.image_space_edit.text().strip()
             config["additional_config"]["video_space_id"] = self.video_space_edit.text().strip()
-        
+        elif agent_type == "fine_tuning":
+            config["additional_config"]["output_dir"] = self.ft_output_dir_edit.text()
+            config["additional_config"]["push_to_hub"] = self.ft_push_to_hub_check.isChecked()
         return config

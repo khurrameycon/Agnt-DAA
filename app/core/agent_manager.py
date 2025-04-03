@@ -16,6 +16,7 @@ from app.agents.code_gen_agent import CodeGenerationAgent
 from app.agents.media_generation_agent import MediaGenerationAgent
 from app.agents.agent_registry import AgentRegistry
 from smolagents import Tool, DuckDuckGoSearchTool
+from app.agents.fine_tuning_agent import FineTuningAgent
 
 class AgentManager:
     """Manages agents and their execution"""
@@ -64,6 +65,7 @@ class AgentManager:
         AgentRegistry.register("visual_web", VisualWebAgent)
         AgentRegistry.register("code_generation", CodeGenerationAgent)
         AgentRegistry.register("media_generation", MediaGenerationAgent)
+        AgentRegistry.register("fine_tuning", FineTuningAgent)
         # AgentRegistry.register("chat", LocalModelAgent)
 
 

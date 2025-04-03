@@ -10,3 +10,63 @@
 2025-03-28 09:16:12,381 - agent.MyResearchAssistant - ERROR - Error initializing web browsing agent: DDGS.__init__() got an unexpected keyword argument 'name'
 2025-03-28 09:16:12,382 - app.core.agent_manager - ERROR - Error running agent MyResearchAssistant: DDGS.__init__() got an unexpected keyword argument 'name'
 2025-03-28 09:40:29,387 - agent.webagent - ERROR - Error running web browsing agent: 'WebBrowsingAgent' object has no attribute 'agent'
+2025-04-03 11:59:07,049 - agent.tuner - ERROR - Error initializing fine-tuning agent: Converting from Tiktoken failed, if a converter for SentencePiece is available, provide a model path with a SentencePiece tokenizer.model file.Currently available slow->fast converters: ['AlbertTokenizer', 'BartTokenizer', 'BarthezTokenizer', 'BertTokenizer', 'BigBirdTokenizer', 'BlenderbotTokenizer', 'CamembertTokenizer', 'CLIPTokenizer', 'CodeGenTokenizer', 'ConvBertTokenizer', 'DebertaTokenizer', 'DebertaV2Tokenizer', 'DistilBertTokenizer', 'DPRReaderTokenizer', 'DPRQuestionEncoderTokenizer', 'DPRContextEncoderTokenizer', 'ElectraTokenizer', 'FNetTokenizer', 'FunnelTokenizer', 'GPT2Tokenizer', 'HerbertTokenizer', 'LayoutLMTokenizer', 'LayoutLMv2Tokenizer', 'LayoutLMv3Tokenizer', 'LayoutXLMTokenizer', 'LongformerTokenizer', 'LEDTokenizer', 'LxmertTokenizer', 'MarkupLMTokenizer', 'MBartTokenizer', 'MBart50Tokenizer', 'MPNetTokenizer', 'MobileBertTokenizer', 'MvpTokenizer', 'NllbTokenizer', 'OpenAIGPTTokenizer', 'PegasusTokenizer', 'Qwen2Tokenizer', 'RealmTokenizer', 'ReformerTokenizer', 'RemBertTokenizer', 'RetriBertTokenizer', 'RobertaTokenizer', 'RoFormerTokenizer', 'SeamlessM4TTokenizer', 'SqueezeBertTokenizer', 'T5Tokenizer', 'UdopTokenizer', 'WhisperTokenizer', 'XLMRobertaTokenizer', 'XLNetTokenizer', 'SplinterTokenizer', 'XGLMTokenizer', 'LlamaTokenizer', 'CodeLlamaTokenizer', 'GemmaTokenizer', 'Phi3Tokenizer']
+2025-04-03 11:59:07,049 - app.core.agent_manager - ERROR - Error running agent tuner: Converting from Tiktoken failed, if a converter for SentencePiece is available, provide a model path with a SentencePiece tokenizer.model file.Currently available slow->fast converters: ['AlbertTokenizer', 'BartTokenizer', 'BarthezTokenizer', 'BertTokenizer', 'BigBirdTokenizer', 'BlenderbotTokenizer', 'CamembertTokenizer', 'CLIPTokenizer', 'CodeGenTokenizer', 'ConvBertTokenizer', 'DebertaTokenizer', 'DebertaV2Tokenizer', 'DistilBertTokenizer', 'DPRReaderTokenizer', 'DPRQuestionEncoderTokenizer', 'DPRContextEncoderTokenizer', 'ElectraTokenizer', 'FNetTokenizer', 'FunnelTokenizer', 'GPT2Tokenizer', 'HerbertTokenizer', 'LayoutLMTokenizer', 'LayoutLMv2Tokenizer', 'LayoutLMv3Tokenizer', 'LayoutXLMTokenizer', 'LongformerTokenizer', 'LEDTokenizer', 'LxmertTokenizer', 'MarkupLMTokenizer', 'MBartTokenizer', 'MBart50Tokenizer', 'MPNetTokenizer', 'MobileBertTokenizer', 'MvpTokenizer', 'NllbTokenizer', 'OpenAIGPTTokenizer', 'PegasusTokenizer', 'Qwen2Tokenizer', 'RealmTokenizer', 'ReformerTokenizer', 'RemBertTokenizer', 'RetriBertTokenizer', 'RobertaTokenizer', 'RoFormerTokenizer', 'SeamlessM4TTokenizer', 'SqueezeBertTokenizer', 'T5Tokenizer', 'UdopTokenizer', 'WhisperTokenizer', 'XLMRobertaTokenizer', 'XLNetTokenizer', 'SplinterTokenizer', 'XGLMTokenizer', 'LlamaTokenizer', 'CodeLlamaTokenizer', 'GemmaTokenizer', 'Phi3Tokenizer']
+2025-04-03 12:08:06,549 - agent.saf - ERROR - Error initializing fine-tuning agent: None is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`
+2025-04-03 12:08:06,549 - app.core.agent_manager - ERROR - Error running agent saf: None is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`
+2025-04-03 12:08:47,468 - agent.saf - ERROR - Error initializing fine-tuning agent: None is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`
+2025-04-03 12:08:47,470 - app.core.agent_manager - ERROR - Error running agent saf: None is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`
+2025-04-03 12:11:29,210 - agent.ssff - ERROR - Error initializing fine-tuning agent: None is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`
+2025-04-03 12:11:29,210 - app.core.agent_manager - ERROR - Error running agent ssff: None is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`
+2025-04-03 12:19:05,246 - agent.dfdsa - ERROR - Error in fine-tuning agent: 'ProgressCallback' object has no attribute 'on_train_begin'
+2025-04-03 12:40:19,760 - agent.sdf - ERROR - Error setting up PEFT: Target modules {'query_key_value'} not found in the base model. Please check the target modules and try again.
+2025-04-03 12:40:19,762 - agent.sdf - ERROR - Error in fine-tuning agent: Target modules {'query_key_value'} not found in the base model. Please check the target modules and try again.
+2025-04-03 12:46:23,680 - agent.sdf - ERROR - Error during fine-tuning: index out of range in self
+2025-04-03 12:46:23,681 - agent.sdf - ERROR - Error in fine-tuning agent: index out of range in self
+2025-04-03 12:55:34,482 - agent.asd - ERROR - Error during fine-tuning: index out of range in self
+2025-04-03 12:55:34,482 - agent.asd - ERROR - Error in fine-tuning agent: index out of range in self
+2025-04-03 12:56:51,993 - agent.asd - ERROR - Error setting up PEFT: Target modules {'v_proj', 'q_proj'} not found in the base model. Please check the target modules and try again.
+2025-04-03 12:56:52,007 - agent.asd - ERROR - Fallback approach also failed: Target module BloomAttention(
+  (query_key_value): Linear(in_features=2048, out_features=6144, bias=True)
+  (dense): Linear(in_features=2048, out_features=2048, bias=True)
+  (attention_dropout): Dropout(p=0.0, inplace=False)
+) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
+2025-04-03 12:56:52,007 - agent.asd - ERROR - Error in fine-tuning agent: Target module BloomAttention(
+  (query_key_value): Linear(in_features=2048, out_features=6144, bias=True)
+  (dense): Linear(in_features=2048, out_features=2048, bias=True)
+  (attention_dropout): Dropout(p=0.0, inplace=False)
+) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
+2025-04-03 13:07:05,349 - agent.sdf - ERROR - Error during fine-tuning: Got unexpected arguments: {'token_type_ids': tensor([0, 0, 0, 0])}
+2025-04-03 13:07:05,350 - agent.sdf - ERROR - Error in fine-tuning agent: Got unexpected arguments: {'token_type_ids': tensor([0, 0, 0, 0])}
+2025-04-03 13:15:12,289 - agent.sdf - ERROR - Error setting up PEFT: Target modules {'query_key_value'} not found in the base model. Please check the target modules and try again.
+2025-04-03 13:15:12,298 - agent.sdf - ERROR - Fallback approach also failed: Target module OPTSdpaAttention(
+  (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
+2025-04-03 13:15:12,299 - agent.sdf - ERROR - Error in fine-tuning agent: Target module OPTSdpaAttention(
+  (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
+2025-04-03 13:22:12,361 - agent.sdf - ERROR - Error setting up PEFT: Target modules {'query_key_value'} not found in the base model. Please check the target modules and try again.
+2025-04-03 13:22:12,377 - agent.sdf - ERROR - Fallback approach also failed: Target module OPTSdpaAttention(
+  (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
+2025-04-03 13:22:12,377 - agent.sdf - ERROR - Error in fine-tuning agent: Target module OPTSdpaAttention(
+  (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.

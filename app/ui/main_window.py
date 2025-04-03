@@ -21,6 +21,7 @@ from app.core.config_manager import ConfigManager
 from app.core.agent_manager import AgentManager
 from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
 from app.ui.components.conversation import ConversationWidget
+from app.ui.components.fine_tuning_tab import FineTuningTab
 
 class AgentThread(QThread):
     """Thread for running agents to keep UI responsive"""
@@ -40,6 +41,7 @@ class AgentThread(QThread):
         self.agent_manager = agent_manager
         self.agent_id = agent_id
         self.input_text = input_text
+        
     
     def run(self):
         """Run the agent"""
@@ -130,11 +132,12 @@ class MainWindow(QMainWindow):
         
         # Create tabs
         self.create_chat_tab()
-        self.create_agents_tab()
         self.create_web_browsing_tab()
         self.create_visual_web_tab()
         self.create_code_gen_tab()
         self.create_media_gen_tab()
+        self.create_fine_tuning_tab()
+        self.create_agents_tab()
         self.create_settings_tab()
         
         # Create status bar
@@ -1142,4 +1145,55 @@ class MainWindow(QMainWindow):
         self.agent_thread.result_ready.connect(callback)
         self.agent_thread.progress_update.connect(lambda text: self.status_bar.showMessage(f"Processing: {text}"))
         self.agent_thread.start()
+    
+
+    def create_fine_tuning_tab(self):
+        """Create the fine-tuning tab"""
+        from app.ui.components.fine_tuning_tab import FineTuningTab
+        
+        # Create tab
+        self.fine_tuning_tab = FineTuningTab(self.agent_manager, self)
+        
+        # Load agents
+        self.fine_tuning_tab.load_agents()
+        
+        # Add tab
+        self.tabs.addTab(self.fine_tuning_tab, "Fine-Tuning")
+
+    # Add this method to the MainWindow class
+    def create_fine_tuning_agent(self):
+        """Create a new fine-tuning agent"""
+        from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
+        
+        # Create dialog
+        dialog = CreateAgentDialog(self.agent_manager, self)
+        
+        # Set agent type to fine_tuning
+        index = dialog.agent_type_combo.findText("fine_tuning")
+        if index >= 0:
+            dialog.agent_type_combo.setCurrentIndex(index)
+        
+        # Show dialog
+        if dialog.exec():
+            # Get agent configuration
+            agent_config = dialog.get_agent_config()
+            
+            # Create agent
+            agent_id = self.agent_manager.create_agent(
+                agent_id=agent_config["agent_id"],
+                agent_type=agent_config["agent_type"],
+                model_config=agent_config["model_config"],
+                tools=agent_config["tools"],
+                additional_config=agent_config["additional_config"]
+            )
+            
+            if agent_id:
+                # Show success message
+                self.status_bar.showMessage(f"Fine-tuning agent '{agent_id}' created", 3000)
+                
+                # Reload agents
+                self.fine_tuning_tab.load_agents()
+                
+                # Switch to fine-tuning tab
+                self.tabs.setCurrentWidget(self.fine_tuning_tab)
 

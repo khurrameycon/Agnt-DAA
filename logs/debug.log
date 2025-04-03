@@ -219,3 +219,329 @@
 2025-03-28 10:15:38,549 - smolagents.models - INFO - Using device: auto
 2025-03-28 10:15:46,474 - accelerate.big_modeling - WARNING - Some parameters are on the meta device because they were offloaded to the disk and cpu.
 2025-03-28 10:15:47,235 - agent.MyChat - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct initialized successfully
+2025-04-03 11:39:12,884 - sagax1 - INFO - Logging initialized
+2025-04-03 11:39:13,248 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 11:39:13,248 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 11:39:13,248 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 11:39:13,248 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 11:39:13,248 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 11:39:13,248 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 11:39:14,100 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 11:39:14,844 - sagax1 - INFO - Application started
+2025-04-03 11:50:35,723 - sagax1 - INFO - Logging initialized
+2025-04-03 11:50:35,784 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 11:50:35,785 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 11:50:35,786 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 11:50:35,786 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 11:50:35,787 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 11:50:35,787 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 11:50:36,045 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 11:50:36,209 - sagax1 - INFO - Application started
+2025-04-03 11:52:01,540 - sagax1 - INFO - Logging initialized
+2025-04-03 11:52:01,570 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 11:52:01,570 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 11:52:01,571 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 11:52:01,571 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 11:52:01,572 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 11:52:01,572 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 11:52:01,847 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 11:52:01,999 - sagax1 - INFO - Application started
+2025-04-03 11:52:48,580 - agent.tuner - INFO - FineTuningAgent tuner initialized with model meta-llama/Llama-3-8B-Instruct
+2025-04-03 11:52:48,581 - app.core.agent_manager - INFO - Created agent with ID tuner of type fine_tuning
+2025-04-03 11:58:24,310 - sagax1 - INFO - Logging initialized
+2025-04-03 11:58:24,374 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 11:58:24,374 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 11:58:24,374 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 11:58:24,374 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 11:58:24,374 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 11:58:24,374 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 11:58:24,652 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 11:58:24,851 - sagax1 - INFO - Application started
+2025-04-03 11:58:42,274 - agent.tuner - INFO - FineTuningAgent tuner initialized with model Gryphe/MythoMax-L2-13B
+2025-04-03 11:58:42,274 - app.core.agent_manager - INFO - Created agent with ID tuner of type fine_tuning
+2025-04-03 11:59:00,818 - app.core.agent_manager - INFO - Running agent tuner with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 11:59:00,818 - agent.tuner - INFO - Loading tokenizer for Gryphe/MythoMax-L2-13B
+2025-04-03 11:59:07,049 - agent.tuner - ERROR - Error initializing fine-tuning agent: Converting from Tiktoken failed, if a converter for SentencePiece is available, provide a model path with a SentencePiece tokenizer.model file.Currently available slow->fast converters: ['AlbertTokenizer', 'BartTokenizer', 'BarthezTokenizer', 'BertTokenizer', 'BigBirdTokenizer', 'BlenderbotTokenizer', 'CamembertTokenizer', 'CLIPTokenizer', 'CodeGenTokenizer', 'ConvBertTokenizer', 'DebertaTokenizer', 'DebertaV2Tokenizer', 'DistilBertTokenizer', 'DPRReaderTokenizer', 'DPRQuestionEncoderTokenizer', 'DPRContextEncoderTokenizer', 'ElectraTokenizer', 'FNetTokenizer', 'FunnelTokenizer', 'GPT2Tokenizer', 'HerbertTokenizer', 'LayoutLMTokenizer', 'LayoutLMv2Tokenizer', 'LayoutLMv3Tokenizer', 'LayoutXLMTokenizer', 'LongformerTokenizer', 'LEDTokenizer', 'LxmertTokenizer', 'MarkupLMTokenizer', 'MBartTokenizer', 'MBart50Tokenizer', 'MPNetTokenizer', 'MobileBertTokenizer', 'MvpTokenizer', 'NllbTokenizer', 'OpenAIGPTTokenizer', 'PegasusTokenizer', 'Qwen2Tokenizer', 'RealmTokenizer', 'ReformerTokenizer', 'RemBertTokenizer', 'RetriBertTokenizer', 'RobertaTokenizer', 'RoFormerTokenizer', 'SeamlessM4TTokenizer', 'SqueezeBertTokenizer', 'T5Tokenizer', 'UdopTokenizer', 'WhisperTokenizer', 'XLMRobertaTokenizer', 'XLNetTokenizer', 'SplinterTokenizer', 'XGLMTokenizer', 'LlamaTokenizer', 'CodeLlamaTokenizer', 'GemmaTokenizer', 'Phi3Tokenizer']
+2025-04-03 11:59:07,049 - app.core.agent_manager - ERROR - Error running agent tuner: Converting from Tiktoken failed, if a converter for SentencePiece is available, provide a model path with a SentencePiece tokenizer.model file.Currently available slow->fast converters: ['AlbertTokenizer', 'BartTokenizer', 'BarthezTokenizer', 'BertTokenizer', 'BigBirdTokenizer', 'BlenderbotTokenizer', 'CamembertTokenizer', 'CLIPTokenizer', 'CodeGenTokenizer', 'ConvBertTokenizer', 'DebertaTokenizer', 'DebertaV2Tokenizer', 'DistilBertTokenizer', 'DPRReaderTokenizer', 'DPRQuestionEncoderTokenizer', 'DPRContextEncoderTokenizer', 'ElectraTokenizer', 'FNetTokenizer', 'FunnelTokenizer', 'GPT2Tokenizer', 'HerbertTokenizer', 'LayoutLMTokenizer', 'LayoutLMv2Tokenizer', 'LayoutLMv3Tokenizer', 'LayoutXLMTokenizer', 'LongformerTokenizer', 'LEDTokenizer', 'LxmertTokenizer', 'MarkupLMTokenizer', 'MBartTokenizer', 'MBart50Tokenizer', 'MPNetTokenizer', 'MobileBertTokenizer', 'MvpTokenizer', 'NllbTokenizer', 'OpenAIGPTTokenizer', 'PegasusTokenizer', 'Qwen2Tokenizer', 'RealmTokenizer', 'ReformerTokenizer', 'RemBertTokenizer', 'RetriBertTokenizer', 'RobertaTokenizer', 'RoFormerTokenizer', 'SeamlessM4TTokenizer', 'SqueezeBertTokenizer', 'T5Tokenizer', 'UdopTokenizer', 'WhisperTokenizer', 'XLMRobertaTokenizer', 'XLNetTokenizer', 'SplinterTokenizer', 'XGLMTokenizer', 'LlamaTokenizer', 'CodeLlamaTokenizer', 'GemmaTokenizer', 'Phi3Tokenizer']
+2025-04-03 12:07:56,181 - agent.saf - INFO - FineTuningAgent saf initialized with model None
+2025-04-03 12:07:56,181 - app.core.agent_manager - INFO - Created agent with ID saf of type fine_tuning
+2025-04-03 12:08:05,895 - app.core.agent_manager - INFO - Running agent saf with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 12:08:05,896 - agent.saf - INFO - Loading tokenizer for None
+2025-04-03 12:08:06,549 - agent.saf - ERROR - Error initializing fine-tuning agent: None is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`
+2025-04-03 12:08:06,549 - app.core.agent_manager - ERROR - Error running agent saf: None is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`
+2025-04-03 12:08:46,784 - app.core.agent_manager - INFO - Running agent saf with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 12:08:46,785 - agent.saf - INFO - Loading tokenizer for None
+2025-04-03 12:08:47,468 - agent.saf - ERROR - Error initializing fine-tuning agent: None is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`
+2025-04-03 12:08:47,470 - app.core.agent_manager - ERROR - Error running agent saf: None is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`
+2025-04-03 12:09:53,925 - sagax1 - INFO - Logging initialized
+2025-04-03 12:09:53,982 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 12:09:53,983 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 12:09:53,983 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 12:09:53,983 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 12:09:53,984 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 12:09:53,984 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 12:09:54,268 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 12:09:54,479 - sagax1 - INFO - Application started
+2025-04-03 12:11:09,845 - agent.ssff - INFO - FineTuningAgent ssff initialized with model None
+2025-04-03 12:11:09,845 - app.core.agent_manager - INFO - Created agent with ID ssff of type fine_tuning
+2025-04-03 12:11:28,585 - app.core.agent_manager - INFO - Running agent ssff with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 12:11:28,585 - agent.ssff - INFO - Loading tokenizer for None
+2025-04-03 12:11:29,210 - agent.ssff - ERROR - Error initializing fine-tuning agent: None is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`
+2025-04-03 12:11:29,210 - app.core.agent_manager - ERROR - Error running agent ssff: None is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`
+2025-04-03 12:18:25,009 - sagax1 - INFO - Logging initialized
+2025-04-03 12:18:25,090 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 12:18:25,091 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 12:18:25,091 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 12:18:25,092 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 12:18:25,093 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 12:18:25,093 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 12:18:25,365 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 12:18:25,539 - sagax1 - INFO - Application started
+2025-04-03 12:18:38,992 - agent.dfdsa - INFO - FineTuningAgent dfdsa initialized with model bigscience/bloomz-1b7
+2025-04-03 12:18:38,992 - app.core.agent_manager - INFO - Created agent with ID dfdsa of type fine_tuning
+2025-04-03 12:18:56,150 - app.core.agent_manager - INFO - Running agent dfdsa with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 12:18:56,150 - agent.dfdsa - INFO - Loading tokenizer for bigscience/bloomz-1b7
+2025-04-03 12:18:58,482 - agent.dfdsa - INFO - FineTuningAgent dfdsa initialized successfully
+2025-04-03 12:18:58,482 - agent.dfdsa - INFO - Loaded dataset with 6 training and 2 test examples
+2025-04-03 12:18:58,890 - agent.dfdsa - INFO - Dataset preprocessing completed
+2025-04-03 12:18:58,890 - agent.dfdsa - INFO - Loading base model bigscience/bloomz-1b7
+2025-04-03 12:19:00,612 - agent.dfdsa - INFO - Model bigscience/bloomz-1b7 loaded successfully
+2025-04-03 12:19:00,612 - agent.dfdsa - INFO - Setting up PEFT with LoRA
+2025-04-03 12:19:04,863 - bitsandbytes.cextension - WARNING - The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
+2025-04-03 12:19:05,062 - agent.dfdsa - INFO - PEFT setup completed successfully
+2025-04-03 12:19:05,091 - agent.dfdsa - INFO - Trainer setup completed
+2025-04-03 12:19:05,091 - agent.dfdsa - INFO - Starting fine-tuning
+2025-04-03 12:19:05,246 - agent.dfdsa - ERROR - Error in fine-tuning agent: 'ProgressCallback' object has no attribute 'on_train_begin'
+2025-04-03 12:22:43,172 - sagax1 - INFO - Logging initialized
+2025-04-03 12:22:43,228 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 12:22:43,229 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 12:22:43,229 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 12:22:43,230 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 12:22:43,230 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 12:22:43,231 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 12:22:43,501 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 12:22:43,666 - sagax1 - INFO - Application started
+2025-04-03 12:22:51,503 - agent.sdf - INFO - FineTuningAgent sdf initialized with model bigscience/bloomz-1b7
+2025-04-03 12:22:51,503 - app.core.agent_manager - INFO - Created agent with ID sdf of type fine_tuning
+2025-04-03 12:23:06,672 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 12:23:06,672 - agent.sdf - INFO - Loading tokenizer for bigscience/bloomz-1b7
+2025-04-03 12:23:08,140 - agent.sdf - INFO - FineTuningAgent sdf initialized successfully
+2025-04-03 12:23:08,140 - agent.sdf - INFO - Loaded dataset with 8 training and 2 test examples
+2025-04-03 12:23:08,524 - agent.sdf - INFO - Dataset preprocessing completed
+2025-04-03 12:23:08,524 - agent.sdf - INFO - Loading base model bigscience/bloomz-1b7
+2025-04-03 12:23:09,516 - agent.sdf - INFO - Model bigscience/bloomz-1b7 loaded successfully
+2025-04-03 12:23:09,518 - agent.sdf - INFO - Setting up PEFT with LoRA
+2025-04-03 12:23:10,511 - bitsandbytes.cextension - WARNING - The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
+2025-04-03 12:23:10,577 - agent.sdf - INFO - PEFT setup completed successfully
+2025-04-03 12:23:10,622 - agent.sdf - INFO - Trainer setup completed
+2025-04-03 12:23:10,622 - agent.sdf - INFO - Starting fine-tuning
+2025-04-03 12:25:26,469 - agent.sdf - INFO - Fine-tuning completed
+2025-04-03 12:25:26,469 - agent.sdf - INFO - Saving fine-tuned model
+2025-04-03 12:26:03,817 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "generate", "instruction": "what is rei...
+2025-04-03 12:26:03,817 - agent.sdf - INFO - Loading fine-tuned model from ./fine_tuned_models
+2025-04-03 12:26:48,635 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "generate", "instruction": "what is mac...
+2025-04-03 12:26:48,635 - agent.sdf - INFO - Loading fine-tuned model from ./fine_tuned_models
+2025-04-03 12:26:58,312 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "generate", "instruction": "what is mac...
+2025-04-03 12:26:58,312 - agent.sdf - INFO - Loading fine-tuned model from ./fine_tuned_models
+2025-04-03 12:27:25,273 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 12:27:25,290 - agent.sdf - INFO - Loaded dataset with 8 training and 2 test examples
+2025-04-03 12:27:44,640 - datasets.fingerprint - WARNING - Parameter 'function'=<function FineTuningAgent.preprocess_dataset.<locals>.preprocess_function at 0x000001C8438D8C20> of the transform datasets.arrow_dataset.Dataset._map_single couldn't be hashed properly, a random hash was used instead. Make sure your transforms and parameters are serializable with pickle or dill for the dataset fingerprinting and caching to work. If you reuse this transform, the caching mechanism will consider it to be different from the previous calls and recompute everything. This warning is only showed once. Subsequent hashing failures won't be showed.
+2025-04-03 12:28:04,324 - agent.sdf - INFO - Dataset preprocessing completed
+2025-04-03 12:28:04,324 - agent.sdf - INFO - Loading base model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 12:40:19,378 - agent.sdf - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct loaded successfully
+2025-04-03 12:40:19,380 - agent.sdf - INFO - Setting up PEFT with LoRA
+2025-04-03 12:40:19,760 - agent.sdf - ERROR - Error setting up PEFT: Target modules {'query_key_value'} not found in the base model. Please check the target modules and try again.
+2025-04-03 12:40:19,762 - agent.sdf - ERROR - Error in fine-tuning agent: Target modules {'query_key_value'} not found in the base model. Please check the target modules and try again.
+2025-04-03 12:44:59,966 - sagax1 - INFO - Logging initialized
+2025-04-03 12:45:00,041 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 12:45:00,041 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 12:45:00,042 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 12:45:00,043 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 12:45:00,043 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 12:45:00,044 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 12:45:00,314 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 12:45:01,547 - sagax1 - INFO - Application started
+2025-04-03 12:45:58,998 - agent.sdf - INFO - FineTuningAgent sdf initialized with model bigscience/bloomz-1b7
+2025-04-03 12:45:58,998 - app.core.agent_manager - INFO - Created agent with ID sdf of type fine_tuning
+2025-04-03 12:46:19,141 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 12:46:19,141 - agent.sdf - INFO - Loading tokenizer for bigscience/bloomz-1b7
+2025-04-03 12:46:20,655 - agent.sdf - INFO - FineTuningAgent sdf initialized successfully
+2025-04-03 12:46:20,671 - agent.sdf - INFO - Loaded dataset with 5 training and 2 test examples
+2025-04-03 12:46:21,042 - agent.sdf - INFO - Dataset preprocessing completed
+2025-04-03 12:46:21,042 - agent.sdf - INFO - Loading base model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 12:46:22,970 - agent.sdf - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct loaded successfully
+2025-04-03 12:46:22,970 - agent.sdf - INFO - Setting up PEFT with LoRA
+2025-04-03 12:46:22,970 - agent.sdf - INFO - Detected model architecture: llama
+2025-04-03 12:46:22,986 - agent.sdf - INFO - Using target modules: ['q_proj', 'v_proj']
+2025-04-03 12:46:23,364 - bitsandbytes.cextension - WARNING - The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
+2025-04-03 12:46:23,460 - agent.sdf - INFO - PEFT setup completed successfully
+2025-04-03 12:46:23,483 - agent.sdf - INFO - Trainer setup completed
+2025-04-03 12:46:23,483 - agent.sdf - INFO - Starting fine-tuning
+2025-04-03 12:46:23,680 - agent.sdf - ERROR - Error during fine-tuning: index out of range in self
+2025-04-03 12:46:23,681 - agent.sdf - ERROR - Error in fine-tuning agent: index out of range in self
+2025-04-03 12:55:10,451 - sagax1 - INFO - Logging initialized
+2025-04-03 12:55:10,517 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 12:55:10,518 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 12:55:10,518 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 12:55:10,519 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 12:55:10,519 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 12:55:10,520 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 12:55:10,780 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 12:55:10,952 - sagax1 - INFO - Application started
+2025-04-03 12:55:18,244 - agent.asd - INFO - FineTuningAgent asd initialized with model bigscience/bloomz-1b7
+2025-04-03 12:55:18,244 - app.core.agent_manager - INFO - Created agent with ID asd of type fine_tuning
+2025-04-03 12:55:29,970 - app.core.agent_manager - INFO - Running agent asd with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 12:55:29,970 - agent.asd - INFO - Loading tokenizer for bigscience/bloomz-1b7
+2025-04-03 12:55:31,447 - agent.asd - INFO - FineTuningAgent asd initialized successfully
+2025-04-03 12:55:31,447 - agent.asd - INFO - Loaded dataset with 7 training and 2 test examples
+2025-04-03 12:55:31,816 - agent.asd - INFO - Dataset preprocessing completed
+2025-04-03 12:55:31,831 - agent.asd - INFO - Loading base model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 12:55:33,791 - agent.asd - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct loaded successfully
+2025-04-03 12:55:33,791 - agent.asd - INFO - Setting up PEFT with LoRA
+2025-04-03 12:55:33,791 - agent.asd - INFO - Detected model architecture: llama
+2025-04-03 12:55:33,791 - agent.asd - INFO - Using target modules: ['q_proj', 'v_proj']
+2025-04-03 12:55:34,173 - bitsandbytes.cextension - WARNING - The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
+2025-04-03 12:55:34,252 - agent.asd - INFO - PEFT setup completed successfully
+2025-04-03 12:55:34,285 - agent.asd - INFO - Trainer setup completed
+2025-04-03 12:55:34,285 - agent.asd - INFO - Starting fine-tuning
+2025-04-03 12:55:34,482 - agent.asd - ERROR - Error during fine-tuning: index out of range in self
+2025-04-03 12:55:34,482 - agent.asd - ERROR - Error in fine-tuning agent: index out of range in self
+2025-04-03 12:55:59,229 - app.core.agent_manager - INFO - Running agent asd with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 12:55:59,238 - agent.asd - INFO - Loaded dataset with 7 training and 2 test examples
+2025-04-03 12:56:23,173 - datasets.fingerprint - WARNING - Parameter 'function'=<function FineTuningAgent.preprocess_dataset.<locals>.preprocess_function at 0x00000264042AA2A0> of the transform datasets.arrow_dataset.Dataset._map_single couldn't be hashed properly, a random hash was used instead. Make sure your transforms and parameters are serializable with pickle or dill for the dataset fingerprinting and caching to work. If you reuse this transform, the caching mechanism will consider it to be different from the previous calls and recompute everything. This warning is only showed once. Subsequent hashing failures won't be showed.
+2025-04-03 12:56:49,879 - agent.asd - INFO - Dataset preprocessing completed
+2025-04-03 12:56:49,880 - agent.asd - INFO - Loading base model bigscience/bloomz-1b7
+2025-04-03 12:56:51,091 - agent.asd - INFO - Model bigscience/bloomz-1b7 loaded successfully
+2025-04-03 12:56:51,091 - agent.asd - INFO - Setting up PEFT with LoRA
+2025-04-03 12:56:51,091 - agent.asd - INFO - Using target modules: ['q_proj', 'v_proj']
+2025-04-03 12:56:51,993 - agent.asd - ERROR - Error setting up PEFT: Target modules {'v_proj', 'q_proj'} not found in the base model. Please check the target modules and try again.
+2025-04-03 12:56:51,993 - agent.asd - INFO - Trying alternative target module detection...
+2025-04-03 12:56:51,996 - agent.asd - INFO - Found potential attention modules: ['transformer.h.0.self_attention', 'transformer.h.0.self_attention.query_key_value', 'transformer.h.0.self_attention.dense', 'transformer.h.0.self_attention.attention_dropout', 'transformer.h.0.post_attention_layernorm']...
+2025-04-03 12:56:51,997 - agent.asd - INFO - Using detected target modules: ['post_attention_layernorm', 'attention_dropout', 'self_attention', 'dense', 'query_key_value']
+2025-04-03 12:56:52,007 - agent.asd - ERROR - Fallback approach also failed: Target module BloomAttention(
+  (query_key_value): Linear(in_features=2048, out_features=6144, bias=True)
+  (dense): Linear(in_features=2048, out_features=2048, bias=True)
+  (attention_dropout): Dropout(p=0.0, inplace=False)
+) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
+2025-04-03 12:56:52,007 - agent.asd - ERROR - Error in fine-tuning agent: Target module BloomAttention(
+  (query_key_value): Linear(in_features=2048, out_features=6144, bias=True)
+  (dense): Linear(in_features=2048, out_features=2048, bias=True)
+  (attention_dropout): Dropout(p=0.0, inplace=False)
+) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
+2025-04-03 13:01:39,977 - sagax1 - INFO - Logging initialized
+2025-04-03 13:01:40,046 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 13:01:40,046 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 13:01:40,046 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 13:01:40,046 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 13:01:40,046 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 13:01:40,046 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 13:01:40,323 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 13:01:43,562 - sagax1 - INFO - Application started
+2025-04-03 13:02:09,273 - agent.sdf - INFO - FineTuningAgent sdf initialized with model bigscience/bloomz-1b7
+2025-04-03 13:02:09,273 - app.core.agent_manager - INFO - Created agent with ID sdf of type fine_tuning
+2025-04-03 13:02:23,997 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 13:02:23,997 - agent.sdf - INFO - Loading tokenizer for bigscience/bloomz-1b7
+2025-04-03 13:02:25,602 - agent.sdf - INFO - FineTuningAgent sdf initialized successfully
+2025-04-03 13:02:25,602 - agent.sdf - INFO - Loaded dataset with 10 training and 3 test examples
+2025-04-03 13:02:25,996 - agent.sdf - INFO - Dataset preprocessing completed
+2025-04-03 13:02:25,996 - agent.sdf - INFO - Loading base model bigscience/bloomz-560m
+2025-04-03 13:07:04,602 - agent.sdf - INFO - Model bigscience/bloomz-560m loaded successfully
+2025-04-03 13:07:04,602 - agent.sdf - INFO - Setting up PEFT with LoRA
+2025-04-03 13:07:04,604 - agent.sdf - INFO - Detected model architecture: bloom
+2025-04-03 13:07:04,604 - agent.sdf - INFO - Using target modules: ['query_key_value']
+2025-04-03 13:07:05,085 - bitsandbytes.cextension - WARNING - The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
+2025-04-03 13:07:05,136 - agent.sdf - INFO - PEFT setup completed successfully
+2025-04-03 13:07:05,170 - agent.sdf - INFO - Trainer setup completed
+2025-04-03 13:07:05,170 - agent.sdf - INFO - Starting fine-tuning
+2025-04-03 13:07:05,349 - agent.sdf - ERROR - Error during fine-tuning: Got unexpected arguments: {'token_type_ids': tensor([0, 0, 0, 0])}
+2025-04-03 13:07:05,350 - agent.sdf - ERROR - Error in fine-tuning agent: Got unexpected arguments: {'token_type_ids': tensor([0, 0, 0, 0])}
+2025-04-03 13:09:50,939 - sagax1 - INFO - Logging initialized
+2025-04-03 13:09:51,016 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 13:09:51,017 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 13:09:51,017 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 13:09:51,017 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 13:09:51,018 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 13:09:51,018 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 13:09:51,357 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 13:09:52,849 - sagax1 - INFO - Application started
+2025-04-03 13:09:58,614 - agent.sdf - INFO - FineTuningAgent sdf initialized with model bigscience/bloomz-1b7
+2025-04-03 13:09:58,614 - app.core.agent_manager - INFO - Created agent with ID sdf of type fine_tuning
+2025-04-03 13:10:11,571 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 13:10:11,571 - agent.sdf - INFO - Loading tokenizer for bigscience/bloomz-1b7
+2025-04-03 13:10:13,050 - agent.sdf - INFO - FineTuningAgent sdf initialized successfully
+2025-04-03 13:10:13,050 - agent.sdf - INFO - Loaded dataset with 8 training and 2 test examples
+2025-04-03 13:10:13,431 - agent.sdf - INFO - Dataset preprocessing completed
+2025-04-03 13:10:13,431 - agent.sdf - INFO - Loading base model bigscience/bloomz-560m
+2025-04-03 13:10:14,334 - agent.sdf - INFO - Model bigscience/bloomz-560m loaded successfully
+2025-04-03 13:10:14,334 - agent.sdf - INFO - Setting up PEFT with LoRA
+2025-04-03 13:10:14,334 - agent.sdf - INFO - Detected model architecture: bloom
+2025-04-03 13:10:14,334 - agent.sdf - INFO - Using target modules: ['query_key_value']
+2025-04-03 13:10:14,814 - bitsandbytes.cextension - WARNING - The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
+2025-04-03 13:10:14,870 - agent.sdf - INFO - PEFT setup completed successfully
+2025-04-03 13:10:14,905 - agent.sdf - INFO - Trainer setup completed
+2025-04-03 13:10:14,905 - agent.sdf - INFO - Starting fine-tuning
+2025-04-03 13:11:06,898 - agent.sdf - INFO - Fine-tuning completed
+2025-04-03 13:11:06,898 - agent.sdf - INFO - Saving fine-tuned model
+2025-04-03 13:11:24,940 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "generate", "instruction": "whaat is ma...
+2025-04-03 13:11:24,940 - agent.sdf - INFO - Loading fine-tuned model from ./fine_tuned_models
+2025-04-03 13:11:32,373 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "generate", "instruction": "what is mac...
+2025-04-03 13:11:32,373 - agent.sdf - INFO - Loading fine-tuned model from ./fine_tuned_models
+2025-04-03 13:11:45,855 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "generate", "instruction": "what is CV"...
+2025-04-03 13:11:45,855 - agent.sdf - INFO - Loading fine-tuned model from ./fine_tuned_models
+2025-04-03 13:12:06,265 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "generate", "instruction": "what is Com...
+2025-04-03 13:12:06,265 - agent.sdf - INFO - Loading fine-tuned model from ./fine_tuned_models
+2025-04-03 13:12:21,361 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "generate", "instruction": "pakistan? w...
+2025-04-03 13:12:21,361 - agent.sdf - INFO - Loading fine-tuned model from ./fine_tuned_models
+2025-04-03 13:12:35,753 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 13:12:35,753 - agent.sdf - INFO - Loaded dataset with 8 training and 2 test examples
+2025-04-03 13:12:41,387 - datasets.fingerprint - WARNING - Parameter 'function'=<function FineTuningAgent.preprocess_dataset.<locals>.preprocess_function at 0x0000029313555D00> of the transform datasets.arrow_dataset.Dataset._map_single couldn't be hashed properly, a random hash was used instead. Make sure your transforms and parameters are serializable with pickle or dill for the dataset fingerprinting and caching to work. If you reuse this transform, the caching mechanism will consider it to be different from the previous calls and recompute everything. This warning is only showed once. Subsequent hashing failures won't be showed.
+2025-04-03 13:12:47,336 - agent.sdf - INFO - Dataset preprocessing completed
+2025-04-03 13:12:47,336 - agent.sdf - INFO - Loading base model facebook/opt-350m
+2025-04-03 13:15:11,917 - agent.sdf - INFO - Model facebook/opt-350m loaded successfully
+2025-04-03 13:15:11,918 - agent.sdf - INFO - Setting up PEFT with LoRA
+2025-04-03 13:15:11,918 - agent.sdf - INFO - Using target modules: ['query_key_value']
+2025-04-03 13:15:12,289 - agent.sdf - ERROR - Error setting up PEFT: Target modules {'query_key_value'} not found in the base model. Please check the target modules and try again.
+2025-04-03 13:15:12,290 - agent.sdf - INFO - Trying alternative target module detection...
+2025-04-03 13:15:12,291 - agent.sdf - INFO - Found potential attention modules: ['model.decoder.project_out', 'model.decoder.project_in', 'model.decoder.layers.0.self_attn', 'model.decoder.layers.0.self_attn.k_proj', 'model.decoder.layers.0.self_attn.v_proj']...
+2025-04-03 13:15:12,292 - agent.sdf - INFO - Using detected target modules: ['v_proj', 'k_proj', 'project_out', 'self_attn_layer_norm', 'project_in', 'q_proj', 'out_proj', 'self_attn']
+2025-04-03 13:15:12,298 - agent.sdf - ERROR - Fallback approach also failed: Target module OPTSdpaAttention(
+  (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
+2025-04-03 13:15:12,299 - agent.sdf - ERROR - Error in fine-tuning agent: Target module OPTSdpaAttention(
+  (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
+2025-04-03 13:21:46,384 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 13:21:46,400 - agent.sdf - INFO - Loaded dataset with 8 training and 2 test examples
+2025-04-03 13:22:08,949 - agent.sdf - INFO - Dataset preprocessing completed
+2025-04-03 13:22:08,949 - agent.sdf - INFO - Loading base model facebook/opt-350m
+2025-04-03 13:22:12,028 - agent.sdf - INFO - Model facebook/opt-350m loaded successfully
+2025-04-03 13:22:12,028 - agent.sdf - INFO - Setting up PEFT with LoRA
+2025-04-03 13:22:12,028 - agent.sdf - INFO - Using target modules: ['query_key_value']
+2025-04-03 13:22:12,361 - agent.sdf - ERROR - Error setting up PEFT: Target modules {'query_key_value'} not found in the base model. Please check the target modules and try again.
+2025-04-03 13:22:12,361 - agent.sdf - INFO - Trying alternative target module detection...
+2025-04-03 13:22:12,361 - agent.sdf - INFO - Found potential attention modules: ['model.decoder.project_out', 'model.decoder.project_in', 'model.decoder.layers.0.self_attn', 'model.decoder.layers.0.self_attn.k_proj', 'model.decoder.layers.0.self_attn.v_proj']...
+2025-04-03 13:22:12,361 - agent.sdf - INFO - Using detected target modules: ['v_proj', 'k_proj', 'project_out', 'self_attn_layer_norm', 'project_in', 'q_proj', 'out_proj', 'self_attn']
+2025-04-03 13:22:12,377 - agent.sdf - ERROR - Fallback approach also failed: Target module OPTSdpaAttention(
+  (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
+2025-04-03 13:22:12,377 - agent.sdf - ERROR - Error in fine-tuning agent: Target module OPTSdpaAttention(
+  (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+  (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
