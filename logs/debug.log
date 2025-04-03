@@ -694,3 +694,137 @@ AttributeError: 'FineTuningTab' object has no attribute 'model_selector'. Did yo
 2025-04-03 15:22:07,169 - smolagents.models - INFO - Using device: auto
 2025-04-03 15:22:14,784 - agent.chat - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct initialized successfully
 2025-04-03 15:23:38,188 - app.core.agent_manager - INFO - Running agent chat with input: so you know everything?...
+2025-04-03 15:25:10,012 - app.core.agent_manager - INFO - Created web browsing agent with ID research
+2025-04-03 15:25:11,209 - app.core.agent_manager - INFO - Running agent research with input: give me policy of higher education in USA for non ...
+2025-04-03 15:25:11,209 - agent.research - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 15:25:11,209 - smolagents.models - INFO - Using device: auto
+2025-04-03 15:25:14,338 - agent.research - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 15:25:14,426 - agent.research - INFO - Web browsing agent research initialized successfully
+2025-04-03 15:26:44,017 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-04-03 15:37:14,655 - sagax1 - INFO - Logging initialized
+2025-04-03 15:37:14,701 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 15:37:14,701 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 15:37:14,701 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 15:37:14,701 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 15:37:14,701 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 15:37:14,701 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 15:37:15,013 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 15:37:16,315 - sagax1 - INFO - Application started
+2025-04-03 15:37:25,336 - app.core.agent_manager - INFO - Created web browsing agent with ID as
+2025-04-03 15:37:42,909 - app.core.agent_manager - INFO - Running agent as with input: what is HEC policy for overseas studies in Pakista...
+2025-04-03 15:37:42,909 - agent.as - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 15:37:42,925 - smolagents.models - INFO - Using device: auto
+2025-04-03 15:37:46,026 - agent.as - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 15:37:46,067 - agent.as - INFO - Web browsing agent as initialized successfully
+2025-04-03 15:38:08,373 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-04-03 15:40:49,558 - sagax1 - INFO - Logging initialized
+2025-04-03 15:40:49,617 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 15:40:49,617 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 15:40:49,617 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 15:40:49,617 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 15:40:49,617 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 15:40:49,617 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 15:40:49,943 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 15:40:51,296 - sagax1 - INFO - Application started
+2025-04-03 15:40:59,064 - app.core.agent_manager - INFO - Created web browsing agent with ID ds
+2025-04-03 15:41:01,450 - app.core.agent_manager - INFO - Running agent ds with input: what is HEC policy for overseas studies in Pakista...
+2025-04-03 15:41:01,450 - agent.ds - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 15:41:01,467 - smolagents.models - INFO - Using device: auto
+2025-04-03 15:41:04,581 - agent.ds - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 15:41:04,606 - agent.ds - INFO - Web browsing agent ds initialized successfully
+2025-04-03 15:52:05,363 - sagax1 - INFO - Logging initialized
+2025-04-03 15:52:05,430 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 15:52:05,431 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 15:52:05,431 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 15:52:05,431 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 15:52:05,432 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 15:52:05,432 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 15:52:05,724 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 15:52:07,114 - sagax1 - INFO - Application started
+2025-04-03 15:52:18,821 - app.core.agent_manager - INFO - Created web browsing agent with ID asd
+2025-04-03 15:52:24,503 - app.core.agent_manager - INFO - Running agent asd with input: what is HEC policy for overseas studies in Pakista...
+2025-04-03 15:52:24,503 - agent.asd - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 15:52:24,510 - smolagents.models - INFO - Using device: auto
+2025-04-03 15:52:27,620 - agent.asd - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 15:52:27,637 - agent.asd - INFO - Web browsing agent asd initialized successfully
+2025-04-03 15:54:59,209 - sagax1 - INFO - Logging initialized
+2025-04-03 15:54:59,273 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 15:54:59,274 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 15:54:59,274 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 15:54:59,275 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 15:54:59,276 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 15:54:59,276 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 15:54:59,570 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 15:55:00,901 - sagax1 - INFO - Application started
+2025-04-03 15:55:10,922 - app.core.agent_manager - INFO - Created web browsing agent with ID as
+2025-04-03 15:55:13,987 - app.core.agent_manager - INFO - Running agent as with input: what is HEC policy for overseas studies in Pakista...
+2025-04-03 15:55:13,987 - agent.as - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 15:55:14,002 - smolagents.models - INFO - Using device: auto
+2025-04-03 15:55:17,139 - agent.as - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 15:55:17,163 - agent.as - INFO - Web browsing agent as initialized successfully
+2025-04-03 15:55:44,434 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-04-03 16:05:47,850 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-04-03 16:07:11,329 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-04-03 16:07:41,104 - sagax1 - INFO - Logging initialized
+2025-04-03 16:07:41,154 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 16:07:41,154 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 16:07:41,154 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 16:07:41,154 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 16:07:41,154 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 16:07:41,154 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 16:07:41,467 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 16:07:42,908 - sagax1 - INFO - Application started
+2025-04-03 16:07:53,526 - app.core.agent_manager - INFO - Created web browsing agent with ID asd
+2025-04-03 16:08:11,888 - app.core.agent_manager - INFO - Running agent asd with input: policy of HEC on foreign funding?...
+2025-04-03 16:08:11,888 - agent.asd - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 16:08:11,903 - smolagents.models - INFO - Using device: auto
+2025-04-03 16:08:15,017 - agent.asd - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 16:08:15,040 - agent.asd - INFO - Web browsing agent asd initialized successfully
+2025-04-03 16:08:40,140 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-04-03 16:09:59,995 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-04-03 16:11:40,036 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-04-03 16:13:40,209 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-04-03 16:15:07,626 - app.core.agent_manager - WARNING - Agent with ID asd already exists. It will be replaced.
+2025-04-03 16:15:07,630 - app.core.agent_manager - INFO - Created web browsing agent with ID asd (multi-agent)
+2025-04-03 16:15:09,353 - app.core.agent_manager - WARNING - Agent with ID asd already exists. It will be replaced.
+2025-04-03 16:15:09,353 - app.core.agent_manager - INFO - Created web browsing agent with ID asd
+2025-04-03 16:15:09,854 - app.core.agent_manager - WARNING - Agent with ID asd already exists. It will be replaced.
+2025-04-03 16:15:09,854 - app.core.agent_manager - INFO - Created web browsing agent with ID asd (multi-agent)
+2025-04-03 16:15:46,624 - app.core.agent_manager - INFO - Created agent with ID 123 of type media_generation
+2025-04-03 16:16:00,975 - app.core.agent_manager - INFO - Running agent 123 with input: Generate an image: generate image of a lady watchi...
+2025-04-03 16:16:00,988 - agent.123 - INFO - Initializing image generation agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 16:16:00,988 - smolagents.models - INFO - Using device: auto
+2025-04-03 16:16:04,425 - agent.123 - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 16:16:04,425 - agent.123 - INFO - Attempting to initialize image tool from black-forest-labs/FLUX.1-schnell
+2025-04-03 16:16:10,082 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-04-03 16:16:10,723 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2025-04-03 16:16:11,990 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/info?serialize=False "HTTP/1.1 200 OK"
+2025-04-03 16:16:11,990 - smolagents.tools - WARNING - Since `api_name` was not defined, it was automatically set to the first available API: `/infer`.
+2025-04-03 16:16:11,990 - agent.123 - INFO - Successfully initialized image tool from black-forest-labs/FLUX.1-schnell
+2025-04-03 16:16:12,016 - agent.123 - INFO - Image generation agent 123 initialized successfully
+2025-04-03 16:16:12,017 - agent.123 - INFO - Generating image with prompt: generate image of a lady watching mobile
+2025-04-03 16:16:12,017 - agent.123 - INFO - Directly using image_generator tool with prompt: generate image of a lady watching mobile
+2025-04-03 16:16:13,340 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/heartbeat/4b0eb5b2-ca44-46bb-a4c6-084d4dd05ee8 "HTTP/1.1 200 OK"
+2025-04-03 16:16:16,875 - httpx - INFO - HTTP Request: GET https://api.gradio.app/gradio-messaging/en "HTTP/1.1 200 OK"
+2025-04-03 16:16:21,090 - httpx - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/queue/join "HTTP/1.1 200 OK"
+2025-04-03 16:16:22,337 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/queue/data?session_hash=4b0eb5b2-ca44-46bb-a4c6-084d4dd05ee8 "HTTP/1.1 200 OK"
+2025-04-03 16:16:27,807 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/file=/tmp/gradio/f7aae923ce7e00507d3845feef3db98a1b1dee6a/image.webp "HTTP/1.1 200 OK"
+2025-04-03 16:16:41,791 - app.core.agent_manager - INFO - Running agent 123 with input: Generate a video: a lady smiling...
+2025-04-03 16:16:41,791 - agent.123 - INFO - Generating image with prompt: a lady smiling
+2025-04-03 16:16:41,791 - agent.123 - INFO - Directly using image_generator tool with prompt: a lady smiling
+2025-04-03 16:16:43,009 - httpx - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/queue/join "HTTP/1.1 200 OK"
+2025-04-03 16:16:44,272 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/queue/data?session_hash=4b0eb5b2-ca44-46bb-a4c6-084d4dd05ee8 "HTTP/1.1 200 OK"
+2025-04-03 16:16:49,390 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/file=/tmp/gradio/9052202cca2f838444a9b048260576a72ac3d9a7/image.webp "HTTP/1.1 200 OK"
+2025-04-03 16:17:29,521 - app.core.agent_manager - INFO - Running agent 123 with input: Generate a video: young lady smiling 2 second vide...
+2025-04-03 16:17:29,521 - agent.123 - INFO - Generating image with prompt: young lady smiling 2 second video
+2025-04-03 16:17:29,521 - agent.123 - INFO - Directly using image_generator tool with prompt: young lady smiling 2 second video
+2025-04-03 16:17:30,747 - httpx - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/queue/join "HTTP/1.1 200 OK"
+2025-04-03 16:17:31,996 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/queue/data?session_hash=4b0eb5b2-ca44-46bb-a4c6-084d4dd05ee8 "HTTP/1.1 200 OK"
+2025-04-03 16:17:37,096 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/file=/tmp/gradio/2a99e4022b38485baadfaf290fdeecb11cf290b0/image.webp "HTTP/1.1 200 OK"
+2025-04-03 16:17:57,066 - app.core.agent_manager - INFO - Running agent 123 with input: Generate an image: image of young lady crying...
+2025-04-03 16:17:57,066 - agent.123 - INFO - Generating image with prompt: image of young lady crying
+2025-04-03 16:17:57,066 - agent.123 - INFO - Directly using image_generator tool with prompt: image of young lady crying
+2025-04-03 16:17:58,281 - httpx - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/queue/join "HTTP/1.1 200 OK"
+2025-04-03 16:17:59,484 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/queue/data?session_hash=4b0eb5b2-ca44-46bb-a4c6-084d4dd05ee8 "HTTP/1.1 200 OK"
+2025-04-03 16:18:04,622 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/file=/tmp/gradio/dc8b3074fe14fb8aaafc7d3d13168699a7a4ea04/image.webp "HTTP/1.1 200 OK"
+2025-04-03 16:19:01,924 - primp - INFO - response: https://html.duckduckgo.com/html 200

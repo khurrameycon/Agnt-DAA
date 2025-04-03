@@ -299,41 +299,34 @@ class WebBrowsingAgent(BaseAgent):
             if self.use_multi_agent and self.manager_agent:
                 # Format the prompt for the multi-agent setup
                 prompt = f"""
-I need information about the following topic. Please search the web and gather relevant details:
+    I need information about the following topic. Please search the web and gather relevant details:
 
-{input_text}
+    {input_text}
 
-Please provide a comprehensive answer with facts and information from reliable sources.
-"""
+    Please provide a comprehensive answer with facts and information from reliable sources.
+    """
                 # Run the manager agent which will delegate to the web agent as needed
                 result = self.manager_agent.run(prompt)
             else:
-                # Format prompt for single agent
+                # Format prompt for single agent - VERY simple and direct
                 prompt = f"""
-I need to find information about: {input_text}
+    I need to find information about: {input_text}
 
-DO NOT try to import any packages directly like 'duckduckgo_search'. Instead, use the tools that are already provided:
+    Please perform ONLY these specific steps:
+    1. Use the web_search tool to search for "{input_text}" 
+    2. Return the raw search results exactly as provided by the web_search tool
+    3. DO NOT try to visit any webpages or extract content after searching
 
-1. Use web_search(query="your search query") to search the web 
-2. Use visit_webpage(url="full URL") to visit specific webpages
-3. Use extract_content(url="full URL", css_selector="selector") to extract specific content
+    Example of the code you should write:
+    ```python
+    # Search for information
+    results = web_search(query="{input_text}")
+    # Display the results directly without processing
+    print(results)
+    ```
 
-Here's an example of how to use these tools correctly:
-
-```python
-# Search the web for information
-results = web_search(query="Capital of Pakistan")
-print("Search results:", results)
-
-# Visit the most relevant page from the results
-if results:
-    first_result = results[0]
-    webpage_content = visit_webpage(url=first_result[0])
-    print("Found information:", webpage_content[:500])  # Print first 500 chars
-```
-
-Please provide a comprehensive answer based on the information you find.
-"""
+    Remember: Only search and return results. No additional parsing or page visits.
+    """
                 # Run the single agent
                 result = self.main_agent.run(prompt)
             
@@ -346,6 +339,8 @@ Please provide a comprehensive answer based on the information you find.
             error_msg = f"Error running web browsing agent: {str(e)}"
             self.logger.error(error_msg)
             return f"Sorry, I encountered an error while browsing the web: {error_msg}"
+
+
     
     def reset(self) -> None:
         """Reset the agent's state"""

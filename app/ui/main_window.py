@@ -879,7 +879,7 @@ class MainWindow(QMainWindow):
         )
 
     def handle_web_result(self, result: str):
-        """Handle web browsing agent result
+        """Handle web browsing agent result - minimal version that just displays content
         
         Args:
             result: Agent result
@@ -887,22 +887,25 @@ class MainWindow(QMainWindow):
         # Add to conversation
         self.web_conversation.add_message(result, is_user=False)
         
-        # Extract webpage content if available
-        import re
-        
-        # Look for extracted content markers
-        content_match = re.search(r"EXTRACTED CONTENT:(.*?)(?=\n\n|$)", result, re.DOTALL)
-        if content_match:
-            content = content_match.group(1).strip()
+        # Extract search results from the execution logs
+        if "Execution logs:" in result:
+            # Find start of Execution logs
+            logs_index = result.find("Execution logs:")
+            # Get everything after "Execution logs:"
+            content = result[logs_index + 15:]  # +15 to skip "Execution logs:"
+            
+            # Display the content in the web content area
+            self.web_content_display.setText(content)
+        elif "## Search Results" in result:
+            # Alternative approach if we find direct search results
+            results_index = result.find("## Search Results")
+            content = result[results_index:]
             self.web_content_display.setText(content)
         else:
-            # Look for webpage visit content
-            visit_match = re.search(r"Webpage content:(.*?)(?=\n\n|$)", result, re.DOTALL)
-            if visit_match:
-                content = visit_match.group(1).strip()
-                self.web_content_display.setText(content)
+            # Last resort: just display the entire result
+            self.web_content_display.setText(result)
         
-        # Enable input
+        # Enable UI elements
         self.web_input.setEnabled(True)
         self.web_send_button.setEnabled(True)
 
