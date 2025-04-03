@@ -70,3 +70,24 @@ If this is a private repository, make sure to pass a token having permission to 
   (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
   (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
 ) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
+2025-04-03 13:45:55,109 - agent.sdf - ERROR - Error during fine-tuning: index out of range in self
+2025-04-03 13:45:55,115 - agent.sdf - ERROR - Error in fine-tuning agent: index out of range in self
+2025-04-03 14:53:54,518 - sagax1 - ERROR - Unhandled exception: 'FineTuningTab' object has no attribute 'model_selector'
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\main.py", line 47, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 139, in __init__
+    self.create_fine_tuning_tab()
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 1155, in create_fine_tuning_tab
+    self.fine_tuning_tab = FineTuningTab(self.agent_manager, self)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\components\fine_tuning_tab.py", line 262, in __init__
+    self.create_main_panel()
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\components\fine_tuning_tab.py", line 369, in create_main_panel
+    self.model_selector.clear()
+    ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'FineTuningTab' object has no attribute 'model_selector'. Did you mean: 'agent_selector'?
+2025-04-03 14:57:16,822 - agent.asd - ERROR - Error in fine-tuning agent: 'FineTuningAgent' object has no attribute 'config_manager'
+2025-04-03 15:11:00,451 - agent.sd - ERROR - Error during fine-tuning: index out of range in self
+2025-04-03 15:11:00,453 - agent.sd - ERROR - Error in fine-tuning agent: {"status": "error", "message": "index out of range in self", "type": "IndexError", "model_id": "EleutherAI/pythia-1b", "device": "auto", "output_dir": "./fine_tuned_models", "cuda_available": false, "total_memory": 63.6856575012207, "available_memory": 32.306175231933594, "error_type": "data_processing"}

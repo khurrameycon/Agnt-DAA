@@ -264,6 +264,54 @@ class FineTuningTab(QWidget):
         # Create bottom panel with progress and logs
         self.create_bottom_panel()
     
+    def check_model_access(self, model_id):
+        """Check if we can access the selected model, prompt for login if needed
+        
+        Args:
+            model_id: Hugging Face model ID
+            
+        Returns:
+            bool: True if model is accessible, False otherwise
+        """
+        gated_model_providers = ["meta-llama", "mistralai", "google"]
+        
+        if any(provider in model_id.lower() for provider in gated_model_providers):
+            # Check if we have API token
+            token = os.environ.get("HF_API_TOKEN")
+            
+            if not token:
+                token = self.agent_manager.config_manager.get_hf_api_key()
+            
+            if not token:
+                # Prompt user for API token
+                from PyQt6.QtWidgets import QInputDialog
+                
+                token, ok = QInputDialog.getText(
+                    self,
+                    "HuggingFace API Token Required",
+                    f"Model {model_id} requires authentication.\nPlease enter your Hugging Face API token:",
+                    QLineEdit.EchoMode.Password
+                )
+                
+                if ok and token:
+                    # Save the token for future use
+                    self.agent_manager.config_manager.set_hf_api_key(token)
+                    os.environ["HF_API_TOKEN"] = token
+                    return True
+                else:
+                    # User canceled
+                    QMessageBox.warning(
+                        self,
+                        "Authentication Required",
+                        f"Model {model_id} requires authentication. Please set your Hugging Face API token in Settings."
+                    )
+                    return False
+        
+        return True
+
+
+
+
     def create_top_bar(self):
         """Create top bar with agent selection and controls"""
         top_layout = QHBoxLayout()
@@ -316,26 +364,65 @@ class FineTuningTab(QWidget):
         # Create form layout for configuration
         form_layout = QFormLayout()
         
-        # Model selection
+        # Model selection - create model_selector here first
         self.model_selector = QComboBox()
-        self.model_selector.clear()
-        self.model_selector.addItems([
-            "bigscience/bloomz-1b7",  # Most reliable model for fine-tuning
-            "bigscience/bloomz-560m",  # Even smaller model that's very reliable
-            "facebook/opt-350m",      # Another reliable small model
-            "EleutherAI/pythia-410m"  # Another reliable option
-        ])
-
-        # Then update the model_selector description with a warning
-        self.model_selector.setToolTip("These models are specifically selected for reliable fine-tuning. Other models may cause errors.")
-
-        # And add a warning label under the model selector:
-        model_warning = QLabel("⚠️ Please use these pre-selected models for reliable fine-tuning. Other models may require custom configuration.")
-        model_warning.setStyleSheet("color: orange;")
-        form_layout.addRow("", model_warning)
-
         self.model_selector.setEditable(True)
+        
+        # THEN add items to it
+        self.model_selector.addItems([
+            # BLOOM family - most reliable for fine-tuning
+            "bigscience/bloomz-1b7",          # Reliable, medium sized
+            "bigscience/bloomz-560m",         # Smaller, faster training
+            "bigscience/bloomz-3b",           # Larger, better capabilities
+            
+            # Small to medium sized models under 3B parameters
+            "TinyLlama/TinyLlama-1.1B-Chat-v1.0",    # Small but capable Llama
+            "facebook/opt-350m",              # Small OPT model
+            "facebook/opt-1.3b",              # Medium OPT model
+            "EleutherAI/pythia-410m",         # Small Pythia model
+            "EleutherAI/pythia-1b",           # Medium Pythia model
+            
+            # Mistral family models
+            "mistralai/Mistral-7B-v0.1",      # Base Mistral model
+            "mistralai/Mistral-7B-Instruct-v0.2", # Instruction-tuned Mistral
+            
+            # Phi models (small but powerful)
+            "microsoft/phi-1_5",              # Very small but capable
+            "microsoft/phi-2",                # Improved small model
+            
+            # Gemma models
+            "google/gemma-2b",                # Small but powerful Google model
+            "google/gemma-2b-it",             # Instruction-tuned version
+            
+            # Llama models - require login to HF
+            "meta-llama/Llama-2-7b-hf",       # Base Llama 2 model
+            "meta-llama/Llama-2-7b-chat-hf",  # Chat-tuned Llama 2
+        ])
+        
+        # Add tooltip
+        self.model_selector.setToolTip("Select a model to fine-tune. The BLOOM family is most reliable. Larger models (>3B) may require significant memory.")
+        
         form_layout.addRow("Base Model:", self.model_selector)
+        
+        # Add a note about model compatibility
+        model_note = QLabel(
+            "Note: Models are grouped by reliability for fine-tuning. BLOOM and TinyLlama models are most reliable, "
+            "followed by OPT and Pythia. Larger models (>3B) require more memory."
+        )
+        model_note.setWordWrap(True)
+        model_note.setStyleSheet("color: #555; font-style: italic;")
+        form_layout.addRow("", model_note)
+        
+        # Add memory warning
+        memory_warning = QLabel(
+            "⚠️ Memory Usage: Small models (<1B) need ~4GB RAM, medium models (1-3B) need ~8GB RAM, "
+            "and large models (7B+) need 16GB+ RAM or a GPU."
+        )
+        memory_warning.setWordWrap(True)
+        memory_warning.setStyleSheet("color: orange;")
+        form_layout.addRow("", memory_warning)
+        
+        # Rest of the method implementation...
         
         # Training epochs
         self.epochs_spin = QSpinBox()
@@ -562,6 +649,9 @@ class FineTuningTab(QWidget):
     
     def start_fine_tuning(self):
         """Start fine-tuning process"""
+        model_id = self.model_selector.currentText()
+        if not self.check_model_access(model_id):
+            return
         if not self.current_agent_id:
             QMessageBox.warning(
                 self,
@@ -642,13 +732,12 @@ class FineTuningTab(QWidget):
             self.train_button.setEnabled(True)
     
     def handle_fine_tuning_result(self, result: str):
-        """Handle fine-tuning result
+        """Handle fine-tuning result with improved error reporting
         
         Args:
             result: Result from the agent
         """
         self.log_message("Fine-tuning process completed.")
-        self.log_message(result)
         
         # Set progress bar to 100%
         self.progress_bar.setValue(100)
@@ -656,35 +745,91 @@ class FineTuningTab(QWidget):
         # Enable training button
         self.train_button.setEnabled(True)
         
-        # Show result
+        # Try to parse result as JSON
         try:
-            # Parse result as JSON
-            result_obj = json.loads(result)
-            
-            if result_obj.get("status") == "success":
-                # Show success message
+            # Check if result is JSON
+            if result.strip().startswith("{") and result.strip().endswith("}"):
+                result_obj = json.loads(result)
+                
+                if result_obj.get("status") == "success":
+                    # Show success message
+                    QMessageBox.information(
+                        self,
+                        "Fine-Tuning Complete",
+                        f"Fine-tuning completed successfully.\nModel saved to: {result_obj.get('model_path')}"
+                    )
+                    
+                    # Switch to test tab
+                    self.tabs.setCurrentIndex(2)
+                else:
+                    # Show error message
+                    QMessageBox.warning(
+                        self,
+                        "Fine-Tuning Error",
+                        f"Error during fine-tuning: {result_obj.get('message', 'Unknown error')}"
+                    )
+            else:
+                # Check for specific error patterns in the text
+                if "not found" in result.lower() or "404" in result:
+                    QMessageBox.warning(
+                        self,
+                        "Model Not Found",
+                        "The selected model could not be found. Check that the model ID is correct and you have "
+                        "appropriate access permissions."
+                    )
+                elif "authentication" in result.lower() or "unauthorized" in result.lower() or "401" in result:
+                    QMessageBox.warning(
+                        self,
+                        "Authentication Error",
+                        "Authentication is required for this model. Please set your Hugging Face API token "
+                        "in Settings and ensure you've accepted the model license on the Hugging Face website."
+                    )
+                elif "memory" in result.lower() or "cuda" in result.lower() or "gpu" in result.lower():
+                    QMessageBox.warning(
+                        self,
+                        "Memory/GPU Error",
+                        "Not enough memory or GPU resources to fine-tune this model. Try a smaller model or "
+                        "reduce batch size and sequence length."
+                    )
+                elif "target modules" in result.lower():
+                    QMessageBox.warning(
+                        self,
+                        "Model Compatibility Error",
+                        "Could not identify the appropriate attention modules for this model. "
+                        "Try using a different model from the recommended list."
+                    )
+                elif "index out of range" in result.lower():
+                    QMessageBox.warning(
+                        self,
+                        "Data Processing Error",
+                        "There was an error processing the data for this model. This often happens due to "
+                        "mismatches between the data format and model expectations. Try a different model "
+                        "from the recommended list."
+                    )
+                else:
+                    # Generic message for other errors
+                    QMessageBox.warning(
+                        self,
+                        "Fine-Tuning Error",
+                        f"An error occurred during fine-tuning.\nDetails: {result}"
+                    )
+        except json.JSONDecodeError:
+            # Not valid JSON, use pattern matching for error detection
+            if "success" in result.lower() and "completed" in result.lower():
                 QMessageBox.information(
                     self,
                     "Fine-Tuning Complete",
-                    f"Fine-tuning completed successfully.\nModel saved to: {result_obj.get('model_path')}"
+                    "Fine-tuning process completed successfully."
                 )
-                
                 # Switch to test tab
                 self.tabs.setCurrentIndex(2)
             else:
-                # Show error message
                 QMessageBox.warning(
                     self,
-                    "Fine-Tuning Error",
-                    f"Error during fine-tuning: {result_obj.get('message', 'Unknown error')}"
+                    "Fine-Tuning Status",
+                    "Fine-tuning process completed with unknown status. Check the logs for details."
                 )
-        except json.JSONDecodeError:
-            # Not valid JSON, show raw result
-            QMessageBox.information(
-                self,
-                "Fine-Tuning Complete",
-                "Fine-tuning process completed."
-            )
+
     
     def generate_response(self):
         """Generate response from fine-tuned model"""

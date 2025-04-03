@@ -545,3 +545,152 @@ If this is a private repository, make sure to pass a token having permission to 
   (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
   (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
 ) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
+2025-04-03 13:40:11,806 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 13:40:11,806 - agent.sdf - INFO - Loaded dataset with 8 training and 2 test examples
+2025-04-03 13:40:34,332 - agent.sdf - INFO - Dataset preprocessing completed
+2025-04-03 13:40:34,332 - agent.sdf - INFO - Loading base model bigscience/bloomz-560m
+2025-04-03 13:40:35,587 - agent.sdf - INFO - Model bigscience/bloomz-560m loaded successfully
+2025-04-03 13:40:35,587 - agent.sdf - INFO - Setting up PEFT with LoRA
+2025-04-03 13:40:35,588 - agent.sdf - INFO - Using target modules: ['query_key_value']
+2025-04-03 13:40:36,059 - agent.sdf - INFO - PEFT setup completed successfully
+2025-04-03 13:40:36,155 - agent.sdf - INFO - Trainer setup completed
+2025-04-03 13:40:36,155 - agent.sdf - INFO - Starting fine-tuning
+2025-04-03 13:41:31,014 - agent.sdf - INFO - Fine-tuning completed
+2025-04-03 13:41:31,014 - agent.sdf - INFO - Saving fine-tuned model
+2025-04-03 13:42:00,538 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "generate", "instruction": "pakistan? w...
+2025-04-03 13:42:00,554 - agent.sdf - INFO - Loading fine-tuned model from ./fine_tuned_models
+2025-04-03 13:42:18,115 - app.core.agent_manager - INFO - Running agent sdf with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 13:42:18,131 - agent.sdf - INFO - Loaded dataset with 8 training and 2 test examples
+2025-04-03 13:42:29,791 - agent.sdf - INFO - Dataset preprocessing completed
+2025-04-03 13:42:29,791 - agent.sdf - INFO - Loading base model EleutherAI/pythia-410m
+2025-04-03 13:45:54,221 - agent.sdf - INFO - Model EleutherAI/pythia-410m loaded successfully
+2025-04-03 13:45:54,221 - agent.sdf - INFO - Setting up PEFT with LoRA
+2025-04-03 13:45:54,221 - agent.sdf - INFO - Using target modules: ['query_key_value']
+2025-04-03 13:45:54,690 - agent.sdf - INFO - PEFT setup completed successfully
+2025-04-03 13:45:54,758 - agent.sdf - INFO - Trainer setup completed
+2025-04-03 13:45:54,758 - agent.sdf - INFO - Starting fine-tuning
+2025-04-03 13:45:55,109 - agent.sdf - ERROR - Error during fine-tuning: index out of range in self
+2025-04-03 13:45:55,115 - agent.sdf - ERROR - Error in fine-tuning agent: index out of range in self
+2025-04-03 14:25:15,338 - app.ui.components.fine_tuning_tab - INFO - Exported 10 rows to D:/SLKhurram-Coding/sagax1/123.csv
+2025-04-03 14:53:54,203 - sagax1 - INFO - Logging initialized
+2025-04-03 14:53:54,266 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 14:53:54,266 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 14:53:54,266 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 14:53:54,267 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 14:53:54,267 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 14:53:54,268 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 14:53:54,518 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 14:53:54,518 - sagax1 - ERROR - Unhandled exception: 'FineTuningTab' object has no attribute 'model_selector'
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\main.py", line 47, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 139, in __init__
+    self.create_fine_tuning_tab()
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 1155, in create_fine_tuning_tab
+    self.fine_tuning_tab = FineTuningTab(self.agent_manager, self)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\components\fine_tuning_tab.py", line 262, in __init__
+    self.create_main_panel()
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\components\fine_tuning_tab.py", line 369, in create_main_panel
+    self.model_selector.clear()
+    ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'FineTuningTab' object has no attribute 'model_selector'. Did you mean: 'agent_selector'?
+2025-04-03 14:56:30,818 - sagax1 - INFO - Logging initialized
+2025-04-03 14:56:30,871 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 14:56:30,871 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 14:56:30,872 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 14:56:30,872 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 14:56:30,872 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 14:56:30,872 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 14:56:31,177 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 14:56:32,601 - sagax1 - INFO - Application started
+2025-04-03 14:56:40,913 - agent.asd - INFO - FineTuningAgent asd initialized with model bigscience/bloomz-1b7
+2025-04-03 14:56:40,913 - app.core.agent_manager - INFO - Created agent with ID asd of type fine_tuning
+2025-04-03 14:57:14,979 - app.core.agent_manager - INFO - Running agent asd with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 14:57:14,979 - agent.asd - INFO - Loading tokenizer for bigscience/bloomz-1b7
+2025-04-03 14:57:16,439 - agent.asd - INFO - FineTuningAgent asd initialized successfully
+2025-04-03 14:57:16,447 - agent.asd - INFO - Loaded dataset with 12 training and 3 test examples
+2025-04-03 14:57:16,447 - agent.asd - INFO - Using prompt format: bloom
+2025-04-03 14:57:16,822 - agent.asd - INFO - Dataset preprocessing completed
+2025-04-03 14:57:16,822 - agent.asd - INFO - Loading base model bigscience/bloomz-560m
+2025-04-03 14:57:16,822 - agent.asd - ERROR - Error in fine-tuning agent: 'FineTuningAgent' object has no attribute 'config_manager'
+2025-04-03 15:00:00,514 - sagax1 - INFO - Logging initialized
+2025-04-03 15:00:00,556 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 15:00:00,556 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 15:00:00,556 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 15:00:00,556 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 15:00:00,556 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 15:00:00,556 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 15:00:00,877 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 15:00:02,259 - sagax1 - INFO - Application started
+2025-04-03 15:00:10,546 - agent.sd - INFO - FineTuningAgent sd initialized with model bigscience/bloomz-1b7
+2025-04-03 15:00:10,546 - app.core.agent_manager - INFO - Created agent with ID sd of type fine_tuning
+2025-04-03 15:00:44,753 - app.core.agent_manager - INFO - Running agent sd with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 15:00:44,753 - agent.sd - INFO - Loading tokenizer for bigscience/bloomz-1b7
+2025-04-03 15:00:46,193 - agent.sd - INFO - FineTuningAgent sd initialized successfully
+2025-04-03 15:00:46,193 - agent.sd - INFO - Loaded dataset with 14 training and 4 test examples
+2025-04-03 15:00:46,193 - agent.sd - INFO - Using prompt format: bloom
+2025-04-03 15:00:46,591 - agent.sd - INFO - Dataset preprocessing completed
+2025-04-03 15:00:46,591 - agent.sd - INFO - Loading base model bigscience/bloomz-560m
+2025-04-03 15:00:47,454 - agent.sd - INFO - Model bigscience/bloomz-560m loaded successfully
+2025-04-03 15:00:47,454 - agent.sd - INFO - Setting up PEFT with LoRA
+2025-04-03 15:00:47,454 - agent.sd - INFO - Detected model family: bloom
+2025-04-03 15:00:47,454 - agent.sd - INFO - Using target modules: ['query_key_value']
+2025-04-03 15:00:47,935 - bitsandbytes.cextension - WARNING - The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
+2025-04-03 15:00:48,002 - agent.sd - INFO - PEFT setup completed successfully
+2025-04-03 15:00:48,026 - agent.sd - INFO - Trainer setup completed
+2025-04-03 15:00:48,027 - agent.sd - INFO - Starting fine-tuning
+2025-04-03 15:02:17,980 - agent.sd - INFO - Fine-tuning completed
+2025-04-03 15:02:17,980 - agent.sd - INFO - Saving fine-tuned model
+2025-04-03 15:02:32,521 - app.core.agent_manager - INFO - Running agent sd with input: {"action": "generate", "instruction": "what is mac...
+2025-04-03 15:02:32,521 - agent.sd - INFO - Loading fine-tuned model from ./fine_tuned_models
+2025-04-03 15:02:45,430 - app.core.agent_manager - INFO - Running agent sd with input: {"action": "generate", "instruction": "ML?", "inpu...
+2025-04-03 15:02:45,430 - agent.sd - INFO - Loading fine-tuned model from ./fine_tuned_models
+2025-04-03 15:02:55,524 - app.core.agent_manager - INFO - Running agent sd with input: {"action": "generate", "instruction": "Compouoter ...
+2025-04-03 15:02:55,524 - agent.sd - INFO - Loading fine-tuned model from ./fine_tuned_models
+2025-04-03 15:03:17,136 - app.core.agent_manager - INFO - Running agent sd with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 15:03:17,152 - agent.sd - INFO - Loaded dataset with 14 training and 4 test examples
+2025-04-03 15:03:17,152 - agent.sd - INFO - Using prompt format: pythia
+2025-04-03 15:03:22,727 - datasets.fingerprint - WARNING - Parameter 'function'=<function FineTuningAgent.preprocess_dataset.<locals>.preprocess_function at 0x0000021A010ADA80> of the transform datasets.arrow_dataset.Dataset._map_single couldn't be hashed properly, a random hash was used instead. Make sure your transforms and parameters are serializable with pickle or dill for the dataset fingerprinting and caching to work. If you reuse this transform, the caching mechanism will consider it to be different from the previous calls and recompute everything. This warning is only showed once. Subsequent hashing failures won't be showed.
+2025-04-03 15:03:28,630 - agent.sd - INFO - Dataset preprocessing completed
+2025-04-03 15:03:28,630 - agent.sd - INFO - Loading base model EleutherAI/pythia-1b
+2025-04-03 15:10:59,090 - agent.sd - INFO - Model EleutherAI/pythia-1b loaded successfully
+2025-04-03 15:10:59,090 - agent.sd - INFO - Setting up PEFT with LoRA
+2025-04-03 15:10:59,090 - agent.sd - INFO - Detected model family: gpt_neox
+2025-04-03 15:10:59,090 - agent.sd - INFO - Using target modules: ['query_key_value']
+2025-04-03 15:10:59,875 - agent.sd - INFO - PEFT setup completed successfully
+2025-04-03 15:10:59,952 - agent.sd - INFO - Trainer setup completed
+2025-04-03 15:10:59,952 - agent.sd - INFO - Starting fine-tuning
+2025-04-03 15:11:00,451 - agent.sd - ERROR - Error during fine-tuning: index out of range in self
+2025-04-03 15:11:00,453 - agent.sd - ERROR - Error in fine-tuning agent: {"status": "error", "message": "index out of range in self", "type": "IndexError", "model_id": "EleutherAI/pythia-1b", "device": "auto", "output_dir": "./fine_tuned_models", "cuda_available": false, "total_memory": 63.6856575012207, "available_memory": 32.306175231933594, "error_type": "data_processing"}
+2025-04-03 15:11:16,274 - app.core.agent_manager - INFO - Running agent sd with input: {"action": "fine_tune", "dataset": [{"instruction"...
+2025-04-03 15:11:16,294 - agent.sd - INFO - Loaded dataset with 14 training and 4 test examples
+2025-04-03 15:11:16,294 - agent.sd - INFO - Using prompt format: bloom
+2025-04-03 15:11:41,838 - agent.sd - INFO - Dataset preprocessing completed
+2025-04-03 15:11:41,838 - agent.sd - INFO - Loading base model bigscience/bloomz-3b
+2025-04-03 15:12:03,490 - sagax1 - INFO - Logging initialized
+2025-04-03 15:12:03,536 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 15:12:03,537 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 15:12:03,537 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 15:12:03,538 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 15:12:03,538 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 15:12:03,539 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 15:12:03,840 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 15:12:05,011 - sagax1 - INFO - Application started
+2025-04-03 15:21:36,609 - sagax1 - INFO - Logging initialized
+2025-04-03 15:21:36,666 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-03 15:21:36,667 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-03 15:21:36,667 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-03 15:21:36,668 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-03 15:21:36,668 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-03 15:21:36,669 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-03 15:21:36,974 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-03 15:21:38,356 - sagax1 - INFO - Application started
+2025-04-03 15:21:55,178 - app.core.agent_manager - INFO - Created agent with ID chat of type local_model
+2025-04-03 15:22:06,343 - app.core.agent_manager - INFO - Running agent chat with input: what is Machine Learning ?...
+2025-04-03 15:22:07,070 - agent.chat - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct is available
+2025-04-03 15:22:07,070 - agent.chat - INFO - Initializing model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-03 15:22:07,169 - smolagents.models - INFO - Using device: auto
+2025-04-03 15:22:14,784 - agent.chat - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct initialized successfully
+2025-04-03 15:23:38,188 - app.core.agent_manager - INFO - Running agent chat with input: so you know everything?...

@@ -37,23 +37,9 @@ class FineTuningAgent(BaseAgent):
         Args:
             agent_id: Unique identifier for this agent
             config: Agent configuration dictionary
-                model_id: Hugging Face model ID to fine-tune
-                device: Device to use (e.g., 'cpu', 'cuda', 'mps')
-                output_dir: Directory to save the fine-tuned model
-                lora_r: LoRA rank
-                lora_alpha: LoRA alpha
-                lora_dropout: LoRA dropout
-                learning_rate: Learning rate for fine-tuning
-                num_train_epochs: Number of training epochs
-                per_device_train_batch_size: Batch size for training
-                per_device_eval_batch_size: Batch size for evaluation
-                warmup_steps: Number of warmup steps
-                weight_decay: Weight decay
-                hub_model_id: Hugging Face Hub model ID for uploading
-                push_to_hub: Whether to push to Hugging Face Hub
         """
         super().__init__(agent_id, config)
-    
+        
         # Base model configuration with fallback to ensure it's never None
         default_model = "bigscience/bloomz-1b7"  # Good default for fine-tuning
         self.model_id = config.get("model_id") or config.get("model_config", {}).get("model_id", default_model)
@@ -65,7 +51,6 @@ class FineTuningAgent(BaseAgent):
         
         self.device = config.get("device", "auto")
         
-           
         # Output configuration
         self.output_dir = config.get("output_dir", "./fine_tuned_models")
         os.makedirs(self.output_dir, exist_ok=True)
@@ -96,8 +81,72 @@ class FineTuningAgent(BaseAgent):
         self.dataset = None
         self.is_initialized = False
         
+        # Get access to config_manager if available (fix for the error)
+        self.config_manager = None
+        
         self.logger.info(f"FineTuningAgent {agent_id} initialized with model {self.model_id}")
     
+    def _initialize_model_with_auth(self) -> None:
+        """Initialize model with proper authentication for gated models"""
+        # Check if model requires authentication
+        gated_model_providers = ["meta-llama", "mistralai", "google"]
+        
+        needs_auth = any(provider in self.model_id.lower() for provider in gated_model_providers)
+        
+        if needs_auth:
+            self.logger.info(f"Model {self.model_id} may require authentication")
+            
+            # Try to get API key from environment
+            hf_token = os.environ.get("HF_API_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN") or os.environ.get("HF_TOKEN")
+            
+            # Try to get from config_manager if available (with safeguard)
+            if not hf_token and hasattr(self, 'config_manager') and self.config_manager is not None:
+                try:
+                    hf_token = self.config_manager.get_hf_api_key()
+                except Exception as e:
+                    self.logger.warning(f"Error accessing config_manager: {str(e)}")
+            
+            if not hf_token:
+                self.logger.warning(f"No API token found for gated model {self.model_id}")
+                self.logger.warning("You may need to set HF_API_TOKEN environment variable or configure API key in settings")
+            else:
+                self.logger.info("Using API token for model authentication")
+        
+        # Always use token if available
+        token = os.environ.get("HF_API_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN") or os.environ.get("HF_TOKEN")
+        
+        # Load model with error handling
+        try:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                self.model_id,
+                torch_dtype=torch.float16,
+                device_map=self.device,
+                token=token,  # Pass token for gated models
+                trust_remote_code=True  # Some models need this
+            )
+            self.logger.info(f"Model {self.model_id} loaded successfully")
+        except Exception as e:
+            error_msg = str(e)
+            self.logger.error(f"Error loading model: {error_msg}")
+            
+            # Special handling for common errors
+            if "401" in error_msg and "unauthorized" in error_msg.lower():
+                raise ValueError(
+                    f"Authentication error for model {self.model_id}. Please provide a valid Hugging Face API token "
+                    "through the HF_API_TOKEN environment variable or in the application settings. "
+                    "You may need to accept the model license on the Hugging Face website."
+                )
+            elif "404" in error_msg:
+                raise ValueError(
+                    f"Model {self.model_id} not found. Please check that the model ID is correct. "
+                    "Some models require authentication - set your API token in settings."
+                )
+            else:
+                raise
+
+
+
+
     def initialize(self) -> None:
         """Initialize the model and tokenizer"""
         if self.is_initialized:
@@ -144,7 +193,7 @@ class FineTuningAgent(BaseAgent):
         return dataset
     
     def preprocess_dataset(self, dataset: Dataset) -> Dataset:
-        """Preprocess the dataset for training
+        """Preprocess the dataset for training with robust error handling
         
         Args:
             dataset: Hugging Face Dataset
@@ -155,8 +204,29 @@ class FineTuningAgent(BaseAgent):
         if not self.is_initialized:
             self.initialize()
         
+        # Define a function to format text based on model type
+        def get_prompt_format(model_id):
+            """Get appropriate prompt format for different model families"""
+            model_id_lower = model_id.lower()
+            
+            if any(name in model_id_lower for name in ["llama", "mistral"]):
+                return "llama"
+            elif "bloom" in model_id_lower:
+                return "bloom"
+            elif "pythia" in model_id_lower:
+                return "pythia"
+            elif "opt" in model_id_lower:
+                return "opt"
+            else:
+                return "default"
+        
+        # Get format for this model
+        prompt_format = get_prompt_format(self.model_id)
+        self.logger.info(f"Using prompt format: {prompt_format}")
+        
         def preprocess_function(examples):
             texts = []
+            
             for instruction, input_text, output in zip(
                 examples["instruction"], 
                 examples.get("input", [""]*len(examples["instruction"])), 
@@ -165,23 +235,50 @@ class FineTuningAgent(BaseAgent):
                 # Handle missing input field
                 input_value = input_text if input_text else ""
                 
-                if input_value:
-                    text = f"Instruction: {instruction}\nInput: {input_value}\nResponse: {output}"
+                # Format text based on model type
+                if prompt_format == "llama":
+                    if input_value:
+                        text = f"<s>[INST] {instruction}\n{input_value} [/INST] {output}</s>"
+                    else:
+                        text = f"<s>[INST] {instruction} [/INST] {output}</s>"
+                elif prompt_format == "bloom":
+                    if input_value:
+                        text = f"Instruction: {instruction}\nInput: {input_value}\nResponse: {output}"
+                    else:
+                        text = f"Instruction: {instruction}\nResponse: {output}"
+                elif prompt_format == "pythia":
+                    # Plain text format
+                    if input_value:
+                        text = f"Human: {instruction}\n{input_value}\n\nAssistant: {output}"
+                    else:
+                        text = f"Human: {instruction}\n\nAssistant: {output}"
+                elif prompt_format == "opt":
+                    if input_value:
+                        text = f"User: {instruction}\n{input_value}\nAssistant: {output}"
+                    else:
+                        text = f"User: {instruction}\nAssistant: {output}"
                 else:
-                    text = f"Instruction: {instruction}\nResponse: {output}"
+                    # Generic default format
+                    if input_value:
+                        text = f"Instruction: {instruction}\nInput: {input_value}\nResponse: {output}"
+                    else:
+                        text = f"Instruction: {instruction}\nResponse: {output}"
+                    
                 texts.append(text)
             
-            # IMPORTANT: Don't include token_type_ids in the output - this causes issues with some models
+            # Tokenize with safe settings for all models
             tokenized_inputs = self.tokenizer(
                 texts,
                 truncation=True,
                 max_length=self.max_seq_length,
                 padding="max_length",
                 return_tensors="pt",
-                return_token_type_ids=False  # This is the key fix
+                return_token_type_ids=False  # Avoid token_type_ids issues
             )
             
+            # Create clone of input_ids for labels
             tokenized_inputs["labels"] = tokenized_inputs["input_ids"].clone()
+            
             return tokenized_inputs
         
         # Apply preprocessing
@@ -193,28 +290,20 @@ class FineTuningAgent(BaseAgent):
             )
             
             self.logger.info("Dataset preprocessing completed")
-            
             return tokenized_dataset
         except Exception as e:
             self.logger.error(f"Error preprocessing dataset: {str(e)}")
             raise
 
-    # Also update the setup_trainer method to add additional fixes for common issues
 
+    # Update the setup_trainer method for better cross-model compatibility
     def setup_trainer(self, tokenized_dataset: Dataset) -> None:
-        """Setup trainer for fine-tuning
+        """Setup trainer for fine-tuning with robust settings
         
         Args:
             tokenized_dataset: Preprocessed dataset
         """
-        # Remove any problematic columns from the dataset
-        columns_to_remove = ["token_type_ids"]
-        for split in tokenized_dataset:
-            for column in columns_to_remove:
-                if column in tokenized_dataset[split].column_names:
-                    tokenized_dataset[split] = tokenized_dataset[split].remove_columns(column)
-        
-        # Setup training arguments
+        # Setup training arguments with conservative defaults for compatibility
         training_args = TrainingArguments(
             output_dir=self.output_dir,
             overwrite_output_dir=True,
@@ -233,15 +322,19 @@ class FineTuningAgent(BaseAgent):
             push_to_hub=self.push_to_hub,
             hub_model_id=self.hub_model_id,
             save_total_limit=2,  # Only keep the 2 most recent checkpoints
-            # Added settings for better compatbility
-            remove_unused_columns=True,  # Important fix for some models
-            gradient_checkpointing=False,  # Disable for smaller models
+            # Conservative settings for cross-model compatibility
+            dataloader_num_workers=0,  # Avoid multiprocessing issues
+            remove_unused_columns=True,
+            optim="adamw_torch",
+            gradient_checkpointing=False,  # Disabled for stability
+            torch_compile=False,  # Avoid compilation issues
         )
         
-        # Create data collator
+        # Create data collator with padding options
         data_collator = DataCollatorForLanguageModeling(
             tokenizer=self.tokenizer,
-            mlm=False
+            mlm=False,
+            pad_to_multiple_of=8 if training_args.fp16 else None
         )
         
         # Initialize trainer
@@ -257,158 +350,172 @@ class FineTuningAgent(BaseAgent):
 
     
     def load_model(self) -> None:
-        """Load the base model for fine-tuning"""
+        """Load the base model for fine-tuning with authentication support"""
         self.logger.info(f"Loading base model {self.model_id}")
         
-        try:
-            # Load base model with float16 precision
-            self.model = AutoModelForCausalLM.from_pretrained(
-                self.model_id,
-                torch_dtype=torch.float16,
-                device_map=self.device,
-            )
-            
-            self.logger.info(f"Model {self.model_id} loaded successfully")
-            
-        except Exception as e:
-            self.logger.error(f"Error loading model: {str(e)}")
-            raise
+        # Use specialized method for model initialization
+        self._initialize_model_with_auth()
+
     
     def setup_peft(self) -> None:
         """Setup PEFT for efficient fine-tuning"""
         self.logger.info("Setting up PEFT with LoRA")
         
-        # Detect target modules if not specified
-        if not self.target_modules:
-            # Get the model's architecture from its config
-            model_arch = getattr(self.model.config, "model_type", "").lower()
-            self.logger.info(f"Detected model architecture: {model_arch}")
+        # Define target modules by model family
+        model_target_modules = {
+            # These models use query_key_value
+            "bloom": ["query_key_value"],
             
-            # Different models use different layer names
-            if "llama" in model_arch or "llama" in self.model_id.lower():
-                self.target_modules = ["q_proj", "v_proj"]
-            elif "bloom" in model_arch or "bloom" in self.model_id.lower():
-                self.target_modules = ["query_key_value"]
-            elif "gpt" in model_arch or "gpt" in self.model_id.lower():
-                self.target_modules = ["c_attn"]
-            elif "mistral" in model_arch or "mistral" in self.model_id.lower():
-                self.target_modules = ["q_proj", "v_proj"]
-            elif "smollm" in model_arch or "smollm" in self.model_id.lower():
-                self.target_modules = ["q_proj", "v_proj", "k_proj"]
+            # These models use q_proj, v_proj, k_proj
+            "llama": ["q_proj", "v_proj", "k_proj"],
+            "mistral": ["q_proj", "v_proj", "k_proj"],
+            "gemma": ["q_proj", "v_proj", "k_proj"],
+            "phi": ["q_proj", "v_proj", "k_proj"],
+            
+            # These models use q_proj, v_proj (without k_proj)
+            "gpt_neox": ["query_key_value"],
+            "falcon": ["query_key_value"],
+            
+            # OPT models
+            "opt": ["q_proj", "k_proj", "v_proj", "out_proj"],
+            
+            # Pythia models
+            "pythia": ["query_proj", "key_proj", "value_proj"],
+            
+            # Default fallback
+            "default": ["q_proj", "v_proj"]
+        }
+        
+        # Get model type from config or name
+        model_type = getattr(self.model.config, "model_type", "").lower()
+        model_id_lower = self.model_id.lower()
+        
+        # Try to match model type or name to known architectures
+        target_modules = None
+        for family, modules in model_target_modules.items():
+            if family in model_type or family in model_id_lower:
+                target_modules = modules
+                self.logger.info(f"Detected model family: {family}")
+                break
+        
+        # If no match, try examining the model structure
+        if not target_modules:
+            self.logger.info("Model family not directly recognized, analyzing model structure...")
+            
+            # Try to find attention modules by examining module names
+            attention_module_patterns = {
+                "q_proj": ["q_proj", "query_proj", "query"],
+                "k_proj": ["k_proj", "key_proj", "key"],
+                "v_proj": ["v_proj", "value_proj", "value"]
+            }
+            
+            found_modules = set()
+            
+            # Examine model structure and find likely target modules
+            for name, module in self.model.named_modules():
+                if isinstance(module, torch.nn.Linear):
+                    # Check if this is likely an attention component
+                    for module_type, patterns in attention_module_patterns.items():
+                        if any(pattern in name for pattern in patterns) and name.split('.')[-1] in patterns:
+                            found_modules.add(name.split('.')[-1])
+                            self.logger.info(f"Found potential attention module: {name}")
+            
+            if found_modules:
+                target_modules = list(found_modules)
+                self.logger.info(f"Auto-detected target modules: {target_modules}")
             else:
-                # Try to auto-detect by checking for common attention names
-                found_modules = []
-                for name, _ in self.model.named_modules():
-                    if any(module_name in name for module_name in ["q_proj", "query", "attention"]):
-                        found_modules.append(name)
-                
-                # If found modules, use those that end with known attention names
-                if found_modules:
-                    module_candidates = []
-                    for module in found_modules:
-                        parts = module.split('.')
-                        if parts[-1] in ["q_proj", "k_proj", "v_proj", "query", "key", "value", "query_key_value"]:
-                            module_candidates.append(parts[-1])
-                    
-                    if module_candidates:
-                        self.target_modules = list(set(module_candidates))
-                        self.logger.info(f"Auto-detected target modules: {self.target_modules}")
-                    else:
-                        # Fallback to most common options if we couldn't determine specifics
-                        self.target_modules = ["q_proj", "v_proj"]
-                else:
-                    # Fallback for unknown architectures
-                    self.target_modules = ["q_proj", "v_proj"]
+                # If still no modules found, use default
+                target_modules = model_target_modules["default"]
+                self.logger.info(f"Could not auto-detect, using default modules: {target_modules}")
         
-        self.logger.info(f"Using target modules: {self.target_modules}")
+        self.logger.info(f"Using target modules: {target_modules}")
         
-        # Configure LoRA
+        # Configure LoRA with safeguards
         try:
             lora_config = LoraConfig(
                 task_type=TaskType.CAUSAL_LM,
                 r=self.lora_r,
                 lora_alpha=self.lora_alpha,
                 lora_dropout=self.lora_dropout,
-                target_modules=self.target_modules,
+                target_modules=target_modules,
                 bias="none",
             )
             
-            # Prepare model for PEFT
             self.model = prepare_model_for_kbit_training(self.model)
             self.model = get_peft_model(self.model, lora_config)
             
-            # Print trainable parameters
             self.model.print_trainable_parameters()
-            
             self.logger.info("PEFT setup completed successfully")
             
         except Exception as e:
             self.logger.error(f"Error setting up PEFT: {str(e)}")
             
-            # Try one more approach with a more general module finder
-            if "not found in the base model" in str(e):
-                try:
-                    self.logger.info("Trying alternative target module detection...")
+            # Try with simpler config as fallback
+            try:
+                self.logger.info("Trying simpler LoRA configuration...")
+                
+                # Try to find any Linear layers at leaf level
+                linear_modules = []
+                for name, module in self.model.named_modules():
+                    if isinstance(module, torch.nn.Linear) and '.' in name:
+                        parts = name.split('.')
+                        # Get leaf module name (last part)
+                        leaf_name = parts[-1]
+                        if leaf_name not in linear_modules:
+                            linear_modules.append(leaf_name)
+                
+                if linear_modules:
+                    self.logger.info(f"Found Linear modules: {linear_modules[:10]}...")
                     
-                    # Extract all module names and find potential attention modules
-                    all_modules = [name for name, _ in self.model.named_modules()]
-                    attention_candidates = []
+                    # Filter to likely attention modules
+                    likely_attention = [m for m in linear_modules if any(x in m.lower() for x in ["proj", "query", "key", "value", "attn", "qkv"])]
                     
-                    # Keywords that might indicate attention-related modules
-                    attention_keywords = ["attention", "attn", "self", "proj", "query", "key", "value"]
-                    
-                    for module in all_modules:
-                        if any(keyword in module.lower() for keyword in attention_keywords):
-                            parts = module.split(".")
-                            if len(parts) > 1:  # We want leaf modules, not parent containers
-                                attention_candidates.append(module)
-                    
-                    if attention_candidates:
-                        self.logger.info(f"Found potential attention modules: {attention_candidates[:5]}...")
+                    if likely_attention:
+                        self.logger.info(f"Using likely attention modules: {likely_attention}")
                         
-                        # Get the module names at the correct level
-                        possible_targets = []
-                        for module in attention_candidates:
-                            parts = module.split(".")
-                            # Get the last part and check if it's likely to be a target
-                            if len(parts) > 1 and not parts[-1].isdigit():
-                                possible_targets.append(parts[-1])
+                        # Retry with these modules
+                        lora_config = LoraConfig(
+                            task_type=TaskType.CAUSAL_LM,
+                            r=self.lora_r,
+                            lora_alpha=self.lora_alpha,
+                            lora_dropout=self.lora_dropout,
+                            target_modules=likely_attention,
+                            bias="none",
+                        )
                         
-                        # Remove duplicates
-                        unique_targets = list(set(possible_targets))
+                        self.model = prepare_model_for_kbit_training(self.model)
+                        self.model = get_peft_model(self.model, lora_config)
                         
-                        if unique_targets:
-                            self.logger.info(f"Using detected target modules: {unique_targets}")
-                            
-                            # Try again with the detected modules
-                            lora_config = LoraConfig(
-                                task_type=TaskType.CAUSAL_LM,
-                                r=self.lora_r,
-                                lora_alpha=self.lora_alpha,
-                                lora_dropout=self.lora_dropout,
-                                target_modules=unique_targets,
-                                bias="none",
-                            )
-                            
-                            self.model = prepare_model_for_kbit_training(self.model)
-                            self.model = get_peft_model(self.model, lora_config)
-                            
-                            # Print trainable parameters
-                            self.model.print_trainable_parameters()
-                            
-                            self.logger.info("PEFT setup completed successfully with alternative modules")
-                            return
-                    
-                    # If we get here, the fallback approach didn't work either
-                    raise e
-                except Exception as fallback_error:
-                    self.logger.error(f"Fallback approach also failed: {str(fallback_error)}")
-                    raise
+                        self.model.print_trainable_parameters()
+                        self.logger.info("PEFT setup completed successfully with fallback configuration")
+                        return
+                
+                # Last resort - try with default configuration
+                self.logger.info("Trying with default LoRA configuration...")
+                lora_config = LoraConfig(
+                    task_type=TaskType.CAUSAL_LM,
+                    r=8,  # Reduced rank for stability
+                    lora_alpha=16,
+                    lora_dropout=0.05,
+                    target_modules=["query", "value"],  # Very generic names
+                    bias="none",
+                )
+                
+                self.model = prepare_model_for_kbit_training(self.model)
+                self.model = get_peft_model(self.model, lora_config)
+                
+                self.model.print_trainable_parameters()
+                self.logger.info("PEFT setup completed with minimal configuration")
+                
+            except Exception as fallback_error:
+                self.logger.error(f"All PEFT configurations failed: {str(fallback_error)}")
+                raise RuntimeError(f"Could not configure PEFT for model {self.model_id}. Please try a different model.")
+
     
    
     
     def train(self, progress_callback: Optional[Callable[[str], None]] = None) -> Dict[str, Any]:
-        """Fine-tune the model
+        """Fine-tune the model with comprehensive error handling
         
         Args:
             progress_callback: Optional callback for progress updates
@@ -423,54 +530,135 @@ class FineTuningAgent(BaseAgent):
         
         # Custom callback to report progress
         if progress_callback:
-            # Use the standard Transformers callback class instead of creating a custom one
             from transformers.trainer_callback import TrainerCallback
             
             class ProgressReportCallback(TrainerCallback):
                 def __init__(self, progress_fn):
                     self.progress_fn = progress_fn
                     self.last_log = {}
-                    self.step = 0
+                    self.current_epoch = 0
+                    self.total_epochs = 0
                     
+                def on_train_begin(self, args, state, control, **kwargs):
+                    self.total_epochs = args.num_train_epochs
+                    self.progress_fn(f"Training started. Total epochs: {self.total_epochs}")
+                    
+                def on_epoch_begin(self, args, state, control, **kwargs):
+                    self.current_epoch = state.epoch
+                    self.progress_fn(f"Starting epoch {self.current_epoch+1}/{self.total_epochs}")
+                
                 def on_log(self, args, state, control, logs=None, **kwargs):
                     if logs is None:
                         return
-                        
+                    
                     if logs != self.last_log:
-                        # Report progress
-                        self.step += 1
+                        # Extract useful metrics
+                        step = logs.get("step", 0)
                         loss = logs.get("loss", "N/A")
                         epoch = logs.get("epoch", 0)
-                        progress_msg = f"Training: Step={self.step}, Loss={loss}, Epoch={epoch:.2f}"
+                        
+                        # Calculate approximate progress percentage
+                        if self.total_epochs > 0:
+                            progress_pct = min(int((epoch / self.total_epochs) * 100), 99)
+                        else:
+                            progress_pct = 0
+                            
+                        progress_msg = f"Training: Step={step}, Loss={loss}, Epoch={epoch:.2f} ({progress_pct}% complete)"
                         self.progress_fn(progress_msg)
                         self.last_log = logs.copy()
+                
+                def on_train_end(self, args, state, control, **kwargs):
+                    self.progress_fn("Training completed!")
             
             self.trainer.add_callback(ProgressReportCallback(progress_callback))
         
-        # Start training
+        # Start training with comprehensive error handling
         try:
             train_result = self.trainer.train()
             
             self.logger.info("Fine-tuning completed")
             
             # Save model and tokenizer
-            self.logger.info("Saving fine-tuned model")
-            self.trainer.save_model()
-            self.tokenizer.save_pretrained(self.output_dir)
+            try:
+                self.logger.info("Saving fine-tuned model")
+                self.trainer.save_model()
+                self.tokenizer.save_pretrained(self.output_dir)
+            except Exception as save_error:
+                self.logger.error(f"Error saving model: {str(save_error)}")
+                # Continue despite save error, we still have metrics
             
             # Report metrics
             metrics = train_result.metrics
-            self.trainer.log_metrics("train", metrics)
-            self.trainer.save_metrics("train", metrics)
+            try:
+                self.trainer.log_metrics("train", metrics)
+                self.trainer.save_metrics("train", metrics)
+            except Exception as metrics_error:
+                self.logger.error(f"Error saving metrics: {str(metrics_error)}")
+                # Continue despite metrics error
             
             if self.push_to_hub:
-                self.logger.info(f"Pushing model to Hugging Face Hub: {self.hub_model_id}")
-                self.trainer.push_to_hub()
+                try:
+                    self.logger.info(f"Pushing model to Hugging Face Hub: {self.hub_model_id}")
+                    self.trainer.push_to_hub()
+                except Exception as hub_error:
+                    self.logger.error(f"Error pushing to Hub: {str(hub_error)}")
+                    # Continue despite hub error
             
             return metrics
         except Exception as e:
-            self.logger.error(f"Error during fine-tuning: {str(e)}")
-            raise
+            error_str = str(e)
+            self.logger.error(f"Error during fine-tuning: {error_str}")
+            
+            # Create a structured error response
+            error_response = {
+                "status": "error",
+                "message": error_str,
+                "type": type(e).__name__
+            }
+            
+            # Add diagnostic information
+            try:
+                error_response["model_id"] = self.model_id
+                error_response["device"] = self.device
+                error_response["output_dir"] = self.output_dir
+                
+                # Get GPU info if available
+                try:
+                    import torch
+                    error_response["cuda_available"] = torch.cuda.is_available()
+                    if torch.cuda.is_available():
+                        error_response["cuda_device_count"] = torch.cuda.device_count()
+                        error_response["cuda_device_name"] = torch.cuda.get_device_name(0)
+                        error_response["cuda_memory"] = torch.cuda.get_device_properties(0).total_memory
+                except Exception:
+                    pass
+                    
+                # Memory usage info
+                try:
+                    import psutil
+                    error_response["total_memory"] = psutil.virtual_memory().total / (1024 * 1024 * 1024)  # GB
+                    error_response["available_memory"] = psutil.virtual_memory().available / (1024 * 1024 * 1024)  # GB
+                except Exception:
+                    pass
+            except Exception:
+                pass
+                
+            # Add error classification for better UI feedback
+            error_type = "unknown"
+            if "memory" in error_str.lower() or "cuda out of memory" in error_str.lower():
+                error_type = "memory"
+            elif "authentication" in error_str.lower() or "unauthorized" in error_str.lower() or "401" in error_str:
+                error_type = "authentication"
+            elif "not found" in error_str.lower() or "404" in error_str:
+                error_type = "not_found"
+            elif "target modules" in error_str.lower():
+                error_type = "model_compatibility"
+            elif "index out of range" in error_str.lower():
+                error_type = "data_processing"
+            
+            error_response["error_type"] = error_type
+            
+            raise RuntimeError(json.dumps(error_response))
     
     def generate_sample_response(self, instruction: str, input_text: str = "") -> str:
         """Generate a sample response from the fine-tuned model
