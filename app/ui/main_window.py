@@ -959,7 +959,7 @@ class MainWindow(QMainWindow):
         self.visual_web_tab = VisualWebTab(self.agent_manager, self)
         
         # Load agents
-        self.visual_web_tab.load_agents()
+        self.visual_web_tab.refresh_agents()
         
         # Add tab
         self.tabs.addTab(self.visual_web_tab, "Visual Web")
@@ -1061,7 +1061,8 @@ class MainWindow(QMainWindow):
                         self.tabs.setCurrentIndex(i)
                         break
 
-    def create_visual_web_agent(self):
+    # In app/ui/main_window.py
+    def create_visual_web_agent(self, use_recommended_model=False):
         """Create a new visual web agent with enhanced functionality"""
         from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
         
@@ -1072,6 +1073,26 @@ class MainWindow(QMainWindow):
         index = dialog.agent_type_combo.findText("visual_web")
         if index >= 0:
             dialog.agent_type_combo.setCurrentIndex(index)
+        
+        # Use recommended model if specified
+        if use_recommended_model:
+            recommended_model = "meta-llama/Llama-3.2-3B-Instruct"
+            # Find the model in the list or add it
+            found = False
+            for i in range(dialog.model_list.count()):
+                item = dialog.model_list.item(i)
+                if item.text() == recommended_model:
+                    dialog.model_list.setCurrentItem(item)
+                    found = True
+                    break
+                    
+            if not found:
+                from PyQt6.QtWidgets import QListWidgetItem
+                from PyQt6.QtCore import Qt
+                item = QListWidgetItem(recommended_model)
+                item.setData(Qt.ItemDataRole.UserRole, {"id": recommended_model, "is_cached": False})
+                dialog.model_list.addItem(item)
+                dialog.model_list.setCurrentItem(item)
         
         # Show Chrome requirement message
         from PyQt6.QtWidgets import QMessageBox
@@ -1088,6 +1109,11 @@ class MainWindow(QMainWindow):
             # Get agent configuration
             agent_config = dialog.get_agent_config()
             
+            # Set flatten_messages_as_text to False for proper image handling
+            if "additional_config" not in agent_config:
+                agent_config["additional_config"] = {}
+            agent_config["additional_config"]["flatten_messages_as_text"] = False
+            
             # Create agent
             agent_id = self.agent_manager.create_agent(
                 agent_id=agent_config["agent_id"],
@@ -1102,7 +1128,7 @@ class MainWindow(QMainWindow):
                 self.status_bar.showMessage(f"Visual web agent '{agent_id}' created", 3000)
                 
                 # Reload agents
-                self.visual_web_tab.load_agents()
+                self.visual_web_tab.refresh_agents()
                 
                 # Switch to visual web tab
                 self.tabs.setCurrentWidget(self.visual_web_tab)

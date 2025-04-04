@@ -25,7 +25,7 @@ class LocalModelAgent(BaseAgent):
         """
         super().__init__(agent_id, config)
         
-        self.model_id = config.get("model_id", "meta-llama/Llama-3-8B-Instruct")
+        self.model_id = config.get("model_id", "meta-llama/Llama-3.2-3B-Instruct")
         self.device = config.get("device", "auto")
         self.max_new_tokens = config.get("max_tokens", 2048)  # Changed to max_new_tokens
         self.temperature = config.get("temperature", 0.1)

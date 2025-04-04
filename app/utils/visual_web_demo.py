@@ -79,7 +79,7 @@ class VisualWebDemo:
         # Make sure browser is started
         if not visual_web_tab.current_agent or not hasattr(visual_web_tab.current_agent, 'visual_tool') or visual_web_tab.current_agent.visual_tool.browser is None:
             # Try to start browser
-            visual_web_tab.toggle_browser()
+            visual_web_tab.start_stop_browser()
             
             # Check if browser started
             if not visual_web_tab.current_agent or not hasattr(visual_web_tab.current_agent, 'visual_tool') or visual_web_tab.current_agent.visual_tool.browser is None:

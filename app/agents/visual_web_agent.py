@@ -48,32 +48,45 @@ class VisualWebAutomationTool(Tool):
         self.webdriver = None
         self.logger = logging.getLogger(__name__)
     
+    
     def _ensure_browser_started(self):
         """Ensure the browser is started with optimal settings for visual automation"""
         if self.browser is None:
             try:
+                self.logger.info("Starting browser with improved settings...")
+                
                 # Configure browser options
                 options = webdriver.ChromeOptions()
                 options.add_argument("--force-device-scale-factor=1")
-                options.add_argument("--window-size=1000,1350")
+                options.add_argument("--window-size=1000,800")
                 options.add_argument("--disable-pdf-viewer")
                 options.add_argument("--window-position=0,0")
+                options.add_argument("--no-sandbox")
+                options.add_argument("--disable-dev-shm-usage")
+                
+                # Force browser to be visible
+                options.add_argument("--headless=new")  # Use new headless mode
                 
                 # Use WebDriver Manager to get the correct ChromeDriver
                 service = Service(ChromeDriverManager().install())
                 
                 # Start the browser using Selenium
-                import helium
-                # ...
+                self.logger.info("Creating Chrome driver...")
                 self.webdriver = webdriver.Chrome(service=service, options=options)
+                
+                # Initialize helium with the driver
+                import helium
+                self.logger.info("Setting Helium driver...")
                 helium.set_driver(self.webdriver)
                 self.browser = helium
-
                 
-                self.logger.info("Browser started successfully")
+                # Navigate to a simple page to verify browser is working
+                self.webdriver.get("https://www.google.com")
+                self.logger.info(f"Browser started and navigated to: {self.webdriver.current_url}")
                 
             except Exception as e:
                 self.logger.error(f"Error starting browser: {str(e)}")
+                import traceback
                 self.logger.error(traceback.format_exc())
                 raise
     
@@ -330,7 +343,7 @@ class VisualWebAgent(BaseAgent):
         self.signals = VisualWebSignals()
         self.screenshot_updated = self.signals.screenshot_updated
         
-        self.model_id = config.get("model_id", "meta-llama/Llama-3-8B-Instruct")
+        self.model_id = config.get("model_id", "meta-llama/Llama-3.2-3B-Instruct")
         self.device = config.get("device", "auto")
         self.max_tokens = config.get("max_tokens", 2048)
         self.temperature = config.get("temperature", 0.1)
@@ -416,6 +429,8 @@ class VisualWebAgent(BaseAgent):
             tools = self._initialize_tools()
             
             # Define screenshot callback for agent memory
+            # In app/agents/visual_web_agent.py, find the save_screenshot_to_memory function:
+
             def save_screenshot_to_memory(memory_step, agent):
                 """Save screenshot to agent memory step"""
                 try:
@@ -432,20 +447,35 @@ class VisualWebAgent(BaseAgent):
                                     previous_memory_step.observations_images = None
                         
                         # Take screenshot
-                        screenshot_bytes = self.visual_tool.webdriver.get_screenshot_as_png()
-                        image = Image.open(BytesIO(screenshot_bytes))
-                        
-                        # Set screenshot in memory step
-                        memory_step.observations_images = [image.copy()]
-                        
-                        # Update observations with current URL
-                        url_info = f"Current url: {self.visual_tool.webdriver.current_url}"
-                        memory_step.observations = (
-                            url_info if memory_step.observations is None 
-                            else memory_step.observations + "\n" + url_info
-                        )
+                        try:
+                            screenshot_bytes = self.visual_tool.webdriver.get_screenshot_as_png()
+                            image = Image.open(BytesIO(screenshot_bytes))
+                            
+                            # Set screenshot in memory step
+                            memory_step.observations_images = [image.copy()]
+                            
+                            # Update observations with current URL
+                            url_info = f"Current url: {self.visual_tool.webdriver.current_url}"
+                            memory_step.observations = (
+                                url_info if memory_step.observations is None 
+                                else memory_step.observations + "\n" + url_info
+                            )
+                            
+                            self.logger.info("Screenshot saved to memory successfully")
+                        except Exception as screenshot_error:
+                            self.logger.error(f"Error taking screenshot: {str(screenshot_error)}")
+                            # Add text observation about the error instead
+                            memory_step.observations = (
+                                "Could not take screenshot. " 
+                                if memory_step.observations is None 
+                                else memory_step.observations + "\nCould not take screenshot. "
+                            )
+                            memory_step.observations += f"Current URL: {self.visual_tool.webdriver.current_url}"
                 except Exception as e:
                     self.logger.error(f"Error saving screenshot to memory: {str(e)}")
+                    # Ensure the step has text observations at minimum
+                    if not hasattr(memory_step, 'observations') or memory_step.observations is None:
+                        memory_step.observations = "Error capturing browser state."
             
             # Create the agent with step callbacks for screenshots
             self.agent = CodeAgent(
@@ -455,6 +485,7 @@ class VisualWebAgent(BaseAgent):
                 verbosity_level=2,
                 step_callbacks=[save_screenshot_to_memory],
                 max_steps=20  # Limit to 20 steps to avoid infinite loops
+                # flatten_messages_as_text=False 
             )
             
             # Import helium for the agent

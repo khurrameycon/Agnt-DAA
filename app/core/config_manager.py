@@ -13,7 +13,7 @@ DEFAULT_CONFIG = {
         "huggingface": ""
     },
     "models": {
-        "default_model": "meta-llama/Llama-3-8B-Instruct",
+        "default_model": "meta-llama/Llama-3.2-3B-Instruct",
         "cache_dir": "~/.cache/sagax1/models"
     },
     "ui": {

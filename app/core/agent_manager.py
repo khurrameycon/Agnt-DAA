@@ -81,7 +81,7 @@ class AgentManager:
                 try:
                     agent_id = f"default_{default_agent}"
                     agent_type = default_config.get("agent_type", "local_model")
-                    model_id = default_config.get("model_id", "meta-llama/Llama-3-8B-Instruct")
+                    model_id = default_config.get("model_id", "meta-llama/Llama-3.2-3B-Instruct")
                     
                     self.create_agent(
                         agent_id=agent_id,

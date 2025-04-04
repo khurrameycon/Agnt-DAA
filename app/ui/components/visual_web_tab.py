@@ -65,17 +65,17 @@ class VisualWebTab(QWidget):
         
         # Refresh button
         refresh_button = QPushButton("Refresh")
-        refresh_button.clicked.connect(self.load_agents)
+        refresh_button.clicked.connect(self.refresh_agents)
         top_layout.addWidget(refresh_button)
         
         # Create button
         create_button = QPushButton("Create New")
-        create_button.clicked.connect(self.create_new_agent)
+        create_button.clicked.connect(self.create_agent)
         top_layout.addWidget(create_button)
         
         # Start/stop button
         self.start_stop_button = QPushButton("Start Browser")
-        self.start_stop_button.clicked.connect(self.toggle_browser)
+        self.start_stop_button.clicked.connect(self.start_stop_browser)
         self.start_stop_button.setEnabled(False)
         top_layout.addWidget(self.start_stop_button)
         
@@ -174,8 +174,7 @@ class VisualWebTab(QWidget):
     
     def navigate_to_url(self):
         """Navigate to the URL entered in the URL input field"""
-        if self.current_agent is None:
-            self.show_error_message("Browser not started", "Please start the browser first.")
+        if not self.ensure_browser_initialized():
             return
         
         url = self.url_input.toPlainText().strip()
@@ -195,13 +194,28 @@ class VisualWebTab(QWidget):
             command: Command to execute
             parameters: Parameters for the command
         """
-        if self.current_agent is None:
-            self.show_error_message("Browser not started", "Please start the browser first.")
-            return
+        # Make sure we have a browser
+        if self.current_agent is None or not hasattr(self.current_agent, 'visual_tool') or self.current_agent.visual_tool.browser is None:
+            self.logger.info("Browser not active, attempting to start...")
+            # Use start_stop_browser instead of toggle_browser
+            self.start_stop_browser()
+            
+            # Wait for browser to start
+            import time
+            time.sleep(3)
+            
+            # Check again
+            if self.current_agent is None or not hasattr(self.current_agent, 'visual_tool') or self.current_agent.visual_tool.browser is None:
+                self.logger.error("Browser failed to start")
+                self.show_error_message("Browser Not Started", "Please start the browser first.")
+                return
         
         try:
             # Get the visual tool from the agent
             visual_tool = self.current_agent.visual_tool
+            
+            # Log what we're doing
+            self.logger.info(f"Executing command: {command} with parameters: {parameters}")
             
             # Execute the command
             result = visual_tool.forward(command, parameters)
@@ -211,6 +225,8 @@ class VisualWebTab(QWidget):
             self.conversation.add_message(result, is_user=False)
         except Exception as e:
             self.logger.error(f"Error executing quick command: {str(e)}")
+            import traceback
+            self.logger.error(traceback.format_exc())
             self.conversation.add_message(f"Error executing command: {str(e)}", is_user=False)
     
     def add_chrome_notice(self):
@@ -262,12 +278,30 @@ class VisualWebTab(QWidget):
         
         self.layout.addLayout(input_layout)
     
+    def ensure_browser_initialized(self):
+        """Ensure the browser is properly initialized"""
+        if self.current_agent is None or not hasattr(self.current_agent, 'visual_tool') or self.current_agent.visual_tool.browser is None:
+            # Try to start the browser
+            if self.start_stop_button.text() == "Start Browser":
+                self.start_stop_browser()
+                # Wait a moment for the browser to start
+                import time
+                time.sleep(2)
+                
+            # Check again
+            if self.current_agent is None or not hasattr(self.current_agent, 'visual_tool') or self.current_agent.visual_tool.browser is None:
+                self.show_error_message("Browser Not Started", "Please start the browser first.")
+                return False
+        return True
+    
     def on_agent_selected(self, agent_id: str):
         """Handle agent selection
         
         Args:
             agent_id: ID of the selected agent
         """
+        self.logger.info(f"Agent selected: '{agent_id}'")
+        
         if agent_id == "No visual web agents available":
             self.current_agent_id = None
             self.current_agent = None
@@ -276,6 +310,9 @@ class VisualWebTab(QWidget):
             return
         
         try:
+            # Store the selected agent ID immediately to avoid empty ID issues
+            self.current_agent_id = agent_id
+            
             # Get agent instance
             agent = self.agent_manager.active_agents.get(agent_id)
             
@@ -287,17 +324,19 @@ class VisualWebTab(QWidget):
                         self.current_agent.screenshot_updated.disconnect(self.update_screenshot)
                     except:
                         pass
-                
+                    
                 # Connect to new agent
                 agent.screenshot_updated.connect(self.update_screenshot)
                 
                 # Update current agent
-                self.current_agent_id = agent_id
                 self.current_agent = agent
                 
                 # Enable buttons
                 self.start_stop_button.setEnabled(True)
-                self.send_button.setEnabled(True)
+                
+                # Enable send button only if browser is started
+                self.send_button.setEnabled(hasattr(agent, 'visual_tool') and 
+                                         agent.visual_tool.browser is not None)
                 
                 # Update button text
                 if hasattr(agent, 'visual_tool') and agent.visual_tool.browser is not None:
@@ -305,22 +344,20 @@ class VisualWebTab(QWidget):
                 else:
                     self.start_stop_button.setText("Start Browser")
             else:
-                # Create agent if it doesn't exist
-                agent_config = self.agent_manager.get_agent_config(agent_id)
+                # Store ID but not the agent instance yet
+                self.current_agent = None
                 
-                if agent_config["agent_type"] == "visual_web":
-                    self.current_agent_id = agent_id
-                    self.current_agent = None
-                    
-                    # Enable start button
-                    self.start_stop_button.setEnabled(True)
-                    self.start_stop_button.setText("Start Browser")
-                    
-                    # Disable send button until browser is started
-                    self.send_button.setEnabled(False)
+                # Enable start button
+                self.start_stop_button.setEnabled(True)
+                self.start_stop_button.setText("Start Browser")
+                
+                # Disable send button until browser is started
+                self.send_button.setEnabled(False)
+                
         except Exception as e:
             self.logger.error(f"Error selecting agent: {str(e)}")
-            self.current_agent_id = None
+            import traceback
+            self.logger.error(traceback.format_exc())
             self.current_agent = None
             self.start_stop_button.setEnabled(False)
             self.send_button.setEnabled(False)
@@ -358,10 +395,79 @@ class VisualWebTab(QWidget):
         """
         QMessageBox.warning(self, title, message)
     
-    def toggle_browser(self):
+
+    def init_browser_manually(self):
+        """Manually initialize the browser as a fallback method"""
+        if self.current_agent is None:
+            self.logger.error("No agent available for manual browser initialization")
+            return False
+            
+        try:
+            self.logger.info("Attempting manual browser initialization...")
+            
+            # Import required libraries
+            import helium
+            from selenium import webdriver
+            from selenium.webdriver.chrome.service import Service
+            from webdriver_manager.chrome import ChromeDriverManager
+            
+            # Configure browser options
+            options = webdriver.ChromeOptions()
+            options.add_argument("--force-device-scale-factor=1")
+            options.add_argument("--window-size=1000,800")
+            options.add_argument("--disable-pdf-viewer")
+            options.add_argument("--window-position=0,0")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+            
+            # Start Chrome directly
+            self.logger.info("Starting Chrome directly...")
+            browser_driver = webdriver.Chrome(
+                service=Service(ChromeDriverManager().install()), 
+                options=options
+            )
+            
+            # Navigate to a page to verify it works
+            browser_driver.get("https://www.google.com")
+            self.logger.info(f"Browser navigated to: {browser_driver.current_url}")
+            
+            # Set the driver in helium
+            helium.set_driver(browser_driver)
+            
+            # Set the browser in visual_tool
+            if hasattr(self.current_agent, 'visual_tool'):
+                self.current_agent.visual_tool.browser = helium
+                self.current_agent.visual_tool.webdriver = browser_driver
+                
+                # Take a screenshot to verify
+                screenshot_bytes = browser_driver.get_screenshot_as_png()
+                from PIL import Image
+                from io import BytesIO
+                image = Image.open(BytesIO(screenshot_bytes))
+                self.update_screenshot(image)
+                
+                self.logger.info("Manual browser initialization successful")
+                self.start_stop_button.setText("Stop Browser")
+                self.send_button.setEnabled(True)
+                return True
+            else:
+                self.logger.error("Agent doesn't have visual_tool attribute")
+                return False
+                
+        except Exception as e:
+            self.logger.error(f"Manual browser initialization failed: {str(e)}")
+            import traceback
+            self.logger.error(traceback.format_exc())
+            return False
+
+
+    def start_stop_browser(self):
         """Toggle browser start/stop"""
         if self.current_agent_id is None:
+            self.show_error_message("No Agent Selected", "Please select or create an agent first.")
             return
+            
+        self.logger.info(f"Toggle browser called. Current agent ID: {self.current_agent_id}")
         
         # Check if the button text is "Stop Browser"
         if self.start_stop_button.text() == "Stop Browser":
@@ -374,51 +480,76 @@ class VisualWebTab(QWidget):
                 self.screenshot_label.setText("Browser closed")
             return
         
-        # Get agent instance
-        agent = self.agent_manager.active_agents.get(self.current_agent_id)
+        # Show loading message
+        self.screenshot_label.setText("Starting browser, please wait...")
+        self.repaint()  # Force UI update
         
-        if agent is None:
-            # Create agent if it doesn't exist
-            self.agent_manager.create_agent(
-                agent_id=self.current_agent_id,
-                agent_type="visual_web",
-                model_config=self.agent_manager.get_agent_config(self.current_agent_id)["model_config"],
-                tools=self.agent_manager.get_agent_config(self.current_agent_id)["tools"],
-                additional_config=self.agent_manager.get_agent_config(self.current_agent_id)["additional_config"]
-            )
-            
+        try:
+            # Get or create agent instance
             agent = self.agent_manager.active_agents.get(self.current_agent_id)
             
             if agent is None:
-                self.logger.error(f"Failed to create agent {self.current_agent_id}")
-                self.show_error_message("Error", f"Failed to create agent {self.current_agent_id}")
-                return
-            
+                # Create agent if it doesn't exist
+                self.logger.info(f"Creating agent: {self.current_agent_id}")
+                self.agent_manager.create_agent(
+                    agent_id=self.current_agent_id,
+                    agent_type="visual_web",
+                    model_config=self.agent_manager.get_agent_config(self.current_agent_id)["model_config"],
+                    tools=self.agent_manager.get_agent_config(self.current_agent_id)["tools"],
+                    additional_config=self.agent_manager.get_agent_config(self.current_agent_id)["additional_config"]
+                )
+                
+                agent = self.agent_manager.active_agents.get(self.current_agent_id)
+                
+            # Try to disconnect existing signals to avoid duplicates
+            try:
+                if hasattr(agent, 'screenshot_updated'):
+                    agent.screenshot_updated.disconnect(self.update_screenshot)
+            except:
+                pass
+                
             # Connect signals
-            agent.screenshot_updated.connect(self.update_screenshot)
+            if hasattr(agent, 'screenshot_updated'):
+                agent.screenshot_updated.connect(self.update_screenshot)
             
             # Update current agent
             self.current_agent = agent
-        
-        try:
-            # Show loading message
-            self.screenshot_label.setText("Starting browser, please wait...")
-            self.repaint()  # Force UI update
             
-            # Initialize agent (which starts the browser)
-            agent.initialize()
+            # Try normal initialization first
+            try:
+                self.logger.info("Initializing agent with standard method...")
+                agent.initialize()
+                
+                # Wait for browser to potentially start
+                import time
+                time.sleep(2)
+            except Exception as e:
+                self.logger.error(f"Standard initialization failed: {str(e)}")
             
-            # Update button text
+            # Check if browser started
             if hasattr(agent, 'visual_tool') and agent.visual_tool.browser is not None:
+                self.logger.info("Browser started with standard method")
                 self.start_stop_button.setText("Stop Browser")
                 self.send_button.setEnabled(True)
                 self.conversation.add_message("Browser started successfully", is_user=False)
-            else:
-                self.start_stop_button.setText("Start Browser")
-                self.send_button.setEnabled(False)
-                self.screenshot_label.setText("Failed to start browser")
+                return
+            
+            # If standard method failed, try manual initialization
+            self.logger.info("Standard browser initialization failed, trying manual method...")
+            if self.init_browser_manually():
+                self.logger.info("Manual browser initialization successful")
+                return
+            
+            # If both methods fail
+            self.start_stop_button.setText("Start Browser")
+            self.send_button.setEnabled(False)
+            self.screenshot_label.setText("Failed to start browser")
+            self.show_error_message("Browser Error", "Failed to start browser. Please check if Chrome is installed and try again.")
+                
         except Exception as e:
-            self.logger.error(f"Error starting browser: {str(e)}")
+            self.logger.error(f"Error in start_stop_browser: {str(e)}")
+            import traceback
+            self.logger.error(traceback.format_exc())
             self.start_stop_button.setText("Start Browser")
             self.send_button.setEnabled(False)
             self.screenshot_label.setText(f"Error starting browser: {str(e)}")
@@ -426,36 +557,97 @@ class VisualWebTab(QWidget):
     
     def send_command(self):
         """Send command to agent"""
-        if self.current_agent is None:
-            self.show_error_message("Browser not started", "Please start the browser first.")
-            return
-        
-        # Get command
-        command = self.command_input.toPlainText().strip()
-        if not command:
-            self.show_error_message("Empty Command", "Please enter a command for the agent.")
-            return
-        
-        # Add to conversation
-        self.conversation.add_message(command, is_user=True)
-        
-        # Clear input
-        self.command_input.clear()
-        
-        # Disable input
-        self.command_input.setEnabled(False)
-        self.send_button.setEnabled(False)
-        self.start_stop_button.setEnabled(False)
-        
-        # Show loading message
-        self.conversation.add_message("Processing your request...", is_user=False)
-        
-        # Run agent in thread
-        self.window().run_agent_in_thread(
-            self.current_agent_id, 
-            command,
-            self.handle_agent_result
-        )
+        try:
+            # Log that the function was called
+            self.logger.info("Send command method called")
+            
+            # Check if browser is running
+            if self.current_agent is None or not hasattr(self.current_agent, 'visual_tool') or self.current_agent.visual_tool.browser is None:
+                self.logger.error("Browser not started")
+                self.show_error_message("Browser Not Started", "Please start the browser first.")
+                return
+            
+            # Get command
+            command = self.command_input.toPlainText().strip()
+            if not command:
+                self.show_error_message("Empty Command", "Please enter a command for the agent.")
+                return
+            
+            # Add to conversation
+            self.conversation.add_message(command, is_user=True)
+            
+            # Clear input
+            self.command_input.clear()
+            
+            # Disable UI while processing
+            self.command_input.setEnabled(False)
+            self.send_button.setEnabled(False)
+            self.start_stop_button.setEnabled(False)
+            
+            # Show processing message
+            self.conversation.add_message("Processing your request...", is_user=False)
+            
+            # Try simple direct execution first for certain patterns
+            if any(pattern in command.lower() for pattern in ["go to ", "navigate to "]):
+                try:
+                    # Extract URL
+                    url = None
+                    if "go to " in command.lower():
+                        url = command.lower().split("go to ")[1].split()[0].strip()
+                    elif "navigate to " in command.lower():
+                        url = command.lower().split("navigate to ")[1].split()[0].strip()
+                    
+                    if url:
+                        # Make sure URL has protocol
+                        if not url.startswith("http"):
+                            url = "https://" + url
+                            
+                        # Execute directly
+                        self.logger.info(f"Direct execution: Navigating to {url}")
+                        result = self.current_agent.visual_tool.forward("go_to", url)
+                        self.conversation.add_message(f"Navigated to {url}", is_user=False)
+                        
+                        # Re-enable UI
+                        self.command_input.setEnabled(True)
+                        self.send_button.setEnabled(True)
+                        self.start_stop_button.setEnabled(True)
+                        return
+                except Exception as e:
+                    self.logger.error(f"Error in direct execution: {str(e)}")
+                    # Continue to regular agent processing
+            
+            # Find the main window to run agent in thread
+            main_window = self.window()
+            if hasattr(main_window, 'run_agent_in_thread'):
+                self.logger.info(f"Running agent {self.current_agent_id} with command: {command}")
+                
+                # Execute the agent in a thread
+                main_window.run_agent_in_thread(
+                    self.current_agent_id, 
+                    command,
+                    self.handle_agent_result
+                )
+            else:
+                self.logger.error("Parent window not found or missing run_agent_in_thread method")
+                self.conversation.add_message("Error: Could not run agent. Please try again.", is_user=False)
+                
+                # Re-enable UI
+                self.command_input.setEnabled(True)
+                self.send_button.setEnabled(True)
+                self.start_stop_button.setEnabled(True)
+                
+        except Exception as e:
+            self.logger.error(f"Error in send_command: {str(e)}")
+            import traceback
+            self.logger.error(traceback.format_exc())
+            
+            # Show error
+            self.conversation.add_message(f"Error: {str(e)}", is_user=False)
+            
+            # Re-enable UI
+            self.command_input.setEnabled(True)
+            self.send_button.setEnabled(True)
+            self.start_stop_button.setEnabled(True)
     
     def handle_agent_result(self, result: str):
         """Handle agent result
@@ -514,7 +706,7 @@ class VisualWebTab(QWidget):
         except Exception as e:
             self.logger.error(f"Error updating screenshot: {str(e)}")
             
-    def load_agents(self):
+    def refresh_agents(self):
         """Load available agents"""
         # Clear existing items
         self.agent_selector.clear()
@@ -542,7 +734,7 @@ class VisualWebTab(QWidget):
         if self.agent_selector.count() > 0:
             self.agent_selector.setCurrentIndex(0)
     
-    def create_new_agent(self):
+    def create_agent(self):
         """Create a new visual web agent"""
         # Find the main window by traversing up the parent hierarchy
         main_window = self
@@ -550,10 +742,23 @@ class VisualWebTab(QWidget):
             main_window = main_window.parent()
         
         if main_window and hasattr(main_window, 'create_visual_web_agent'):
-            main_window.create_visual_web_agent()
+            # Suggest a more compatible model
+            from PyQt6.QtWidgets import QMessageBox
+            result = QMessageBox.question(
+                self,
+                "Model Recommendation",
+                "For best compatibility with visual web automation, we recommend using 'meta-llama/Llama-3.2-3B-Instruct'.\n\n"
+                "Would you like to use this model?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.Yes
+            )
+            
+            use_recommended = result == QMessageBox.StandardButton.Yes
+            
+            # Call the create method with the recommended model flag
+            main_window.create_visual_web_agent(use_recommended_model=use_recommended)
         else:
             # Fallback if we can't find the method
-            from PyQt6.QtWidgets import QMessageBox
             QMessageBox.warning(
                 self,
                 "Not Implemented",

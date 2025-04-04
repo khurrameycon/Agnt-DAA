@@ -304,7 +304,7 @@ class CreateAgentDialog(QDialog):
         
         # Add some popular models
         popular_models = [
-            "meta-llama/Llama-3-8B-Instruct",
+            "meta-llama/Llama-3.2-3B-Instruct",
             "mistralai/Mistral-7B-Instruct-v0.2",
             "HuggingFaceTB/SmolLM2-1.7B-Instruct",
             "Gryphe/MythoMax-L2-13B"
