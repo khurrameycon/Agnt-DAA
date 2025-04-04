@@ -828,3 +828,116 @@ AttributeError: 'FineTuningTab' object has no attribute 'model_selector'. Did yo
 2025-04-03 16:17:59,484 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/queue/data?session_hash=4b0eb5b2-ca44-46bb-a4c6-084d4dd05ee8 "HTTP/1.1 200 OK"
 2025-04-03 16:18:04,622 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/file=/tmp/gradio/dc8b3074fe14fb8aaafc7d3d13168699a7a4ea04/image.webp "HTTP/1.1 200 OK"
 2025-04-03 16:19:01,924 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-04-04 10:37:11,065 - sagax1 - INFO - Logging initialized
+2025-04-04 10:37:11,776 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 10:37:11,776 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 10:37:11,777 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 10:37:11,777 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 10:37:11,778 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 10:37:11,779 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 10:37:13,325 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 10:37:16,741 - sagax1 - INFO - Application started
+2025-04-04 11:02:53,039 - sagax1 - INFO - Logging initialized
+2025-04-04 11:02:53,112 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 11:02:53,113 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 11:02:53,113 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 11:02:53,114 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 11:02:53,114 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 11:02:53,114 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 11:02:53,464 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 11:02:57,395 - sagax1 - INFO - Application started
+2025-04-04 11:03:32,942 - app.core.agent_manager - INFO - Created web browsing agent with ID sa
+2025-04-04 11:03:47,147 - app.core.agent_manager - INFO - Running agent sa with input: policy on foegien education by HEC...
+2025-04-04 11:03:47,147 - agent.sa - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 11:03:47,147 - smolagents.models - INFO - Using device: auto
+2025-04-04 11:03:51,693 - agent.sa - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 11:03:51,709 - agent.sa - INFO - Web browsing agent sa initialized successfully
+2025-04-04 11:04:05,057 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-04-04 11:27:23,669 - sagax1 - INFO - Logging initialized
+2025-04-04 11:27:24,045 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 11:27:24,045 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 11:27:24,045 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 11:27:24,045 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 11:27:24,045 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 11:27:24,045 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 11:27:24,893 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 11:27:28,518 - sagax1 - INFO - Application started
+2025-04-04 11:27:48,303 - app.core.agent_manager - INFO - Created web browsing agent with ID as
+2025-04-04 11:28:02,169 - app.core.agent_manager - INFO - Running agent as with input: Policy on Polio vaccine in Pakistan...
+2025-04-04 11:28:02,169 - agent.as - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 11:28:02,217 - smolagents.models - INFO - Using device: auto
+2025-04-04 11:28:07,491 - agent.as - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 11:28:07,555 - agent.as - INFO - Web browsing agent as initialized successfully
+2025-04-04 11:28:19,055 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-04-04 11:32:41,257 - sagax1 - INFO - Logging initialized
+2025-04-04 11:32:41,327 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 11:32:41,327 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 11:32:41,327 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 11:32:41,327 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 11:32:41,327 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 11:32:41,327 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 11:32:41,633 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 11:32:42,883 - sagax1 - INFO - Application started
+2025-04-04 11:32:52,688 - app.core.agent_manager - INFO - Created web browsing agent with ID sa
+2025-04-04 11:33:03,927 - app.core.agent_manager - INFO - Running agent sa with input: Polio in Pakistan...
+2025-04-04 11:33:03,927 - agent.sa - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 11:33:03,939 - smolagents.models - INFO - Using device: auto
+2025-04-04 11:33:07,196 - agent.sa - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 11:33:07,211 - agent.sa - INFO - Web browsing agent sa initialized successfully
+2025-04-04 11:33:08,594 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-04-04 11:33:56,667 - app.core.agent_manager - INFO - Created agent with ID chat of type local_model
+2025-04-04 11:34:07,817 - app.core.agent_manager - INFO - Running agent chat with input: what is Model ? in Machine learning...
+2025-04-04 11:34:08,500 - agent.chat - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct is available
+2025-04-04 11:34:08,500 - agent.chat - INFO - Initializing model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 11:34:08,500 - smolagents.models - INFO - Using device: auto
+2025-04-04 11:34:11,241 - agent.chat - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct initialized successfully
+2025-04-04 11:39:27,260 - sagax1 - INFO - Logging initialized
+2025-04-04 11:39:27,292 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 11:39:27,292 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 11:39:27,292 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 11:39:27,292 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 11:39:27,292 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 11:39:27,292 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 11:39:27,588 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 11:39:28,776 - sagax1 - INFO - Application started
+2025-04-04 11:39:36,490 - app.core.agent_manager - INFO - Created web browsing agent with ID asd
+2025-04-04 11:39:46,637 - app.core.agent_manager - INFO - Running agent asd with input: HEC policy on Postgraduation...
+2025-04-04 11:39:46,637 - agent.asd - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 11:39:46,637 - smolagents.models - INFO - Using device: auto
+2025-04-04 11:39:50,683 - agent.asd - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 11:39:50,699 - agent.asd - INFO - Web browsing agent asd initialized successfully
+2025-04-04 11:39:51,926 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-04-04 11:43:42,514 - sagax1 - INFO - Logging initialized
+2025-04-04 11:43:42,561 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 11:43:42,561 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 11:43:42,561 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 11:43:42,561 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 11:43:42,561 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 11:43:42,561 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 11:43:42,870 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 11:43:44,118 - sagax1 - INFO - Application started
+2025-04-04 11:43:52,920 - app.core.agent_manager - INFO - Created web browsing agent with ID sdf
+2025-04-04 11:44:16,607 - app.core.agent_manager - INFO - Running agent sdf with input: what is Ivy leaque ? how to get admission in these...
+2025-04-04 11:44:16,607 - agent.sdf - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 11:44:16,613 - smolagents.models - INFO - Using device: auto
+2025-04-04 11:44:19,593 - agent.sdf - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 11:44:19,614 - agent.sdf - INFO - Web browsing agent sdf initialized successfully
+2025-04-04 11:44:20,963 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-04-04 11:48:04,375 - sagax1 - INFO - Logging initialized
+2025-04-04 11:48:04,446 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 11:48:04,446 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 11:48:04,446 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 11:48:04,446 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 11:48:04,446 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 11:48:04,446 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 11:48:04,768 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 11:48:06,186 - sagax1 - INFO - Application started
+2025-04-04 11:48:14,742 - app.core.agent_manager - INFO - Created web browsing agent with ID asdf
+2025-04-04 11:48:28,101 - app.core.agent_manager - INFO - Running agent asdf with input: what is loreum ispum?...
+2025-04-04 11:48:28,101 - agent.asdf - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 11:48:28,117 - smolagents.models - INFO - Using device: auto
+2025-04-04 11:48:31,434 - agent.asdf - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 11:48:31,450 - agent.asdf - INFO - Web browsing agent asdf initialized successfully
+2025-04-04 11:48:32,799 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-04-04 11:48:54,800 - app.core.agent_manager - INFO - Running agent asdf with input: HEC policy on Post Doctorate...
+2025-04-04 11:48:55,966 - primp - INFO - response: https://html.duckduckgo.com/html 200

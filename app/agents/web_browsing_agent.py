@@ -1,7 +1,7 @@
 """
 Web Browsing Agent for SagaX1
 Agent for browsing the web, searching for information, and visiting webpages
-Based on the multi-agent architecture from the notebook
+Enhanced with improved UI display based on multiagents.ipynb sample
 """
 
 import os
@@ -18,117 +18,81 @@ from smolagents import (
     ToolCallingAgent
 )
 
-class ExtractWebContentTool(Tool):
-    """Tool for extracting specific content from a webpage"""
+class FormattedSearchResults(Tool):
+    """Tool for formatting search results into a more UI-friendly format"""
     
-    name = "extract_content"
-    description = "Extract specific content from a webpage using CSS selectors"
+    name = "format_results"
+    description = "Format search and webpage results for better display in the UI"
     inputs = {
-        "url": {
-            "type": "string", 
-            "description": "URL of the webpage to extract content from"
-        },
-        "css_selector": {
-            "type": "string", 
-            "description": "CSS selector to extract content (e.g., 'div.content', 'h1', 'p.summary')"
-        }
-    }
-    output_type = "string"
-    
-    def forward(self, url: str, css_selector: str) -> str:
-        """Extract content from a webpage using a CSS selector
-        
-        Args:
-            url: URL of the webpage
-            css_selector: CSS selector to extract content
-            
-        Returns:
-            Extracted content as text
-        """
-        try:
-            import requests
-            from bs4 import BeautifulSoup
-            
-            # Add http:// if missing
-            if not url.startswith('http'):
-                url = 'https://' + url
-            
-            # Get the webpage
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            }
-            response = requests.get(url, headers=headers, timeout=10)
-            response.raise_for_status()
-            
-            # Parse the HTML
-            soup = BeautifulSoup(response.text, 'html.parser')
-            
-            # Extract content using the CSS selector
-            elements = soup.select(css_selector)
-            
-            if not elements:
-                return f"No elements found matching selector '{css_selector}'"
-            
-            # Extract text from all matching elements
-            content = "\n".join([el.get_text().strip() for el in elements])
-            
-            return f"EXTRACTED CONTENT:\n{content}"
-            
-        except requests.exceptions.RequestException as e:
-            return f"Error accessing webpage: {str(e)}"
-        except Exception as e:
-            return f"Error extracting content: {str(e)}"
-
-class SaveWebContentTool(Tool):
-    """Tool for saving web content to a file"""
-    
-    name = "save_content"
-    description = "Save web content to a file for later reference"
-    inputs = {
-        "filename": {
-            "type": "string", 
-            "description": "Name of the file to save (will be saved in the 'downloads' folder)"
-        },
         "content": {
             "type": "string", 
-            "description": "Content to save to the file"
+            "description": "Raw search results or webpage content to format"
         }
     }
     output_type = "string"
     
-    def forward(self, filename: str, content: str) -> str:
-        """Save content to a file
+    def forward(self, content: str) -> str:
+        """Format content for better display
         
         Args:
-            filename: Name of the file to save
-            content: Content to save
+            content: Raw content to format
             
         Returns:
-            Confirmation message
+            Formatted content
         """
         try:
-            # Create downloads directory if it doesn't exist
-            os.makedirs('downloads', exist_ok=True)
+            # Check if the content is from a web search
+            if "Web search results:" in content:
+                # Format search results more attractively
+                lines = content.split("\n")
+                formatted = "# Search Results\n\n"
+                
+                current_result = None
+                results = []
+                
+                for line in lines:
+                    if line.startswith("[") and "]" in line:
+                        # New result title
+                        if current_result:
+                            results.append(current_result)
+                        current_result = {"title": line, "content": []}
+                    elif current_result and line.strip():
+                        current_result["content"].append(line)
+                
+                # Add the last result
+                if current_result:
+                    results.append(current_result)
+                
+                # Format results in a more structured way
+                for i, result in enumerate(results):
+                    title = result["title"]
+                    content = "\n".join(result["content"])
+                    formatted += f"## Result {i+1}\n{title}\n\n{content}\n\n"
+                
+                return formatted
             
-            # Ensure filename has a valid extension
-            if not filename.endswith(('.txt', '.html', '.json', '.md', '.csv')):
-                filename += '.txt'  # Default to .txt
+            # Check if it's webpage content
+            elif "Error fetching the webpage:" not in content and len(content) > 500:
+                # Simplify lengthy webpage content
+                # Extract what seems to be the main content
+                paragraphs = [p for p in content.split("\n\n") if len(p) > 100]
+                
+                if paragraphs:
+                    formatted = "# Webpage Content\n\n"
+                    formatted += "\n\n".join(paragraphs[:5])  # First 5 substantial paragraphs
+                    if len(paragraphs) > 5:
+                        formatted += "\n\n... (content continues) ..."
+                    return formatted
             
-            # Create the full file path
-            file_path = os.path.join('downloads', filename)
-            
-            # Write the content to the file
-            with open(file_path, 'w', encoding='utf-8') as f:
-                f.write(content)
-            
-            return f"Content saved to {file_path}"
+            # Default: return content as is
+            return content
             
         except Exception as e:
-            return f"Error saving content: {str(e)}"
+            return f"Error formatting content: {str(e)}"
 
 class WebBrowsingAgent(BaseAgent):
     """Agent for browsing the web, searching for information, and visiting webpages
-    Supports multi-agent collaboration for complex web tasks
+    Enhanced with better UI display capabilities
     """
     
     def __init__(self, agent_id: str, config: Dict[str, Any]):
@@ -161,6 +125,9 @@ class WebBrowsingAgent(BaseAgent):
         self.web_agent = None
         self.manager_agent = None
         self.is_initialized = False
+        
+        # Store the last raw search results for UI display
+        self.last_search_results = ""
     
     def initialize(self) -> None:
         """Initialize the model and agent(s)"""
@@ -182,12 +149,12 @@ class WebBrowsingAgent(BaseAgent):
             if self.use_multi_agent:
                 self._initialize_multi_agent(model, tools)
             else:
-                # Create a single agent
-                self.main_agent = CodeAgent(
+                # Create a single agent for direct search
+                self.main_agent = ToolCallingAgent(
                     tools=tools,
                     model=model,
-                    additional_authorized_imports=self.authorized_imports,
-                    verbosity_level=1
+                    max_steps=5,  # Allow several steps for search and optional page visits
+                    verbosity_level=2  # Provide detailed output logs
                 )
             
             self.is_initialized = True
@@ -254,8 +221,7 @@ class WebBrowsingAgent(BaseAgent):
         return [
             DuckDuckGoSearchTool(),
             VisitWebpageTool(),
-            ExtractWebContentTool(),
-            SaveWebContentTool()
+            FormattedSearchResults()
         ]
     
     def _initialize_multi_agent(self, model, tools: List[Tool]) -> None:
@@ -271,7 +237,8 @@ class WebBrowsingAgent(BaseAgent):
             model=model,
             max_steps=10,  # Allow for more steps as web search may require several iterations
             name="web_search_agent",
-            description="Runs web searches and visits webpages for you."
+            description="Runs web searches and visits webpages for you.",
+            verbosity_level=2  # Provide detailed output logs
         )
         
         # Create a manager agent that handles the overall task (using CodeAgent)
@@ -279,7 +246,8 @@ class WebBrowsingAgent(BaseAgent):
             tools=[],  # No direct tools, will use the web_agent
             model=model,
             managed_agents=[self.web_agent],  # This is how we connect the agents
-            additional_authorized_imports=self.authorized_imports
+            additional_authorized_imports=self.authorized_imports,
+            verbosity_level=2  # Provide detailed output logs
         )
     
     def run(self, input_text: str, callback: Optional[Callable[[str], None]] = None) -> str:
@@ -296,51 +264,46 @@ class WebBrowsingAgent(BaseAgent):
             self.initialize()
         
         try:
-            if self.use_multi_agent and self.manager_agent:
-                # Format the prompt for the multi-agent setup
-                prompt = f"""
-    I need information about the following topic. Please search the web and gather relevant details:
-
-    {input_text}
-
-    Please provide a comprehensive answer with facts and information from reliable sources.
-    """
-                # Run the manager agent which will delegate to the web agent as needed
-                result = self.manager_agent.run(prompt)
-            else:
-                # Format prompt for single agent - VERY simple and direct
-                prompt = f"""
-    I need to find information about: {input_text}
-
-    Please perform ONLY these specific steps:
-    1. Use the web_search tool to search for "{input_text}" 
-    2. Return the raw search results exactly as provided by the web_search tool
-    3. DO NOT try to visit any webpages or extract content after searching
-
-    Example of the code you should write:
-    ```python
-    # Search for information
-    results = web_search(query="{input_text}")
-    # Display the results directly without processing
-    print(results)
-    ```
-
-    Remember: Only search and return results. No additional parsing or page visits.
-    """
-                # Run the single agent
-                result = self.main_agent.run(prompt)
+            # Directly use the DuckDuckGoSearchTool for simplicity and reliability
+            search_tool = DuckDuckGoSearchTool()
+            
+            # Perform the search
+            search_results = search_tool(query=input_text)
+            
+            # Clean up the formatting
+            # Replace markdown formatting
+            formatted_results = f"Search Results for: {input_text}\n\n"
+            
+            # Process the results to improve formatting
+            lines = search_results.split("\n")
+            for line in lines:
+                # Handle link lines - extract URL and title
+                if line.startswith("|") and "](" in line:
+                    # Extract title and URL from markdown link format |title](url)
+                    parts = line.split("](")
+                    if len(parts) >= 2:
+                        title = parts[0].replace("|", "").strip()
+                        url = parts[1].rstrip(")")
+                        formatted_results += f"{title}\n{url}\n\n"
+                else:
+                    # Regular text line
+                    formatted_results += f"{line}\n"
             
             # Add to history
-            self.add_to_history(input_text, str(result))
+            self.add_to_history(input_text, formatted_results)
             
-            return str(result)
+            # Return just the formatted search results
+            return formatted_results
+            
+        except Exception as e:
+            error_msg = f"Error performing web search: {str(e)}"
+            self.logger.error(error_msg)
+            return f"Sorry, I encountered an error while searching the web: {error_msg}"
             
         except Exception as e:
             error_msg = f"Error running web browsing agent: {str(e)}"
             self.logger.error(error_msg)
             return f"Sorry, I encountered an error while browsing the web: {error_msg}"
-
-
     
     def reset(self) -> None:
         """Reset the agent's state"""
@@ -353,6 +316,7 @@ class WebBrowsingAgent(BaseAgent):
             self.main_agent.memory.reset()
         
         self.clear_history()
+        self.last_search_results = ""
     
     def get_capabilities(self) -> List[str]:
         """Get the list of capabilities this agent has
@@ -365,7 +329,7 @@ class WebBrowsingAgent(BaseAgent):
             "web_browsing", 
             "information_retrieval",
             "content_extraction",
-            "content_saving"
+            "result_formatting"
         ]
         
         if self.use_multi_agent:
@@ -373,17 +337,3 @@ class WebBrowsingAgent(BaseAgent):
             capabilities.append("task_planning")
         
         return capabilities
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert agent to dictionary representation
-        
-        Returns:
-            Dictionary representation of the agent
-        """
-        agent_dict = super().to_dict()
-        agent_dict.update({
-            "model_id": self.model_id,
-            "use_multi_agent": self.use_multi_agent,
-            "capabilities": self.get_capabilities()
-        })
-        return agent_dict

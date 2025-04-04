@@ -847,7 +847,7 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(web_tab, "Web Browsing")
         
     def send_web_command(self):
-        """Send command to web browsing agent"""
+        """Send command to web browsing agent - simplified to just perform search"""
         if self.web_agent_selector.currentText() == "No web browsing agents available":
             return
         
@@ -867,19 +867,25 @@ class MainWindow(QMainWindow):
         # Clear input
         self.web_input.clear()
         
-        # Disable input
+        # Disable input while processing
         self.web_input.setEnabled(False)
         self.web_send_button.setEnabled(False)
         
+        # Show processing status
+        self.status_bar.showMessage("Searching the web, please wait...", 0)
+        
+        # Clear the web content display and show loading message
+        self.web_content_display.setText("Searching the web...")
+        
         # Run agent in thread
         self.run_agent_in_thread(
-            agent_id, 
+            agent_id,
             command,
             self.handle_web_result
         )
 
     def handle_web_result(self, result: str):
-        """Handle web browsing agent result - minimal version that just displays content
+        """Handle web browsing agent result - display clean, properly formatted search results with clickable links
         
         Args:
             result: Agent result
@@ -887,27 +893,57 @@ class MainWindow(QMainWindow):
         # Add to conversation
         self.web_conversation.add_message(result, is_user=False)
         
-        # Extract search results from the execution logs
-        if "Execution logs:" in result:
-            # Find start of Execution logs
-            logs_index = result.find("Execution logs:")
-            # Get everything after "Execution logs:"
-            content = result[logs_index + 15:]  # +15 to skip "Execution logs:"
+        try:
+            # Convert search results to HTML for better display in UI with clickable links
+            html_content = "<html><body style='font-family: Arial, sans-serif;'>"
+            lines = result.split("\n")
             
-            # Display the content in the web content area
-            self.web_content_display.setText(content)
-        elif "## Search Results" in result:
-            # Alternative approach if we find direct search results
-            results_index = result.find("## Search Results")
-            content = result[results_index:]
-            self.web_content_display.setText(content)
-        else:
-            # Last resort: just display the entire result
+            i = 0
+            while i < len(lines):
+                line = lines[i].strip()
+                
+                # Handle title line
+                if "Search Results for:" in line:
+                    html_content += f"<h2>{line}</h2>"
+                    i += 1
+                    continue
+                    
+                # Check if this line is a title and the next is a URL
+                if i < len(lines) - 1:
+                    next_line = lines[i+1].strip()
+                    # If current line is not a URL but the next line is
+                    if (not line.startswith("http")) and next_line.startswith("http"):
+                        # This is a title followed by URL
+                        html_content += f"<p><b>{line}</b><br>"
+                        html_content += f"<a href='{next_line}' style='color: #0066cc;'>{next_line}</a></p>"
+                        i += 2  # Skip both lines
+                        continue
+                
+                # Regular text line
+                if line:
+                    # Check if this is a URL
+                    if line.startswith("http"):
+                        html_content += f"<p><a href='{line}' style='color: #0066cc;'>{line}</a></p>"
+                    else:
+                        html_content += f"<p>{line}</p>"
+                
+                i += 1
+            
+            html_content += "</body></html>"
+            
+            # Set content as HTML
+            self.web_content_display.setHtml(html_content)
+        except Exception as e:
+            # Fallback if HTML processing fails
             self.web_content_display.setText(result)
+            self.logger.error(f"Error formatting web results: {str(e)}")
         
         # Enable UI elements
         self.web_input.setEnabled(True)
         self.web_send_button.setEnabled(True)
+        
+        # Update status
+        self.status_bar.showMessage("Web search completed", 3000)
 
     def create_visual_web_tab(self):
         """Create the visual web automation tab"""
@@ -961,7 +997,7 @@ class MainWindow(QMainWindow):
             self.multi_agent_toggle.setEnabled(False)
         
     def create_web_browsing_agent(self):
-        """Create a new web browsing agent"""
+        """Create a new web browsing agent with enhanced UI display capabilities"""
         from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
         
         # Create dialog
@@ -976,6 +1012,10 @@ class MainWindow(QMainWindow):
         if dialog.exec():
             # Get agent configuration
             agent_config = dialog.get_agent_config()
+            
+            # Make sure we have proper configuration for web browsing
+            if "DuckDuckGoSearchTool" not in agent_config["tools"]:
+                agent_config["tools"].append("DuckDuckGoSearchTool")
             
             # Create agent
             agent_id = self.agent_manager.create_agent(
@@ -998,6 +1038,12 @@ class MainWindow(QMainWindow):
                 for i in range(self.web_agent_selector.count()):
                     if self.web_agent_selector.itemData(i) == agent_id:
                         self.web_agent_selector.setCurrentIndex(i)
+                        break
+                
+                # Switch to the web browsing tab to show the new agent
+                for i in range(self.tabs.count()):
+                    if self.tabs.tabText(i) == "Web Browsing":
+                        self.tabs.setCurrentIndex(i)
                         break
 
     def create_visual_web_agent(self):
