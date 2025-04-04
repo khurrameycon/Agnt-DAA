@@ -150,6 +150,10 @@ class MainWindow(QMainWindow):
         
         # Check for API key
         self.check_api_key()
+
+        # After creating the visual_web_tab
+        from app.utils.visual_web_demo import VisualWebDemo
+        VisualWebDemo.add_demo_menu(self.visual_web_tab)
         
     def check_api_key(self):
         """Check if API key is set and prompt if not"""
@@ -945,6 +949,8 @@ class MainWindow(QMainWindow):
         # Update status
         self.status_bar.showMessage("Web search completed", 3000)
 
+    
+
     def create_visual_web_tab(self):
         """Create the visual web automation tab"""
         from app.ui.components.visual_web_tab import VisualWebTab
@@ -957,6 +963,15 @@ class MainWindow(QMainWindow):
         
         # Add tab
         self.tabs.addTab(self.visual_web_tab, "Visual Web")
+        
+        # Add demo functionality if needed
+        try:
+            # Import the demo class - try/except prevents errors if file doesn't exist yet
+            from app.utils.visual_web_demo import VisualWebDemo
+            VisualWebDemo.add_demo_menu(self.visual_web_tab)
+        except ImportError:
+            # If the demo module isn't available, don't add the demo menu
+            self.logger.info("Visual Web Demo not available, skipping demo menu")
 
     def create_code_gen_tab(self):
         """Create the code generation tab"""
@@ -1047,7 +1062,7 @@ class MainWindow(QMainWindow):
                         break
 
     def create_visual_web_agent(self):
-        """Create a new visual web agent"""
+        """Create a new visual web agent with enhanced functionality"""
         from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
         
         # Create dialog
@@ -1057,6 +1072,16 @@ class MainWindow(QMainWindow):
         index = dialog.agent_type_combo.findText("visual_web")
         if index >= 0:
             dialog.agent_type_combo.setCurrentIndex(index)
+        
+        # Show Chrome requirement message
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(
+            self,
+            "Chrome Requirement",
+            "Visual Web Automation requires Google Chrome to be installed on your system. "
+            "Please make sure Chrome is installed before creating the agent.",
+            QMessageBox.StandardButton.Ok
+        )
         
         # Show dialog
         if dialog.exec():
@@ -1081,6 +1106,12 @@ class MainWindow(QMainWindow):
                 
                 # Switch to visual web tab
                 self.tabs.setCurrentWidget(self.visual_web_tab)
+            else:
+                QMessageBox.warning(
+                    self,
+                    "Agent Creation Failed",
+                    "Failed to create visual web agent. Please check the logs for details."
+                )
 
     def create_code_generation_agent(self):
         """Create a new code generation agent"""

@@ -941,3 +941,181 @@ AttributeError: 'FineTuningTab' object has no attribute 'model_selector'. Did yo
 2025-04-04 11:48:32,799 - primp - INFO - response: https://html.duckduckgo.com/html 200
 2025-04-04 11:48:54,800 - app.core.agent_manager - INFO - Running agent asdf with input: HEC policy on Post Doctorate...
 2025-04-04 11:48:55,966 - primp - INFO - response: https://html.duckduckgo.com/html 200
+2025-04-04 11:54:11,432 - sagax1 - INFO - Logging initialized
+2025-04-04 11:54:11,478 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 11:54:11,478 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 11:54:11,478 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 11:54:11,478 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 11:54:11,478 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 11:54:11,490 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 11:54:11,764 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 11:54:12,980 - sagax1 - INFO - Application started
+2025-04-04 12:15:36,763 - sagax1 - INFO - Logging initialized
+2025-04-04 12:15:36,802 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 12:15:36,802 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 12:15:36,803 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 12:15:36,804 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 12:15:36,804 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 12:15:36,805 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 12:15:37,062 - sagax1 - ERROR - Unhandled exception: 'VisualWebTab' object has no attribute 'on_agent_selected'
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\main.py", line 47, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 136, in __init__
+    self.create_visual_web_tab()
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 957, in create_visual_web_tab
+    self.visual_web_tab = VisualWebTab(self.agent_manager, self)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\components\visual_web_tab.py", line 45, in __init__
+    self.create_top_bar()
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\components\visual_web_tab.py", line 63, in create_top_bar
+    self.agent_selector.currentTextChanged.connect(self.on_agent_selected)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'VisualWebTab' object has no attribute 'on_agent_selected'. Did you mean: 'agent_selector'?
+2025-04-04 12:16:16,865 - sagax1 - INFO - Logging initialized
+2025-04-04 12:16:16,920 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 12:16:16,920 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 12:16:16,921 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 12:16:16,921 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 12:16:16,922 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 12:16:16,922 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 12:16:17,165 - sagax1 - ERROR - Unhandled exception: 'VisualWebTab' object has no attribute 'on_agent_selected'
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\main.py", line 47, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 136, in __init__
+    self.create_visual_web_tab()
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 957, in create_visual_web_tab
+    self.visual_web_tab = VisualWebTab(self.agent_manager, self)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\components\visual_web_tab.py", line 45, in __init__
+    self.create_top_bar()
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\components\visual_web_tab.py", line 63, in create_top_bar
+    self.agent_selector.currentTextChanged.connect(self.on_agent_selected)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'VisualWebTab' object has no attribute 'on_agent_selected'. Did you mean: 'agent_selector'?
+2025-04-04 12:20:33,861 - sagax1 - INFO - Logging initialized
+2025-04-04 12:20:33,933 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 12:20:33,934 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 12:20:33,934 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 12:20:33,934 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 12:20:33,935 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 12:20:33,935 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 12:20:34,205 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 12:20:34,266 - sagax1 - ERROR - Unhandled exception: cannot import name 'QAction' from 'PyQt6.QtWidgets' (D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\PyQt6\QtWidgets.pyd)
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\main.py", line 47, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 156, in __init__
+    VisualWebDemo.add_demo_menu(self.visual_web_tab)
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\utils\visual_web_demo.py", line 51, in add_demo_menu
+    from PyQt6.QtWidgets import QPushButton, QMenu, QAction
+ImportError: cannot import name 'QAction' from 'PyQt6.QtWidgets' (D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\PyQt6\QtWidgets.pyd)
+2025-04-04 12:21:39,858 - sagax1 - INFO - Logging initialized
+2025-04-04 12:21:39,896 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 12:21:39,896 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 12:21:39,896 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 12:21:39,896 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 12:21:39,896 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 12:21:39,911 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 12:21:40,188 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 12:21:40,240 - sagax1 - ERROR - Unhandled exception: cannot import name 'QAction' from 'PyQt6.QtWidgets' (D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\PyQt6\QtWidgets.pyd)
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\main.py", line 47, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 156, in __init__
+    VisualWebDemo.add_demo_menu(self.visual_web_tab)
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\utils\visual_web_demo.py", line 51, in add_demo_menu
+    from PyQt6.QtWidgets import QPushButton, QMenu, QAction
+ImportError: cannot import name 'QAction' from 'PyQt6.QtWidgets' (D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\PyQt6\QtWidgets.pyd)
+2025-04-04 12:23:34,811 - sagax1 - INFO - Logging initialized
+2025-04-04 12:23:34,879 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 12:23:34,880 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 12:23:34,880 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 12:23:34,880 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 12:23:34,882 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 12:23:34,882 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 12:23:35,234 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 12:23:36,464 - sagax1 - INFO - Application started
+2025-04-04 12:25:26,361 - sagax1 - INFO - Logging initialized
+2025-04-04 12:25:26,397 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 12:25:26,397 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 12:25:26,397 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 12:25:26,397 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 12:25:26,397 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 12:25:26,397 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 12:25:26,737 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 12:25:27,967 - sagax1 - INFO - Application started
+2025-04-04 12:25:43,322 - app.agents.agent_registry - ERROR - Error creating agent of type 'visual_web': descriptor '__init__' requires a 'PyQt6.sip.simplewrapper' object but received a 'VisualWebAgent'
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\agent_registry.py", line 64, in create_agent
+    return agent_class(agent_id, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 312, in __init__
+    QObject.__init__(self)
+TypeError: descriptor '__init__' requires a 'PyQt6.sip.simplewrapper' object but received a 'VisualWebAgent'
+2025-04-04 12:25:43,322 - app.core.agent_manager - ERROR - Failed to create agent with ID asd
+2025-04-04 12:38:21,881 - sagax1 - INFO - Logging initialized
+2025-04-04 12:38:21,947 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 12:38:21,947 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 12:38:21,948 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 12:38:21,948 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 12:38:21,949 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 12:38:21,949 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 12:38:22,245 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 12:38:23,490 - sagax1 - INFO - Application started
+2025-04-04 12:38:42,438 - app.agents.agent_registry - ERROR - Error creating agent of type 'visual_web': descriptor '__init__' requires a 'PyQt6.sip.simplewrapper' object but received a 'VisualWebAgent'
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\agent_registry.py", line 64, in create_agent
+    return agent_class(agent_id, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 312, in __init__
+    QObject.__init__(self)
+TypeError: descriptor '__init__' requires a 'PyQt6.sip.simplewrapper' object but received a 'VisualWebAgent'
+2025-04-04 12:38:42,440 - app.core.agent_manager - ERROR - Failed to create agent with ID 123
+2025-04-04 12:40:25,137 - sagax1 - INFO - Logging initialized
+2025-04-04 12:40:25,182 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 12:40:25,182 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 12:40:25,182 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 12:40:25,182 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 12:40:25,182 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 12:40:25,182 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 12:40:26,770 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 12:40:28,099 - sagax1 - INFO - Application started
+2025-04-04 12:40:35,164 - app.agents.agent_registry - ERROR - Error creating agent of type 'visual_web': 'QObject' object has no attribute 'pyqtSignal'
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\agent_registry.py", line 64, in create_agent
+    return agent_class(agent_id, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 316, in __init__
+    self.screenshot_updated = self.qobject.pyqtSignal(object)
+                              ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'QObject' object has no attribute 'pyqtSignal'
+2025-04-04 12:40:35,164 - app.core.agent_manager - ERROR - Failed to create agent with ID sdf
+2025-04-04 12:42:17,172 - sagax1 - INFO - Logging initialized
+2025-04-04 12:42:17,222 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-04 12:42:17,222 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-04 12:42:17,222 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-04 12:42:17,222 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-04 12:42:17,222 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-04 12:42:17,222 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-04 12:42:17,535 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-04 12:42:18,725 - sagax1 - INFO - Application started
+2025-04-04 12:42:26,676 - app.core.agent_manager - INFO - Created agent with ID sdf of type visual_web
+2025-04-04 12:42:26,676 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 12:42:31,160 - agent.sdf - INFO - Initializing visual web agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 12:42:31,160 - smolagents.models - INFO - Using device: auto
+2025-04-04 12:42:34,205 - agent.sdf - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 12:42:34,230 - agent.sdf - ERROR - Error initializing visual web agent: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 12:42:34,230 - app.ui.components.visual_web_tab - ERROR - Error starting browser: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 12:43:21,345 - app.core.agent_manager - INFO - Created web browsing agent with ID 123
+2025-04-04 12:43:21,909 - app.core.agent_manager - INFO - Running agent 123 with input: what is PoLLing ?...
+2025-04-04 12:43:21,909 - agent.123 - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 12:43:21,909 - smolagents.models - INFO - Using device: auto
+2025-04-04 12:43:25,431 - agent.123 - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-04 12:43:25,431 - agent.123 - INFO - Web browsing agent 123 initialized successfully
+2025-04-04 12:43:26,968 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200

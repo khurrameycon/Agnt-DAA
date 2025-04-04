@@ -1,6 +1,7 @@
 """
 Visual Web Automation Agent for SagaX1
 Agent for visually interacting with websites through screenshots and automation
+Enhanced with features from the web_browser.ipynb example
 """
 
 import os
@@ -42,17 +43,18 @@ class VisualWebAutomationTool(Tool):
         self.logger = logging.getLogger(__name__)
     
     def _ensure_browser_started(self):
-        """Ensure the browser is started"""
+        """Ensure the browser is started with optimal settings for visual automation"""
         if self.browser is None:
             try:
                 import helium
                 from selenium import webdriver
                 
-                # Configure browser options
+                # Configure browser options based on the notebook example
                 options = webdriver.ChromeOptions()
                 options.add_argument("--force-device-scale-factor=1")
-                options.add_argument("--window-size=1280,1024")
+                options.add_argument("--window-size=1000,1350")
                 options.add_argument("--disable-pdf-viewer")
+                options.add_argument("--window-position=0,0")
                 
                 # Start the browser
                 self.browser = helium.start_chrome(headless=False, options=options)
@@ -96,6 +98,12 @@ class VisualWebAutomationTool(Tool):
                 helium.click(element)
                 return f"Clicked on {element}"
                 
+            elif command == "click_link":
+                # For more reliable link clicking
+                element = parameters
+                helium.click(helium.Link(element))
+                return f"Clicked on link '{element}'"
+                
             elif command == "type":
                 # Split parameters into target and text
                 parts = parameters.split(',', 1)
@@ -121,9 +129,18 @@ class VisualWebAutomationTool(Tool):
             elif command == "scroll":
                 try:
                     pixels = int(parameters)
-                    script = f"window.scrollBy(0, {pixels});"
-                    self.webdriver.execute_script(script)
-                    return f"Scrolled by {pixels} pixels"
+                    # Using helium's scroll function
+                    helium.scroll_down(num_pixels=pixels)
+                    return f"Scrolled down by {pixels} pixels"
+                except ValueError:
+                    return f"Error: Scroll parameter must be an integer, got '{parameters}'"
+                
+            elif command == "scroll_up":
+                try:
+                    pixels = int(parameters)
+                    # Using helium's scroll function
+                    helium.scroll_up(num_pixels=pixels)
+                    return f"Scrolled up by {pixels} pixels"
                 except ValueError:
                     return f"Error: Scroll parameter must be an integer, got '{parameters}'"
                 
@@ -139,6 +156,48 @@ class VisualWebAutomationTool(Tool):
                 element = parameters
                 text = helium.Text(element).web_element.text
                 return f"Text from {element}: {text}"
+                
+            elif command == "close_popups":
+                # Improved popup handling based on the notebook
+                webdriver.ActionChains(self.webdriver).send_keys(Keys.ESCAPE).perform()
+                return "Attempted to close popups using Escape key"
+                
+            elif command == "search_text":
+                # Implement Ctrl+F search functionality from the notebook
+                parts = parameters.split(',', 1)
+                text = parts[0].strip()
+                nth_result = 1
+                if len(parts) > 1 and parts[1].strip().isdigit():
+                    nth_result = int(parts[1].strip())
+                
+                elements = self.webdriver.find_elements(By.XPATH, f"//*[contains(text(), '{text}')]")
+                if not elements:
+                    return f"No matches found for '{text}'"
+                if nth_result > len(elements):
+                    return f"Match n°{nth_result} not found (only {len(elements)} matches found)"
+                
+                result = f"Found {len(elements)} matches for '{text}'."
+                elem = elements[nth_result - 1]
+                self.webdriver.execute_script("arguments[0].scrollIntoView(true);", elem)
+                result += f" Focused on element {nth_result} of {len(elements)}"
+                return result
+                
+            elif command == "check_exists":
+                # Check if an element exists
+                element = parameters
+                try:
+                    if hasattr(helium, element):  # If it's a type like Text, Link, etc.
+                        exists = getattr(helium, element)().exists()
+                    else:
+                        # Assume it's a text element
+                        exists = helium.Text(element).exists()
+                    
+                    if exists:
+                        return f"Element '{element}' exists on the page"
+                    else:
+                        return f"Element '{element}' does not exist on the page"
+                except Exception as e:
+                    return f"Error checking if element exists: {str(e)}"
                 
             elif command == "current_url":
                 return f"Current URL: {self.webdriver.current_url}"
@@ -233,10 +292,13 @@ class BrowserThread(QThread):
         self.running = False
         self.wait()
 
+class VisualWebSignals(QObject):
+    """Signal handler for VisualWebAgent"""
+    screenshot_updated = pyqtSignal(object)
+
+
 class VisualWebAgent(BaseAgent):
     """Agent for visually interacting with websites through screenshots and automation"""
-    
-    screenshot_updated = pyqtSignal(object)
     
     def __init__(self, agent_id: str, config: Dict[str, Any]):
         """Initialize the visual web agent
@@ -249,8 +311,11 @@ class VisualWebAgent(BaseAgent):
                 max_tokens: Maximum number of tokens to generate
                 temperature: Temperature for generation
         """
-        BaseAgent.__init__(self, agent_id, config)
-        QObject.__init__(self)
+        super().__init__(agent_id, config)
+        
+        # Create signal handler
+        self.signals = VisualWebSignals()
+        self.screenshot_updated = self.signals.screenshot_updated
         
         self.model_id = config.get("model_id", "meta-llama/Llama-3-8B-Instruct")
         self.device = config.get("device", "auto")
@@ -275,7 +340,7 @@ class VisualWebAgent(BaseAgent):
         Args:
             screenshot: Screenshot image
         """
-        self.screenshot_updated.emit(screenshot)
+        self.signals.screenshot_updated.emit(screenshot)
     
     def initialize(self) -> None:
         """Initialize the model and agent"""
@@ -335,13 +400,50 @@ class VisualWebAgent(BaseAgent):
             # Initialize tools
             tools = self._initialize_tools()
             
-            # Create the agent
+            # Define screenshot callback for agent memory
+            def save_screenshot_to_memory(memory_step, agent):
+                """Save screenshot to agent memory step"""
+                try:
+                    # Wait a bit for page to load
+                    time.sleep(1.0)
+                    
+                    # Get screenshot
+                    if self.visual_tool.browser is not None:
+                        # Remove previous screenshots for lean processing
+                        current_step = memory_step.step_number
+                        for previous_memory_step in agent.memory.steps:
+                            if hasattr(previous_memory_step, 'step_number') and previous_memory_step.step_number <= current_step - 2:
+                                if hasattr(previous_memory_step, 'observations_images'):
+                                    previous_memory_step.observations_images = None
+                        
+                        # Take screenshot
+                        screenshot_bytes = self.visual_tool.webdriver.get_screenshot_as_png()
+                        image = Image.open(BytesIO(screenshot_bytes))
+                        
+                        # Set screenshot in memory step
+                        memory_step.observations_images = [image.copy()]
+                        
+                        # Update observations with current URL
+                        url_info = f"Current url: {self.visual_tool.webdriver.current_url}"
+                        memory_step.observations = (
+                            url_info if memory_step.observations is None 
+                            else memory_step.observations + "\n" + url_info
+                        )
+                except Exception as e:
+                    self.logger.error(f"Error saving screenshot to memory: {str(e)}")
+            
+            # Create the agent with step callbacks for screenshots
             self.agent = CodeAgent(
                 tools=tools,
                 model=model,
                 additional_authorized_imports=["helium", "selenium", "time"] + self.authorized_imports,
-                verbosity_level=1
+                verbosity_level=2,
+                step_callbacks=[save_screenshot_to_memory],
+                max_steps=20  # Limit to 20 steps to avoid infinite loops
             )
+            
+            # Import helium for the agent
+            self.agent.python_executor("from helium import *", self.agent.state)
             
             # Start browser thread
             self.browser_thread.start()
@@ -370,6 +472,59 @@ class VisualWebAgent(BaseAgent):
         # Add screenshot tool
         tools.append(self.screenshot_tool)
         
+        # Add additional tools from the notebook
+        
+        # Add search_item_ctrl_f tool
+        @tool
+        def search_item_ctrl_f(text: str, nth_result: int = 1) -> str:
+            """
+            Searches for text on the current page via Ctrl + F and jumps to the nth occurrence.
+            Args:
+                text: The text to search for
+                nth_result: Which occurrence to jump to (default: 1)
+            """
+            driver = self.visual_tool.webdriver
+            from selenium.webdriver.common.by import By
+            
+            elements = driver.find_elements(By.XPATH, f"//*[contains(text(), '{text}')]")
+            if nth_result > len(elements):
+                raise Exception(f"Match n°{nth_result} not found (only {len(elements)} matches found)")
+            result = f"Found {len(elements)} matches for '{text}'."
+            elem = elements[nth_result - 1]
+            driver.execute_script("arguments[0].scrollIntoView(true);", elem)
+            result += f" Focused on element {nth_result} of {len(elements)}"
+            return result
+        
+        tools.append(search_item_ctrl_f)
+        
+        # Add go_back tool
+        @tool
+        def go_back() -> str:
+            """Goes back to previous page."""
+            if self.visual_tool.webdriver:
+                self.visual_tool.webdriver.back()
+                return "Navigated back to previous page"
+            return "No browser session to navigate back"
+        
+        tools.append(go_back)
+        
+        # Add close_popups tool
+        @tool
+        def close_popups() -> str:
+            """
+            Closes any visible modal or pop-up on the page. Use this to dismiss pop-up windows!
+            This does not work on cookie consent banners.
+            """
+            from selenium.webdriver.common.keys import Keys
+            
+            if self.visual_tool.webdriver:
+                from selenium import webdriver
+                webdriver.ActionChains(self.visual_tool.webdriver).send_keys(Keys.ESCAPE).perform()
+                return "Attempted to close popups using Escape key"
+            return "No browser session to close popups"
+        
+        tools.append(close_popups)
+        
         return tools
     
     def run(self, input_text: str, callback: Optional[Callable[[str], None]] = None) -> str:
@@ -386,29 +541,65 @@ class VisualWebAgent(BaseAgent):
             self.initialize()
         
         try:
+            # Add detailed instructions for helium
+            helium_instructions = """
+You can use helium to access websites. Don't bother about the helium driver, it's already managed.
+We've already ran "from helium import *"
+Then you can go to pages!
+Code:
+go_to('github.com/trending')
+```<end_code>
+
+You can directly click clickable elements by inputting the text that appears on them.
+Code:
+click("Top products")
+```<end_code>
+
+If it's a link:
+Code:
+click(Link("Top products"))
+```<end_code>
+
+If you try to interact with an element and it's not found, you'll get a LookupError.
+In general stop your action after each button click to see what happens on your screenshot.
+Never try to login in a page.
+
+To scroll up or down, use scroll_down or scroll_up with as an argument the number of pixels to scroll from.
+Code:
+scroll_down(num_pixels=1200) # This will scroll one viewport down
+```<end_code>
+
+When you have pop-ups with a cross icon to close, don't try to click the close icon by finding its element or targeting an 'X' element (this most often fails).
+Just use your built-in tool `close_popups` to close them:
+Code:
+close_popups()
+```<end_code>
+
+You can use .exists() to check for the existence of an element. For example:
+Code:
+if Text('Accept cookies?').exists():
+    click('I accept')
+```<end_code>
+"""
+            
             # Enhance the prompt with visual web automation guidance
             enhanced_prompt = f"""
 You are a visual web automation agent that can control a web browser to accomplish tasks.
 You can see screenshots of the browser window and interact with it using commands.
 
+{helium_instructions}
+
 You have access to these tools:
 - web_search: Search the web for information
-- visual_web_automation: Control the browser with commands like:
-  * go_to: Navigate to a URL (add https:// if missing)
-  * click: Click on an element (button, link, etc.)
-  * type: Type text into a field (format: "element,text")
-  * screenshot: Take a screenshot
-  * scroll: Scroll by a number of pixels
-  * back: Go back to the previous page
-  * get_text: Get text from an element
-  * current_url: Get the current URL
+- search_item_ctrl_f: Search for text on the current page and jump to it
+- close_popups: Close any popups using the Escape key
+- go_back: Go back to the previous page
 - take_screenshot: Take a screenshot and view it
-
-After each web automation action, wait briefly to let the page load.
 
 USER TASK: {input_text}
 
 First, take a screenshot to see the current state of the browser.
+Then, complete the task step by step, making sure to check the results after each action by observing the screenshot.
 """
             
             # Run the agent
@@ -438,7 +629,7 @@ First, take a screenshot to see the current state of the browser.
         Returns:
             List of capability names
         """
-        return ["web_search", "web_automation", "visual_interaction", "screenshot"]
+        return ["web_search", "web_automation", "visual_interaction", "screenshot", "text_search"]
     
     def cleanup(self) -> None:
         """Clean up resources"""

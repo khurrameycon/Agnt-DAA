@@ -91,3 +91,86 @@ AttributeError: 'FineTuningTab' object has no attribute 'model_selector'. Did yo
 2025-04-03 14:57:16,822 - agent.asd - ERROR - Error in fine-tuning agent: 'FineTuningAgent' object has no attribute 'config_manager'
 2025-04-03 15:11:00,451 - agent.sd - ERROR - Error during fine-tuning: index out of range in self
 2025-04-03 15:11:00,453 - agent.sd - ERROR - Error in fine-tuning agent: {"status": "error", "message": "index out of range in self", "type": "IndexError", "model_id": "EleutherAI/pythia-1b", "device": "auto", "output_dir": "./fine_tuned_models", "cuda_available": false, "total_memory": 63.6856575012207, "available_memory": 32.306175231933594, "error_type": "data_processing"}
+2025-04-04 12:15:37,062 - sagax1 - ERROR - Unhandled exception: 'VisualWebTab' object has no attribute 'on_agent_selected'
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\main.py", line 47, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 136, in __init__
+    self.create_visual_web_tab()
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 957, in create_visual_web_tab
+    self.visual_web_tab = VisualWebTab(self.agent_manager, self)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\components\visual_web_tab.py", line 45, in __init__
+    self.create_top_bar()
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\components\visual_web_tab.py", line 63, in create_top_bar
+    self.agent_selector.currentTextChanged.connect(self.on_agent_selected)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'VisualWebTab' object has no attribute 'on_agent_selected'. Did you mean: 'agent_selector'?
+2025-04-04 12:16:17,165 - sagax1 - ERROR - Unhandled exception: 'VisualWebTab' object has no attribute 'on_agent_selected'
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\main.py", line 47, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 136, in __init__
+    self.create_visual_web_tab()
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 957, in create_visual_web_tab
+    self.visual_web_tab = VisualWebTab(self.agent_manager, self)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\components\visual_web_tab.py", line 45, in __init__
+    self.create_top_bar()
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\components\visual_web_tab.py", line 63, in create_top_bar
+    self.agent_selector.currentTextChanged.connect(self.on_agent_selected)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'VisualWebTab' object has no attribute 'on_agent_selected'. Did you mean: 'agent_selector'?
+2025-04-04 12:20:34,266 - sagax1 - ERROR - Unhandled exception: cannot import name 'QAction' from 'PyQt6.QtWidgets' (D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\PyQt6\QtWidgets.pyd)
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\main.py", line 47, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 156, in __init__
+    VisualWebDemo.add_demo_menu(self.visual_web_tab)
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\utils\visual_web_demo.py", line 51, in add_demo_menu
+    from PyQt6.QtWidgets import QPushButton, QMenu, QAction
+ImportError: cannot import name 'QAction' from 'PyQt6.QtWidgets' (D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\PyQt6\QtWidgets.pyd)
+2025-04-04 12:21:40,240 - sagax1 - ERROR - Unhandled exception: cannot import name 'QAction' from 'PyQt6.QtWidgets' (D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\PyQt6\QtWidgets.pyd)
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\main.py", line 47, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\ui\main_window.py", line 156, in __init__
+    VisualWebDemo.add_demo_menu(self.visual_web_tab)
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\utils\visual_web_demo.py", line 51, in add_demo_menu
+    from PyQt6.QtWidgets import QPushButton, QMenu, QAction
+ImportError: cannot import name 'QAction' from 'PyQt6.QtWidgets' (D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\PyQt6\QtWidgets.pyd)
+2025-04-04 12:25:43,322 - app.agents.agent_registry - ERROR - Error creating agent of type 'visual_web': descriptor '__init__' requires a 'PyQt6.sip.simplewrapper' object but received a 'VisualWebAgent'
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\agent_registry.py", line 64, in create_agent
+    return agent_class(agent_id, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 312, in __init__
+    QObject.__init__(self)
+TypeError: descriptor '__init__' requires a 'PyQt6.sip.simplewrapper' object but received a 'VisualWebAgent'
+2025-04-04 12:25:43,322 - app.core.agent_manager - ERROR - Failed to create agent with ID asd
+2025-04-04 12:38:42,438 - app.agents.agent_registry - ERROR - Error creating agent of type 'visual_web': descriptor '__init__' requires a 'PyQt6.sip.simplewrapper' object but received a 'VisualWebAgent'
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\agent_registry.py", line 64, in create_agent
+    return agent_class(agent_id, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 312, in __init__
+    QObject.__init__(self)
+TypeError: descriptor '__init__' requires a 'PyQt6.sip.simplewrapper' object but received a 'VisualWebAgent'
+2025-04-04 12:38:42,440 - app.core.agent_manager - ERROR - Failed to create agent with ID 123
+2025-04-04 12:40:35,164 - app.agents.agent_registry - ERROR - Error creating agent of type 'visual_web': 'QObject' object has no attribute 'pyqtSignal'
+Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\agent_registry.py", line 64, in create_agent
+    return agent_class(agent_id, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 316, in __init__
+    self.screenshot_updated = self.qobject.pyqtSignal(object)
+                              ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'QObject' object has no attribute 'pyqtSignal'
+2025-04-04 12:40:35,164 - app.core.agent_manager - ERROR - Failed to create agent with ID sdf
+2025-04-04 12:42:26,676 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 12:42:34,230 - agent.sdf - ERROR - Error initializing visual web agent: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 12:42:34,230 - app.ui.components.visual_web_tab - ERROR - Error starting browser: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
