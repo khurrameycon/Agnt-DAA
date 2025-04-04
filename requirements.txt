@@ -21,3 +21,6 @@ pyinstaller
 peft
 datasets
 bitsandbytes
+selenium
+webdriver-manager
+helium

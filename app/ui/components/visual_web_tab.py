@@ -451,7 +451,7 @@ class VisualWebTab(QWidget):
         self.conversation.add_message("Processing your request...", is_user=False)
         
         # Run agent in thread
-        self.parent().run_agent_in_thread(
+        self.window().run_agent_in_thread(
             self.current_agent_id, 
             command,
             self.handle_agent_result

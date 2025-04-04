@@ -174,3 +174,1232 @@ AttributeError: 'QObject' object has no attribute 'pyqtSignal'
 2025-04-04 12:42:26,676 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
 2025-04-04 12:42:34,230 - agent.sdf - ERROR - Error initializing visual web agent: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
 2025-04-04 12:42:34,230 - app.ui.components.visual_web_tab - ERROR - Error starting browser: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 13:36:49,770 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 13:36:55,443 - agent.as - ERROR - Error initializing visual web agent: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 13:36:55,443 - app.ui.components.visual_web_tab - ERROR - Error starting browser: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 13:38:34,281 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 13:38:38,775 - agent.sa - ERROR - Error initializing visual web agent: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 13:38:38,775 - app.ui.components.visual_web_tab - ERROR - Error starting browser: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 13:42:52,692 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 13:42:57,975 - agent.as - ERROR - Error initializing visual web agent: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 13:42:57,976 - app.ui.components.visual_web_tab - ERROR - Error starting browser: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 13:48:45,392 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 13:48:51,732 - agent.we - ERROR - Error initializing visual web agent: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 13:48:51,732 - app.ui.components.visual_web_tab - ERROR - Error starting browser: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 13:57:07,524 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 13:57:12,778 - agent.sa - ERROR - Error initializing visual web agent: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 13:57:12,779 - agent.sa - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 460, in initialize
+    self.agent.python_executor("from helium import *", self.agent.state)
+TypeError: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+
+2025-04-04 13:57:12,779 - app.ui.components.visual_web_tab - ERROR - Error starting browser: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 14:01:48,719 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 14:24:24,856 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 14:24:32,112 - agent.asd - ERROR - Error initializing visual web agent: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 14:24:32,113 - agent.asd - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 460, in initialize
+    self.agent.python_executor("from helium import *", self.agent.state)
+TypeError: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+
+2025-04-04 14:24:32,114 - app.ui.components.visual_web_tab - ERROR - Error starting browser: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 14:28:01,427 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 14:28:05,828 - agent.as - ERROR - Error initializing visual web agent: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 14:28:05,829 - agent.as - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 463, in initialize
+    self.agent.python_executor("from helium import *", self.agent.state)
+TypeError: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+
+2025-04-04 14:28:05,830 - app.ui.components.visual_web_tab - ERROR - Error starting browser: LocalPythonExecutor.__call__() takes 2 positional arguments but 3 were given
+2025-04-04 14:32:32,428 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 14:33:01,703 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id: session deleted as the browser has closed the connection
+from disconnected: not connected to DevTools
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0017FED0]
+	(No symbol) [0x0019DD52]
+	(No symbol) [0x00203D9F]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:33:03,710 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:33:05,717 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:33:07,720 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:33:09,725 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:34:20,209 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 14:34:33,501 - app.agents.visual_web_agent - ERROR - Error starting browser: module 'helium' has no attribute 'wrap_driver'
+2025-04-04 14:34:33,501 - app.agents.visual_web_agent - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 70, in _ensure_browser_started
+    self.browser = helium.wrap_driver(self.webdriver)
+                   ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'helium' has no attribute 'wrap_driver'. Did you mean: 'get_driver'?
+
+2025-04-04 14:34:33,501 - app.agents.visual_web_agent - ERROR - Error in forward method: module 'helium' has no attribute 'wrap_driver'
+2025-04-04 14:34:33,501 - app.agents.visual_web_agent - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 90, in forward
+    self._ensure_browser_started()
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 70, in _ensure_browser_started
+    self.browser = helium.wrap_driver(self.webdriver)
+                   ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'helium' has no attribute 'wrap_driver'. Did you mean: 'get_driver'?
+
+2025-04-04 14:40:47,186 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 14:42:55,544 - app.agents.visual_web_agent - ERROR - Error in forward method: Message: unknown error: net::ERR_NAME_NOT_RESOLVED
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0018DAF0]
+	(No symbol) [0x00181458]
+	(No symbol) [0x00182D40]
+	(No symbol) [0x001816E8]
+	(No symbol) [0x00181243]
+	(No symbol) [0x00180F51]
+	(No symbol) [0x0017EF30]
+	(No symbol) [0x0017F8CB]
+	(No symbol) [0x0019401E]
+	(No symbol) [0x0021F2F7]
+	(No symbol) [0x001FD05C]
+	(No symbol) [0x0021E6FB]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:42:55,562 - app.agents.visual_web_agent - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 105, in forward
+    helium.go_to(url)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\__init__.py", line 140, in go_to
+    _get_api_impl().go_to_impl(url)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 36, in f_decorated
+    result = f(self, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 55, in f_decorated
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 130, in go_to_impl
+    self.require_driver().get(url)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 454, in get
+    self.execute(Command.GET, {"url": url})
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 429, in execute
+    self.error_handler.check_response(response)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.WebDriverException: Message: unknown error: net::ERR_NAME_NOT_RESOLVED
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0018DAF0]
+	(No symbol) [0x00181458]
+	(No symbol) [0x00182D40]
+	(No symbol) [0x001816E8]
+	(No symbol) [0x00181243]
+	(No symbol) [0x00180F51]
+	(No symbol) [0x0017EF30]
+	(No symbol) [0x0017F8CB]
+	(No symbol) [0x0019401E]
+	(No symbol) [0x0021F2F7]
+	(No symbol) [0x001FD05C]
+	(No symbol) [0x0021E6FB]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+
+2025-04-04 14:45:30,276 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id: session deleted as the browser has closed the connection
+from disconnected: not connected to DevTools
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0017FED0]
+	(No symbol) [0x0019DD52]
+	(No symbol) [0x00203D9F]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:45:32,281 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:45:34,286 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:45:36,293 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:45:37,638 - app.agents.visual_web_agent - ERROR - Error in forward method: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:45:37,990 - app.agents.visual_web_agent - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 134, in forward
+    screenshot = self.webdriver.get_screenshot_as_png()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 1003, in get_screenshot_as_png
+    return b64decode(self.get_screenshot_as_base64().encode("ascii"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 1013, in get_screenshot_as_base64
+    return self.execute(Command.SCREENSHOT)["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 429, in execute
+    self.error_handler.check_response(response)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.InvalidSessionIdException: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+
+2025-04-04 14:45:38,299 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:45:40,302 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:45:42,307 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:45:44,314 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:45:46,319 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x001904F0]
+	(No symbol) [0x001CB8B8]
+	(No symbol) [0x001FCF16]
+	(No symbol) [0x001F89E8]
+	(No symbol) [0x001F7F66]
+	(No symbol) [0x001636E5]
+	(No symbol) [0x00163C3E]
+	(No symbol) [0x001640CD]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	(No symbol) [0x001633B0]
+	(No symbol) [0x00162BC3]
+	GetHandleVerifier [0x006CDE9C+3635100]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 14:58:47,716 - app.ui.components.visual_web_tab - ERROR - Error selecting agent: Agent with ID  does not exist
+2025-04-04 15:00:18,530 - agent.as - ERROR - Error running visual web agent: Error in generating model output:
+Cannot use images with flatten_messages_as_text=True
+2025-04-04 15:01:11,951 - agent.as - ERROR - Error running visual web agent: Error in generating model output:
+Cannot use images with flatten_messages_as_text=True
+2025-04-04 15:02:32,619 - app.agents.visual_web_agent - ERROR - Error taking screenshot: 'NoneType' object has no attribute 'encode'
+2025-04-04 15:02:32,619 - app.agents.visual_web_agent - ERROR - Error in forward method: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 15:02:32,628 - app.agents.visual_web_agent - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 145, in forward
+    helium.scroll_down(num_pixels=pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\__init__.py", line 357, in scroll_down
+    _get_api_impl().scroll_down_impl(num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 254, in scroll_down_impl
+    self._scroll_by(0, num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 55, in f_decorated
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 263, in _scroll_by
+    self.require_driver().execute_script(
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 528, in execute_script
+    return self.execute(command, {"script": script, "args": converted_args})["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 429, in execute
+    self.error_handler.check_response(response)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+
+2025-04-04 15:02:32,713 - app.agents.visual_web_agent - ERROR - Error in forward method: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 15:02:32,713 - app.agents.visual_web_agent - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 145, in forward
+    helium.scroll_down(num_pixels=pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\__init__.py", line 357, in scroll_down
+    _get_api_impl().scroll_down_impl(num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 254, in scroll_down_impl
+    self._scroll_by(0, num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 55, in f_decorated
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 263, in _scroll_by
+    self.require_driver().execute_script(
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 528, in execute_script
+    return self.execute(command, {"script": script, "args": converted_args})["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 429, in execute
+    self.error_handler.check_response(response)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+
+2025-04-04 15:02:32,730 - app.agents.visual_web_agent - ERROR - Error in forward method: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 15:02:32,735 - app.agents.visual_web_agent - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 145, in forward
+    helium.scroll_down(num_pixels=pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\__init__.py", line 357, in scroll_down
+    _get_api_impl().scroll_down_impl(num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 254, in scroll_down_impl
+    self._scroll_by(0, num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 55, in f_decorated
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 263, in _scroll_by
+    self.require_driver().execute_script(
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 528, in execute_script
+    return self.execute(command, {"script": script, "args": converted_args})["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 429, in execute
+    self.error_handler.check_response(response)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+
+2025-04-04 15:02:32,745 - app.agents.visual_web_agent - ERROR - Error in forward method: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 15:02:32,747 - app.agents.visual_web_agent - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 145, in forward
+    helium.scroll_down(num_pixels=pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\__init__.py", line 357, in scroll_down
+    _get_api_impl().scroll_down_impl(num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 254, in scroll_down_impl
+    self._scroll_by(0, num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 55, in f_decorated
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 263, in _scroll_by
+    self.require_driver().execute_script(
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 528, in execute_script
+    return self.execute(command, {"script": script, "args": converted_args})["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 429, in execute
+    self.error_handler.check_response(response)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+
+2025-04-04 15:02:32,754 - app.agents.visual_web_agent - ERROR - Error in forward method: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 15:02:32,754 - app.agents.visual_web_agent - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 145, in forward
+    helium.scroll_down(num_pixels=pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\__init__.py", line 357, in scroll_down
+    _get_api_impl().scroll_down_impl(num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 254, in scroll_down_impl
+    self._scroll_by(0, num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 55, in f_decorated
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 263, in _scroll_by
+    self.require_driver().execute_script(
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 528, in execute_script
+    return self.execute(command, {"script": script, "args": converted_args})["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 429, in execute
+    self.error_handler.check_response(response)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+
+2025-04-04 15:02:32,769 - app.agents.visual_web_agent - ERROR - Error in forward method: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 15:02:32,771 - app.agents.visual_web_agent - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 145, in forward
+    helium.scroll_down(num_pixels=pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\__init__.py", line 357, in scroll_down
+    _get_api_impl().scroll_down_impl(num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 254, in scroll_down_impl
+    self._scroll_by(0, num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 55, in f_decorated
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 263, in _scroll_by
+    self.require_driver().execute_script(
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 528, in execute_script
+    return self.execute(command, {"script": script, "args": converted_args})["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 429, in execute
+    self.error_handler.check_response(response)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+
+2025-04-04 15:02:32,780 - app.agents.visual_web_agent - ERROR - Error in forward method: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 15:02:32,782 - app.agents.visual_web_agent - ERROR - Traceback (most recent call last):
+  File "d:\SLKhurram-Coding\sagax1\Agnt-DAA-main\app\agents\visual_web_agent.py", line 145, in forward
+    helium.scroll_down(num_pixels=pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\__init__.py", line 357, in scroll_down
+    _get_api_impl().scroll_down_impl(num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 254, in scroll_down_impl
+    self._scroll_by(0, num_pixels)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 55, in f_decorated
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\helium\_impl\__init__.py", line 263, in _scroll_by
+    self.require_driver().execute_script(
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 528, in execute_script
+    return self.execute(command, {"script": script, "args": converted_args})["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 429, in execute
+    self.error_handler.check_response(response)
+  File "D:\SLKhurram-Coding\sagax1\Agnt-DAA-main\venv\Lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+
+2025-04-04 15:02:34,624 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 15:02:36,631 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 15:02:38,634 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 15:02:40,638 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 15:02:42,645 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+
+2025-04-04 15:02:44,649 - app.agents.visual_web_agent - ERROR - Error taking screenshot: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=135.0.7049.41)
+Stacktrace:
+	GetHandleVerifier [0x00365413+60691]
+	GetHandleVerifier [0x00365454+60756]
+	(No symbol) [0x00190693]
+	(No symbol) [0x0016FBCE]
+	(No symbol) [0x00203C4E]
+	(No symbol) [0x0021DFF9]
+	(No symbol) [0x001FCE56]
+	(No symbol) [0x001CC5F3]
+	(No symbol) [0x001CD444]
+	GetHandleVerifier [0x005ABBC3+2446531]
+	GetHandleVerifier [0x005A7198+2427544]
+	GetHandleVerifier [0x005C2D5E+2541150]
+	GetHandleVerifier [0x0037C3C5+154821]
+	GetHandleVerifier [0x00382BED+181485]
+	GetHandleVerifier [0x0036CC48+91464]
+	GetHandleVerifier [0x0036CDF0+91888]
+	GetHandleVerifier [0x00357980+4736]
+	BaseThreadInitThunk [0x75F95D49+25]
+	RtlInitializeExceptionChain [0x778FCF0B+107]
+	RtlGetAppContainerNamedObjectPath [0x778FCE91+561]
+	(No symbol) [0x00000000]
+

@@ -18,6 +18,12 @@ from PyQt6.QtCore import QObject, pyqtSignal, QTimer, QThread
 from app.agents.base_agent import BaseAgent
 from smolagents import CodeAgent, Tool, DuckDuckGoSearchTool, tool
 
+# Add these imports
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+import traceback
+
 class VisualWebAutomationTool(Tool):
     """Tool for visual web automation"""
     
@@ -46,23 +52,29 @@ class VisualWebAutomationTool(Tool):
         """Ensure the browser is started with optimal settings for visual automation"""
         if self.browser is None:
             try:
-                import helium
-                from selenium import webdriver
-                
-                # Configure browser options based on the notebook example
+                # Configure browser options
                 options = webdriver.ChromeOptions()
                 options.add_argument("--force-device-scale-factor=1")
                 options.add_argument("--window-size=1000,1350")
                 options.add_argument("--disable-pdf-viewer")
                 options.add_argument("--window-position=0,0")
                 
-                # Start the browser
-                self.browser = helium.start_chrome(headless=False, options=options)
-                self.webdriver = helium.get_driver()
+                # Use WebDriver Manager to get the correct ChromeDriver
+                service = Service(ChromeDriverManager().install())
+                
+                # Start the browser using Selenium
+                import helium
+                # ...
+                self.webdriver = webdriver.Chrome(service=service, options=options)
+                helium.set_driver(self.webdriver)
+                self.browser = helium
+
+                
                 self.logger.info("Browser started successfully")
                 
             except Exception as e:
                 self.logger.error(f"Error starting browser: {str(e)}")
+                self.logger.error(traceback.format_exc())
                 raise
     
     def forward(self, command: str, parameters: str) -> str:
@@ -213,7 +225,8 @@ class VisualWebAutomationTool(Tool):
                 return f"Unknown command: {command}"
                 
         except Exception as e:
-            self.logger.error(f"Error executing web automation command: {str(e)}")
+            self.logger.error(f"Error in forward method: {str(e)}")
+            self.logger.error(traceback.format_exc())
             return f"Error: {str(e)}"
 
 class ScreenshotTool(Tool):
@@ -349,7 +362,9 @@ class VisualWebAgent(BaseAgent):
         
         try:
             from smolagents import TransformersModel, HfApiModel, OpenAIServerModel, LiteLLMModel
-            
+            from smolagents import CodeAgent, Tool
+            import helium
+            import selenium
             self.logger.info(f"Initializing visual web agent with model {self.model_id}")
             
             # Try to create the model based on the model_id
@@ -443,8 +458,8 @@ class VisualWebAgent(BaseAgent):
             )
             
             # Import helium for the agent
-            self.agent.python_executor("from helium import *", self.agent.state)
-            
+            # self.agent.python_executor("from helium import *", self.agent.state)
+            self.agent.python_executor("from helium import *")
             # Start browser thread
             self.browser_thread.start()
             
@@ -453,6 +468,7 @@ class VisualWebAgent(BaseAgent):
             
         except Exception as e:
             self.logger.error(f"Error initializing visual web agent: {str(e)}")
+            self.logger.error(traceback.format_exc())
             raise
     
     def _initialize_tools(self) -> List[Tool]:
