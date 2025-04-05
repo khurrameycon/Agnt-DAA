@@ -13,9 +13,15 @@ from app.core.agent_manager import AgentManager
 from app.ui.main_window import MainWindow
 from app.utils.logging_utils import setup_logging
 from PyQt6.QtWidgets import QApplication
+from PyQt6.QtCore import Qt, QCoreApplication
 
 def setup_environment():
     """Set up the environment variables and paths"""
+    # Set application info for QSettings
+    QCoreApplication.setOrganizationName("SagaX1")
+    QCoreApplication.setOrganizationDomain("sagax1.ai")
+    QCoreApplication.setApplicationName("SagaX1")
+    
     # Load environment variables from .env file if it exists
     load_dotenv()
     
@@ -23,6 +29,8 @@ def setup_environment():
     os.makedirs('config', exist_ok=True)
     os.makedirs('assets/icons', exist_ok=True)
     os.makedirs('logs', exist_ok=True)
+    
+    # Note: We don't call UIAssets.ensure_assets_exist() here to avoid QPixmap issues
 
 def main():
     """Main application entry point"""
@@ -33,19 +41,41 @@ def main():
     logger = setup_logging(log_level=logging.INFO)
     
     try:
+        # Enable high DPI scaling
+        QApplication.setHighDpiScaleFactorRoundingPolicy(
+            Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
+        
+        # Create application
+        app = QApplication(sys.argv)
+        app.setApplicationName("SagaX1")
+        app.setApplicationVersion("0.1.0")
+        
+        # Now we can import and use UI-related modules
+        from app.utils.ui_assets import UIAssets
+        from app.utils.style_system import StyleSystem
+        from app.ui.splash_screen import SagaX1SplashScreen
+        
+        # Create default icons now that QApplication exists
+        UIAssets.create_default_icons_file()
+        
+        # Apply application icon
+        UIAssets.apply_app_icon(app)
+        
+        # Apply stylesheet
+        StyleSystem.apply_stylesheet(app)
+        
         # Initialize configuration
         config_manager = ConfigManager()
         
         # Initialize agent manager
         agent_manager = AgentManager(config_manager)
         
-        # Create and show UI
-        app = QApplication(sys.argv)
-        app.setApplicationName("sagax1")
-        app.setApplicationVersion("0.1.0")
-        
+        # Create main window
         window = MainWindow(agent_manager, config_manager)
-        window.show()
+        
+        # Show splash screen
+        splash = SagaX1SplashScreen()
+        splash.show_with_timer(app, window, 2500)  # Show splash for 2.5 seconds
         
         logger.info("Application started")
         sys.exit(app.exec())

@@ -493,3 +493,100 @@ Stacktrace:
 2025-04-04 16:27:13,194 - app.ui.components.visual_web_tab - INFO - Initializing agent with standard method...
 2025-04-04 16:27:13,220 - agent.as - INFO - Initializing visual web agent with model meta-llama/Llama-3.2-3B-Instruct
 2025-04-04 16:27:13,226 - smolagents.models - INFO - Using device: auto
+2025-04-05 16:14:56,662 - sagax1 - INFO - Logging initialized
+2025-04-05 16:14:56,822 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-05 16:14:56,822 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-05 16:14:56,822 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-05 16:14:56,822 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-05 16:14:56,822 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-05 16:14:56,823 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-05 16:14:56,846 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-05 16:14:56,863 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-05 16:14:58,364 - sagax1 - INFO - Application started
+2025-04-05 16:15:37,042 - sagax1 - INFO - Logging initialized
+2025-04-05 16:15:37,170 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-05 16:15:37,171 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-05 16:15:37,171 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-05 16:15:37,171 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-05 16:15:37,171 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-05 16:15:37,171 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-05 16:15:37,223 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-05 16:15:37,239 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-05 16:15:38,533 - sagax1 - INFO - Application started
+2025-04-05 16:21:07,727 - sagax1 - INFO - Logging initialized
+2025-04-05 16:21:07,860 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-05 16:21:07,860 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-05 16:21:07,860 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-05 16:21:07,860 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-05 16:21:07,860 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-05 16:21:07,860 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-05 16:21:07,894 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-05 16:21:07,909 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-05 16:21:08,202 - sagax1 - ERROR - Unhandled exception: name 'QSplitter' is not defined
+Traceback (most recent call last):
+  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\main.py", line 74, in main
+    window = MainWindow(agent_manager, config_manager)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\app\utils\main_window_enhancements.py", line 41, in enhanced_init
+    fix_main_window_layout(self)
+  File "f:\Freelancing\Ernest - Sagax\sagax1-smolagents\app\utils\layout_fix.py", line 28, in fix_main_window_layout
+    splitters = tab_widget.findChildren(QSplitter)
+                                        ^^^^^^^^^
+NameError: name 'QSplitter' is not defined
+2025-04-05 16:24:40,454 - sagax1 - INFO - Logging initialized
+2025-04-05 16:24:40,579 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-05 16:24:40,580 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-05 16:24:40,580 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-05 16:24:40,580 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-05 16:24:40,580 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-05 16:24:40,580 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-05 16:24:40,610 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-05 16:24:40,626 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-05 16:24:41,963 - sagax1 - INFO - Application started
+2025-04-05 16:25:04,246 - app.core.agent_manager - INFO - Created agent with ID mymodel of type local_model
+2025-04-05 16:25:12,427 - app.core.agent_manager - INFO - Running agent mymodel with input: what is Pakistan?...
+2025-04-05 16:25:13,101 - agent.mymodel - ERROR - Error checking model availability: 403 Client Error. (Request ID: Root=1-67f11317-341930d62053afd266011188;d02daa7d-7091-4778-81a5-28e5ac029c1e)
+
+Cannot access gated repo for url https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct/resolve/main/config.json.
+Access to model meta-llama/Llama-3.2-3B-Instruct is restricted and you are not in the authorized list. Visit https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct to ask for access.
+2025-04-05 16:25:13,103 - app.core.agent_manager - ERROR - Error running agent mymodel: 403 Client Error. (Request ID: Root=1-67f11317-341930d62053afd266011188;d02daa7d-7091-4778-81a5-28e5ac029c1e)
+
+Cannot access gated repo for url https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct/resolve/main/config.json.
+Access to model meta-llama/Llama-3.2-3B-Instruct is restricted and you are not in the authorized list. Visit https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct to ask for access.
+2025-04-05 16:25:27,988 - app.core.agent_manager - WARNING - Agent with ID mymodel already exists. It will be replaced.
+2025-04-05 16:25:27,989 - app.core.agent_manager - INFO - Created agent with ID mymodel of type local_model
+2025-04-05 16:25:32,410 - app.core.agent_manager - INFO - Running agent mymodel with input: what is pakistan...
+2025-04-05 16:25:32,970 - agent.mymodel - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct is available
+2025-04-05 16:25:32,970 - agent.mymodel - INFO - Initializing model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-05 16:25:32,981 - smolagents.models - INFO - Using device: auto
+2025-04-05 16:25:38,386 - agent.mymodel - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct initialized successfully
+2025-04-05 16:27:28,856 - sagax1 - INFO - Logging initialized
+2025-04-05 16:27:29,003 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-05 16:27:29,003 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-05 16:27:29,003 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-05 16:27:29,004 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-05 16:27:29,004 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-05 16:27:29,004 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-05 16:27:29,041 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-05 16:27:29,055 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-05 16:27:30,560 - sagax1 - INFO - Application started
+2025-04-05 16:31:44,221 - sagax1 - INFO - Logging initialized
+2025-04-05 16:31:44,350 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-05 16:31:44,350 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-05 16:31:44,350 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-05 16:31:44,350 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-05 16:31:44,350 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-05 16:31:44,350 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-05 16:31:44,381 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-05 16:31:44,397 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-05 16:31:45,689 - sagax1 - INFO - Application started
+2025-04-05 17:09:03,510 - sagax1 - INFO - Logging initialized
+2025-04-05 17:09:03,654 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-05 17:09:03,654 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-05 17:09:03,654 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-05 17:09:03,654 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-05 17:09:03,655 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-05 17:09:03,655 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-05 17:09:03,685 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-05 17:09:03,702 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-05 17:09:04,964 - sagax1 - INFO - Application started

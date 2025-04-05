@@ -1303,3 +1303,11 @@ class MainWindow(QMainWindow):
                 # Switch to fine-tuning tab
                 self.tabs.setCurrentWidget(self.fine_tuning_tab)
 
+# Import and apply the main window enhancements
+try:
+    from app.utils.main_window_enhancements import enhance_main_window
+    # Apply enhancements to the MainWindow class
+    MainWindow = enhance_main_window(MainWindow)
+except ImportError:
+    # If the enhancements aren't available, continue without them
+    pass
