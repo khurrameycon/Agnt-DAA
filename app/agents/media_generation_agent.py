@@ -1,5 +1,5 @@
 """
-Media Generation Agent for SagaX1
+Media Generation Agent for sagax1
 Agent for generating images from text prompts using Hugging Face spaces
 """
 

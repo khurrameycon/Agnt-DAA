@@ -1,5 +1,5 @@
 """
-Fine-tuning Tab Component for SagaX1
+Fine-tuning Tab Component for sagax1
 Tab for fine-tuning models on custom datasets
 """
 

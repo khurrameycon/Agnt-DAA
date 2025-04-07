@@ -1,5 +1,5 @@
 """
-Main Window for SagaX1
+Main Window for sagax1
 Main application window and UI logic
 """
 
@@ -646,7 +646,7 @@ class MainWindow(QMainWindow):
             "About sagax1",
             "<h1>sagax1</h1>"
             "<p>Version 0.1.0</p>"
-            "<p>An AI-powered agent platform for everyday tasks</p>"
+            "<p>An Opensource AI-powered agent platform for everyday tasks</p>"
             "<p>&copy; 2025 sagax1 Team</p>"
         )
 

@@ -1,5 +1,5 @@
 """
-API utilities for SagaX1
+API utilities for sagax1
 Handles interactions with external APIs
 """
 

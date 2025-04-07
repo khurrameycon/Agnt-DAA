@@ -1,5 +1,5 @@
 """
-Model manager for SagaX1
+Model manager for sagax1
 Handles loading, caching, and managing models
 """
 

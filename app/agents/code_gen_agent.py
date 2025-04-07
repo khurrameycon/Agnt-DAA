@@ -1,5 +1,5 @@
 """
-Code Generation Agent for SagaX1
+Code Generation Agent for sagax1
 Agent that can generate and execute code to solve problems
 """
 

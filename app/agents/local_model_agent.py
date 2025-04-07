@@ -1,5 +1,5 @@
 """
-Local Model Agent for SagaX1
+Local Model Agent for sagax1
 Runs local Hugging Face models for text generation and chat interactions
 """
 

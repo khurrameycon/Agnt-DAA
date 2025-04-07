@@ -1,5 +1,5 @@
 """
-Web Browsing Agent for SagaX1
+Web Browsing Agent for sagax1
 Agent for browsing the web, searching for information, and visiting webpages
 Enhanced with improved UI display based on multiagents.ipynb sample
 """

@@ -1,5 +1,5 @@
 """
-Logging utilities for SagaX1
+Logging utilities for sagax1
 """
 
 import os

@@ -1,5 +1,5 @@
 """
-UI Assets Manager for SagaX1
+UI Assets Manager for sagax1
 Handles loading of icons and other UI assets
 """
 

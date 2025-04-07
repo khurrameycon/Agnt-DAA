@@ -1,5 +1,5 @@
 """
-Chat Agent for SagaX1
+Chat Agent for sagax1
 Simple agent for conversational interactions without code execution
 """
 

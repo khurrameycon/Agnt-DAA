@@ -1,10 +1,10 @@
 """
-Style system for SagaX1
+Style system for sagax1
 Provides a professional and attractive UI style
 """
 
 class StyleSystem:
-    """Manages the styling for the SagaX1 application"""
+    """Manages the styling for the sagax1 application"""
     
     # Professional color palette
     COLORS = {

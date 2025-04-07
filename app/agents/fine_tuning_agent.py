@@ -1,5 +1,5 @@
 """
-Fine-tuning Agent for SagaX1
+Fine-tuning Agent for sagax1
 Agent for fine-tuning Hugging Face models on custom datasets
 """
 

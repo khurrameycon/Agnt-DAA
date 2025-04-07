@@ -1,5 +1,5 @@
 """
-Visual Web Automation Tab Component for SagaX1
+Visual Web Automation Tab Component for sagax1
 Tab for visual web automation agent interaction
 Enhanced with features from the web_browser.ipynb example
 """

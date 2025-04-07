@@ -1,5 +1,5 @@
 """
-Agent implementations for SagaX1
+Agent implementations for sagax1
 """
 
 from app.agents.base_agent import BaseAgent

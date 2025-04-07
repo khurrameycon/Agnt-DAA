@@ -1,5 +1,5 @@
 """
-Media Generation Tab Component for SagaX1
+Media Generation Tab Component for sagax1
 Tab for media generation agent interaction
 """
 

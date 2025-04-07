@@ -590,3 +590,39 @@ Access to model meta-llama/Llama-3.2-3B-Instruct is restricted and you are not i
 2025-04-05 17:09:03,685 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
 2025-04-05 17:09:03,702 - app.ui.main_window - INFO - Media generation tab created successfully
 2025-04-05 17:09:04,964 - sagax1 - INFO - Application started
+2025-04-05 22:32:04,630 - sagax1 - INFO - Logging initialized
+2025-04-05 22:32:05,425 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-05 22:32:05,425 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-05 22:32:05,426 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-05 22:32:05,426 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-05 22:32:05,426 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-05 22:32:05,426 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-05 22:32:05,549 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-05 22:32:05,587 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-05 22:32:07,962 - sagax1 - INFO - Application started
+2025-04-05 23:47:38,440 - app.core.agent_manager - INFO - Created agent with ID 132 of type code_generation
+2025-04-05 23:47:55,636 - app.core.agent_manager - INFO - Created agent with ID 321 of type local_model
+2025-04-07 15:21:28,296 - sagax1 - INFO - Logging initialized
+2025-04-07 15:21:28,457 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-07 15:21:28,458 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-07 15:21:28,458 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-07 15:21:28,458 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-07 15:21:28,459 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-07 15:21:28,459 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-07 15:21:28,568 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-07 15:21:28,628 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-07 15:21:31,368 - sagax1 - INFO - Application started
+2025-04-07 15:42:51,717 - app.core.agent_manager - INFO - Created web browsing agent with ID asd
+2025-04-07 15:43:00,209 - app.core.agent_manager - INFO - Running agent asd with input: what is Pkistn?...
+2025-04-07 15:43:00,209 - agent.asd - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-07 15:43:00,364 - smolagents.models - INFO - Using device: auto
+2025-04-07 15:43:06,661 - agent.asd - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-07 15:43:06,749 - agent.asd - INFO - Web browsing agent asd initialized successfully
+2025-04-07 15:43:07,906 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
+2025-04-07 15:43:15,912 - app.core.agent_manager - WARNING - Agent with ID asd already exists. It will be replaced.
+2025-04-07 15:43:16,051 - app.core.agent_manager - INFO - Created agent with ID asd of type local_model
+2025-04-07 15:43:18,629 - app.core.agent_manager - INFO - Running agent asd with input: sdf...
+2025-04-07 15:43:19,267 - agent.asd - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct is available
+2025-04-07 15:43:19,267 - agent.asd - INFO - Initializing model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-07 15:43:19,267 - smolagents.models - INFO - Using device: auto
+2025-04-07 15:43:21,759 - agent.asd - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct initialized successfully

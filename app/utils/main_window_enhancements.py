@@ -1,5 +1,5 @@
 """
-Main Window Enhancements for SagaX1
+Main Window Enhancements for sagax1
 Implementation file for enhancing the MainWindow class
 """
 
@@ -66,7 +66,7 @@ def _apply_enhancements(window):
     """
     try:
         # Set window properties for better appearance
-        window.setWindowTitle("SagaX1 - AI Agent Platform")
+        window.setWindowTitle("sagax1 - AI Agent Platform")
         window.setMinimumSize(1100, 800)
         
         # Apply the application icon
@@ -156,12 +156,12 @@ def _create_header(window):
             header_layout.addWidget(logo_label)
             
             # Add title to header
-            title_label = QLabel("SagaX1")
+            title_label = QLabel("sagax1")
             title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: white;")
             header_layout.addWidget(title_label)
             
             # Add tagline
-            tagline_label = QLabel("AI-powered agent platform for everyday tasks")
+            tagline_label = QLabel("Opensource AI-powered agent platform for everyday tasks")
             tagline_label.setStyleSheet("color: rgba(255, 255, 255, 0.7); font-size: 14px;")
             header_layout.addSpacing(20)
             header_layout.addWidget(tagline_label)
@@ -253,7 +253,7 @@ def _show_enhanced_about(window):
     """
     try:
         about_dialog = QDialog(window)
-        about_dialog.setWindowTitle("About SagaX1")
+        about_dialog.setWindowTitle("About sagax1")
         about_dialog.setMinimumWidth(480)
         about_dialog.setStyleSheet("""
             QDialog {
@@ -291,7 +291,7 @@ def _show_enhanced_about(window):
             layout.addWidget(logo_label)
         
         # Title
-        title_label = QLabel("SagaX1")
+        title_label = QLabel("sagax1")
         title_label.setObjectName("title")
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title_label)
@@ -303,7 +303,7 @@ def _show_enhanced_about(window):
         layout.addWidget(version_label)
         
         # Description
-        description_label = QLabel("An AI-powered agent platform for everyday tasks")
+        description_label = QLabel("An Opensource AI-powered agent platform for everyday tasks")
         description_label.setObjectName("description")
         description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         description_label.setWordWrap(True)
@@ -316,7 +316,7 @@ def _show_enhanced_about(window):
         layout.addWidget(separator)
         
         # Copyright
-        copyright_label = QLabel("© 2025 SagaX1 Team. All rights reserved.")
+        copyright_label = QLabel("© 2025 sagax1 Team. All rights reserved.")
         copyright_label.setObjectName("copyright")
         copyright_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(copyright_label)
@@ -349,7 +349,7 @@ def _enhance_status_bar(window):
         status_bar = window.statusBar()
         
         # Set a default message with application information
-        status_bar.showMessage("SagaX1 - Ready")
+        status_bar.showMessage("sagax1 - Ready")
         
         # Add permanent widgets to the right side
         api_status = QLabel()

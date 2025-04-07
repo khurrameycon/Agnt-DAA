@@ -1,5 +1,5 @@
 """
-Create Agent Dialog for SagaX1
+Create Agent Dialog for sagax1
 Dialog for creating new agents
 """
 

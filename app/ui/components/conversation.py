@@ -1,5 +1,5 @@
 """
-Conversation component for SagaX1
+Conversation component for sagax1
 Handles displaying and managing conversation history
 """
 

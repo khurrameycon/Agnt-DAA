@@ -1,5 +1,5 @@
 """
-UI components for SagaX1
+UI components for sagax1
 """
 
 from app.ui.components.conversation import ConversationWidget

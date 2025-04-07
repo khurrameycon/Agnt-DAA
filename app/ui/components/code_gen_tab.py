@@ -1,5 +1,5 @@
 """
-Code Generation Tab Component for SagaX1
+Code Generation Tab Component for sagax1
 Tab for code generation agent interaction
 """
 

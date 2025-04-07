@@ -1,5 +1,5 @@
 """
-Dialog components for SagaX1
+Dialog components for sagax1
 """
 
 from app.ui.dialogs.create_agent_dialog import CreateAgentDialog

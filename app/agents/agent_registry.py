@@ -1,5 +1,5 @@
 """
-Agent Registry for SagaX1
+Agent Registry for sagax1
 Manages registration and retrieval of agent types
 """
 

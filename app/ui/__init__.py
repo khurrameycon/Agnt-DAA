@@ -1,3 +1,3 @@
 """
-Core components for SagaX1
+Core components for sagax1
 """

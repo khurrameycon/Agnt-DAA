@@ -1,5 +1,5 @@
 """
-Agent Manager for SagaX1
+Agent Manager for sagax1
 Manages the creation, configuration, and execution of agents
 """
 

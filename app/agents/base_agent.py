@@ -1,5 +1,5 @@
 """
-Base Agent class for SagaX1
+Base Agent class for sagax1
 Provides common functionality for all agent types
 """
 
@@ -8,7 +8,7 @@ from typing import Dict, Any, List, Optional, Callable
 import logging
 
 class BaseAgent(ABC):
-    """Base class for all agents in SagaX1"""
+    """Base class for all agents in sagax1"""
     
     def __init__(self, agent_id: str, config: Dict[str, Any]):
         """Initialize the base agent

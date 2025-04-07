@@ -1,5 +1,5 @@
 """
-Visual Web Automation Agent for SagaX1
+Visual Web Automation Agent for sagax1
 Agent for visually interacting with websites through screenshots and automation
 Enhanced with features from the web_browser.ipynb example
 """

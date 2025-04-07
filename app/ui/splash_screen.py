@@ -1,5 +1,5 @@
 """
-Splash screen for SagaX1
+Splash screen for sagax1
 """
 
 import os
@@ -7,8 +7,8 @@ from PyQt6.QtWidgets import QSplashScreen, QApplication
 from PyQt6.QtGui import QPixmap, QColor, QPainter, QFont
 from PyQt6.QtCore import Qt, QTimer, QSize
 
-class SagaX1SplashScreen(QSplashScreen):
-    """Custom splash screen for SagaX1 with professional appearance"""
+class sagax1SplashScreen(QSplashScreen):
+    """Custom splash screen for sagax1 with professional appearance"""
     
     def __init__(self):
         """Initialize the splash screen with logo and styling"""
@@ -56,7 +56,7 @@ class SagaX1SplashScreen(QSplashScreen):
             title_font = QFont("Arial", 36, QFont.Weight.Bold)
             painter.setFont(title_font)
             painter.setPen(QColor(255, 255, 255))  # White text
-            painter.drawText(pixmap.rect(), Qt.AlignmentFlag.AlignCenter, "SagaX1")
+            painter.drawText(pixmap.rect(), Qt.AlignmentFlag.AlignCenter, "sagax1")
             
             # Set up font for tagline
             tagline_font = QFont("Arial", 14)
@@ -67,7 +67,7 @@ class SagaX1SplashScreen(QSplashScreen):
             tagline_rect = pixmap.rect()
             tagline_rect.setTop(tagline_rect.top() + 180)
             painter.drawText(tagline_rect, Qt.AlignmentFlag.AlignHCenter, 
-                           "AI-powered agent platform for everyday tasks")
+                           "Opensource AI-powered agent platform for everyday tasks")
             
             # Finish painting
             painter.end()

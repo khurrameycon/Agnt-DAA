@@ -1,5 +1,5 @@
 """
-Configuration manager for SagaX1
+Configuration manager for sagax1
 Handles loading, saving, and managing application configuration
 """
 
