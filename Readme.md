@@ -1,79 +1,80 @@
-# SagaX1
+# sagax1
 
-An AI-powered agent platform for everyday tasks.
+## An Opensource AI-powered agent platform for everyday tasks
 
-## Features
-
-SagaX1 is a desktop application that provides various AI-powered agents for everyday tasks:
-
-- Run local LLMs from Hugging Face
-- Web browsing with visual capabilities
-- Speech-to-text conversion
-- Code generation and execution
-- RAG for document Q&A
-- Image generation
-- Video generation
-- And more!
+sagax1 is a powerful application that allows you to create and use various AI agents to perform tasks like:
+- Browsing the web
+- Generating images
+- Writing code
+- Visual web automation
+- Fine-tuning models
 
 ## Installation
 
-### Prerequisites
+### Windows Installation
 
-- Python 3.10 or higher
-- [PyQt6](https://pypi.org/project/PyQt6/)
-- [smolagents](https://github.com/huggingface/smolagents)
-- Hugging Face API key
+1. Download the latest installer (`sagax1_Setup.exe`) from the releases page
+2. Run the installer and follow the instructions
+3. Launch sagax1 from the desktop shortcut or start menu
 
-### Setup
+### Developer Installation
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/sagax1.git
-cd sagax1
-```
+To set up the development environment:
+
+1. Clone this repository:
+   ```
+   git clone https://github.com/yourusername/sagax1.git
+   cd sagax1
+   ```
 
 2. Create a virtual environment:
-```bash
-python -m venv venv
-```
+   ```
+   python -m venv venv
+   venv\Scripts\activate
+   ```
 
-3. Activate the virtual environment:
-```bash
-# Windows
-venv\Scripts\activate
-# macOS/Linux
-source venv/bin/activate
-```
+3. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
 
-4. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+4. Run the application:
+   ```
+   python main.py
+   ```
 
-5. Run the application:
-```bash
-python main.py
-```
+### Building the Installer
+
+To build the Windows installer:
+
+1. Make sure you have Python 3.8+ and NSIS installed
+2. Run the build script:
+   ```
+   build_installer.bat
+   ```
+3. The installer will be created in the `dist` folder
 
 ## Usage
 
-1. Launch the application
-2. Set your Hugging Face API key in Settings
-3. Create an agent for your desired task
-4. Interact with the agent through the chat interface
+1. Launch sagax1
+2. Create a new agent using the "Create New" button
+3. Select the agent type based on your task
+4. Configure the agent with your preferred settings
+5. Start using the agent for your tasks
 
-## Development
+## Requirements
 
-This project is being developed in phases:
+- Windows 10/11 (64-bit)
+- Internet connection
+- For visual web automation: Google Chrome must be installed
 
-- Phase 0: Project Setup and Architecture Planning ✅
-- Phase 1: Basic Agent Framework and Model Integration
-- Phase 2: Web and Code Functionality
-- Phase 3: Media and Document Processing
-- Phase 4: Integration and Enhanced Features
-- Phase 5: Optimization and Packaging
-- Phase 6: Testing, Documentation, and Launch
+## API Keys
+
+To use the full functionality of sagax1, you'll need to set up the following API keys:
+- Hugging Face API key (for accessing models)
+
+You can input these keys in the Settings tab of the application.
 
 ## License
 
-TBD
+Copyright © 2025 sagax1 Team

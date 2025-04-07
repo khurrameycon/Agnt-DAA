@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-sagax1 - An AI-powered agent platform for everyday tasks
+sagax1 - An Opensource AI-powered agent platform for everyday tasks
 Main application entry point
 """
 
@@ -18,9 +18,9 @@ from PyQt6.QtCore import Qt, QCoreApplication
 def setup_environment():
     """Set up the environment variables and paths"""
     # Set application info for QSettings
-    QCoreApplication.setOrganizationName("SagaX1")
+    QCoreApplication.setOrganizationName("sagax1")
     QCoreApplication.setOrganizationDomain("sagax1.ai")
-    QCoreApplication.setApplicationName("SagaX1")
+    QCoreApplication.setApplicationName("sagax1")
     
     # Load environment variables from .env file if it exists
     load_dotenv()
@@ -47,13 +47,13 @@ def main():
         
         # Create application
         app = QApplication(sys.argv)
-        app.setApplicationName("SagaX1")
+        app.setApplicationName("sagax1")
         app.setApplicationVersion("0.1.0")
         
         # Now we can import and use UI-related modules
         from app.utils.ui_assets import UIAssets
         from app.utils.style_system import StyleSystem
-        from app.ui.splash_screen import SagaX1SplashScreen
+        from app.ui.splash_screen import sagax1SplashScreen
         
         # Create default icons now that QApplication exists
         UIAssets.create_default_icons_file()
@@ -74,7 +74,7 @@ def main():
         window = MainWindow(agent_manager, config_manager)
         
         # Show splash screen
-        splash = SagaX1SplashScreen()
+        splash = sagax1SplashScreen()
         splash.show_with_timer(app, window, 2500)  # Show splash for 2.5 seconds
         
         logger.info("Application started")
