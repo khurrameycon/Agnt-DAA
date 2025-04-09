@@ -7,7 +7,26 @@ Main application entry point
 import sys
 import os
 import logging
+import tempfile
 from dotenv import load_dotenv
+
+# Fix for MultiplexedPath issue - MUST be before any imports that might use transformers
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    # Create a temporary directory for transformers cache
+    os.environ['TRANSFORMERS_CACHE'] = os.path.join(tempfile.gettempdir(), 'transformers_cache')
+    os.makedirs(os.environ['TRANSFORMERS_CACHE'], exist_ok=True)
+    
+    # Set other environment variables that might help
+    os.environ['HF_HUB_DISABLE_SYMLINKS_WARNING'] = '1'
+    os.environ['TOKENIZERS_PARALLELISM'] = 'false'
+    os.environ['HF_HUB_ENABLE_HF_TRANSFER'] = 'False'
+    os.environ['SAFETENSORS_FAST_GPU'] = '0'
+    
+    # Create a directory for gradio client cache
+    os.environ['GRADIO_TEMP_DIR'] = os.path.join(tempfile.gettempdir(), 'gradio_cache')
+    os.makedirs(os.environ['GRADIO_TEMP_DIR'], exist_ok=True)
+
+# Now it's safe to import the rest
 from app.core.config_manager import ConfigManager
 from app.core.agent_manager import AgentManager
 from app.ui.main_window import MainWindow
@@ -29,8 +48,6 @@ def setup_environment():
     os.makedirs('config', exist_ok=True)
     os.makedirs('assets/icons', exist_ok=True)
     os.makedirs('logs', exist_ok=True)
-    
-    # Note: We don't call UIAssets.ensure_assets_exist() here to avoid QPixmap issues
 
 def main():
     """Main application entry point"""

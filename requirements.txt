@@ -14,11 +14,10 @@ accelerate
 chromadb
 sentence-transformers
 helium
-langchain
-langchain-chroma
-pyinstaller
 peft
 datasets
 bitsandbytes
 selenium
 webdriver-manager
+smolagents[transformers,tools]
+duckduckgo-search

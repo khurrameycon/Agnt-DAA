@@ -602,27 +602,71 @@ Access to model meta-llama/Llama-3.2-3B-Instruct is restricted and you are not i
 2025-04-05 22:32:07,962 - sagax1 - INFO - Application started
 2025-04-05 23:47:38,440 - app.core.agent_manager - INFO - Created agent with ID 132 of type code_generation
 2025-04-05 23:47:55,636 - app.core.agent_manager - INFO - Created agent with ID 321 of type local_model
-2025-04-07 15:21:28,296 - sagax1 - INFO - Logging initialized
-2025-04-07 15:21:28,457 - app.agents.agent_registry - INFO - Registered agent type: local_model
-2025-04-07 15:21:28,458 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
-2025-04-07 15:21:28,458 - app.agents.agent_registry - INFO - Registered agent type: visual_web
-2025-04-07 15:21:28,458 - app.agents.agent_registry - INFO - Registered agent type: code_generation
-2025-04-07 15:21:28,459 - app.agents.agent_registry - INFO - Registered agent type: media_generation
-2025-04-07 15:21:28,459 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
-2025-04-07 15:21:28,568 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
-2025-04-07 15:21:28,628 - app.ui.main_window - INFO - Media generation tab created successfully
-2025-04-07 15:21:31,368 - sagax1 - INFO - Application started
-2025-04-07 15:42:51,717 - app.core.agent_manager - INFO - Created web browsing agent with ID asd
-2025-04-07 15:43:00,209 - app.core.agent_manager - INFO - Running agent asd with input: what is Pkistn?...
-2025-04-07 15:43:00,209 - agent.asd - INFO - Initializing web browsing agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
-2025-04-07 15:43:00,364 - smolagents.models - INFO - Using device: auto
-2025-04-07 15:43:06,661 - agent.asd - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
-2025-04-07 15:43:06,749 - agent.asd - INFO - Web browsing agent asd initialized successfully
-2025-04-07 15:43:07,906 - primp - INFO - response: https://lite.duckduckgo.com/lite/ 200
-2025-04-07 15:43:15,912 - app.core.agent_manager - WARNING - Agent with ID asd already exists. It will be replaced.
-2025-04-07 15:43:16,051 - app.core.agent_manager - INFO - Created agent with ID asd of type local_model
-2025-04-07 15:43:18,629 - app.core.agent_manager - INFO - Running agent asd with input: sdf...
-2025-04-07 15:43:19,267 - agent.asd - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct is available
-2025-04-07 15:43:19,267 - agent.asd - INFO - Initializing model HuggingFaceTB/SmolLM2-1.7B-Instruct
-2025-04-07 15:43:19,267 - smolagents.models - INFO - Using device: auto
-2025-04-07 15:43:21,759 - agent.asd - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct initialized successfully
+2025-04-07 21:44:25,069 - sagax1 - INFO - Logging initialized
+2025-04-07 21:44:25,773 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-07 21:44:25,774 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-07 21:44:25,774 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-07 21:44:25,774 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-07 21:44:25,774 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-07 21:44:25,774 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-07 21:44:25,929 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-07 21:44:25,980 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-07 21:44:27,896 - sagax1 - INFO - Application started
+2025-04-08 07:54:39,016 - sagax1 - INFO - Logging initialized
+2025-04-08 07:54:39,141 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-08 07:54:39,141 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-08 07:54:39,142 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-08 07:54:39,142 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-08 07:54:39,142 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-08 07:54:39,142 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-08 07:54:39,209 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-08 07:54:39,228 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-08 07:54:40,814 - sagax1 - INFO - Application started
+2025-04-09 12:25:46,805 - sagax1 - INFO - Logging initialized
+2025-04-09 12:25:47,462 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-09 12:25:47,463 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-09 12:25:47,463 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-09 12:25:47,463 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-09 12:25:47,463 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-09 12:25:47,464 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-09 12:25:47,546 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-09 12:25:47,587 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-09 12:25:49,487 - sagax1 - INFO - Application started
+2025-04-09 21:12:49,323 - sagax1 - INFO - Logging initialized
+2025-04-09 21:12:49,748 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-09 21:12:49,748 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-09 21:12:49,749 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-09 21:12:49,749 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-09 21:12:49,749 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-09 21:12:49,749 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-09 21:12:49,796 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-09 21:12:49,813 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-09 21:12:51,682 - sagax1 - INFO - Application started
+2025-04-09 21:13:49,220 - sagax1 - INFO - Logging initialized
+2025-04-09 21:13:49,263 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-09 21:13:49,263 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-09 21:13:49,264 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-09 21:13:49,264 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-09 21:13:49,264 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-09 21:13:49,264 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-09 21:13:49,302 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-09 21:13:49,317 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-09 21:13:50,544 - sagax1 - INFO - Application started
+2025-04-09 21:14:19,207 - app.core.agent_manager - INFO - Created agent with ID sdf of type media_generation
+2025-04-09 21:14:30,085 - app.core.agent_manager - INFO - Running agent sdf with input: Generate an image: Generate an image of a lady smi...
+2025-04-09 21:14:30,085 - agent.sdf - INFO - Initializing image generation agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-09 21:14:30,133 - smolagents.models - INFO - Using device: auto
+2025-04-09 21:14:36,334 - agent.sdf - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-09 21:14:36,335 - agent.sdf - INFO - Attempting to initialize image tool from black-forest-labs/FLUX.1-schnell
+2025-04-09 21:14:38,591 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2025-04-09 21:14:39,796 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/info?serialize=False "HTTP/1.1 200 OK"
+2025-04-09 21:14:39,802 - smolagents.tools - WARNING - Since `api_name` was not defined, it was automatically set to the first available API: `/infer`.
+2025-04-09 21:14:39,803 - agent.sdf - INFO - Successfully initialized image tool from black-forest-labs/FLUX.1-schnell
+2025-04-09 21:14:39,834 - agent.sdf - INFO - Image generation agent sdf initialized successfully
+2025-04-09 21:14:39,835 - agent.sdf - INFO - Generating image with prompt: Generate an image of a lady smiling and sleeping
+2025-04-09 21:14:39,835 - agent.sdf - INFO - Directly using image_generator tool with prompt: Generate an image of a lady smiling and sleeping
+2025-04-09 21:14:40,860 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/heartbeat/cd3d44e6-48bb-4b82-8c35-4dec82e26b06 "HTTP/1.1 200 OK"
+2025-04-09 21:14:42,266 - httpx - INFO - HTTP Request: GET https://api.gradio.app/gradio-messaging/en "HTTP/1.1 200 OK"
+2025-04-09 21:14:43,611 - httpx - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/queue/join "HTTP/1.1 200 OK"
+2025-04-09 21:14:44,692 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/queue/data?session_hash=cd3d44e6-48bb-4b82-8c35-4dec82e26b06 "HTTP/1.1 200 OK"
+2025-04-09 21:14:49,872 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/file=/tmp/gradio/0e5a53c79649c2a287ff0ff740ed6334e93aa980/image.webp "HTTP/1.1 200 OK"
