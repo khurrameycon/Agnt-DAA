@@ -10,6 +10,16 @@ import logging
 class QwenCoderTool(Tool):
     """Tool for generating code using the Qwen Coder model"""
     
+    name = "code_generator"
+    description = "Generate code from a text prompt"
+    inputs = {
+        "prompt": {
+            "type": "string", 
+            "description": "Text prompt for code generation"
+        }
+    }
+    output_type = "string"
+    
     def __init__(self, space_id):
         """Initialize the Qwen Coder tool
         
@@ -17,18 +27,13 @@ class QwenCoderTool(Tool):
             space_id: Hugging Face space ID
         """
         # Initialize the Tool parent class
-        super().__init__(
-            name="code_generator",
-            description="Generate code from a text prompt",
-            func=self._generate_code,
-            output_type=str
-        )
+        super().__init__()
         
         self.client = Client(space_id)
         self.space_id = space_id
         self.logger = logging.getLogger(__name__)
     
-    def _generate_code(self, prompt):
+    def forward(self, prompt):
         """Generate code using the Qwen Coder model
         
         Args:
@@ -59,4 +64,6 @@ class QwenCoderTool(Tool):
                 
         except Exception as e:
             self.logger.error(f"Error generating code with Qwen Coder: {str(e)}")
+            import traceback
+            self.logger.error(traceback.format_exc())
             return f"Failed to generate code: {str(e)}"

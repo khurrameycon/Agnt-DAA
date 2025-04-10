@@ -7,10 +7,12 @@ import os
 import logging
 import tempfile
 import time
+import traceback
 from typing import Dict, Any, List, Optional, Callable
 
 from app.agents.base_agent import BaseAgent
 from smolagents import Tool, CodeAgent
+from gradio_client import Client
 
 # Known working code generation spaces
 CODE_GENERATION_SPACES = [
@@ -19,6 +21,67 @@ CODE_GENERATION_SPACES = [
     "microsoft/CodeX-code-generation", # Another alternative
     "meta/code-llama"                  # Last resort fallback
 ]
+
+class QwenCoderTool(Tool):
+    """Tool for generating code using the Qwen Coder model"""
+    
+    name = "code_generator"
+    description = "Generate code from a text prompt"
+    inputs = {
+        "prompt": {
+            "type": "string", 
+            "description": "Text prompt for code generation"
+        }
+    }
+    output_type = "string"
+    
+    def __init__(self, space_id):
+        """Initialize the Qwen Coder tool
+        
+        Args:
+            space_id: Hugging Face space ID
+        """
+        # Initialize the Tool parent class
+        super().__init__()
+        
+        self.client = Client(space_id)
+        self.space_id = space_id
+        self.logger = logging.getLogger(__name__)
+    
+    def forward(self, prompt):
+        """Generate code using the Qwen Coder model
+        
+        Args:
+            prompt: Input prompt for code generation
+            
+        Returns:
+            Generated code
+        """
+        try:
+            # Use the /chat API endpoint with the required parameters
+            result = self.client.predict(
+                prompt,  # message parameter
+                "Qwen2.5-Coder-0.5B-Instruct-Q6_K.gguf",  # model parameter
+                "You are Qwen, created by Alibaba Cloud. You are a helpful assistant that generates code.",  # system prompt
+                1024,  # max_length
+                0.7,   # temperature
+                0.95,  # top_p
+                40,    # frequency_penalty
+                1.1,   # presence_penalty
+                api_name="/chat"
+            )
+            
+            # Extract code from the response
+            if isinstance(result, dict) and "response" in result:
+                return result["response"]
+            else:
+                return str(result)
+                
+        except Exception as e:
+            self.logger.error(f"Error generating code with Qwen Coder: {str(e)}")
+            import traceback
+            self.logger.error(traceback.format_exc())
+            return f"Failed to generate code: {str(e)}"
 
 class CodeGenerationAgent(BaseAgent):
     """Agent for generating code from text prompts"""
@@ -55,6 +118,9 @@ class CodeGenerationAgent(BaseAgent):
         
         # Store generated code snippets
         self.generated_code = []
+        
+        # Setup logging
+        self.logger = logging.getLogger(f"CodeGenerationAgent-{agent_id}")
     
     def initialize(self) -> None:
         """Initialize the model and agent"""
@@ -111,7 +177,7 @@ class CodeGenerationAgent(BaseAgent):
                         )
                         self.logger.info(f"Using LiteLLMModel for {self.model_id}")
             
-            # Initialize code generation tool
+            # Initialize code generation tool directly with our custom implementation
             self._initialize_tools_with_failsafe()
             
             # Create the agent
@@ -127,19 +193,18 @@ class CodeGenerationAgent(BaseAgent):
             
         except Exception as e:
             self.logger.error(f"Error initializing code generation agent: {str(e)}")
+            traceback.print_exc()
             raise
     
     def _initialize_tools_with_failsafe(self) -> None:
         """Initialize code generation tool with failsafe fallbacks"""
-        from app.utils.qwen_coder_tool import QwenCoderTool
-        from smolagents import Tool
         import time
         
         # First try the specified space
         self.logger.info(f"Attempting to initialize code generation tool from {self.code_space_id}")
         
         try:
-            # For the primary space (sitammeur/Qwen-Coder-llamacpp), we need to handle it specially
+            # For the primary space (sitammeur/Qwen-Coder-llamacpp), we handle it with our custom tool
             if "sitammeur/Qwen-Coder" in self.code_space_id:
                 self.code_tool = QwenCoderTool(self.code_space_id)
                 self.logger.info(f"Successfully initialized Qwen Coder tool from {self.code_space_id}")
@@ -155,6 +220,7 @@ class CodeGenerationAgent(BaseAgent):
                 return
         except Exception as e:
             self.logger.warning(f"Failed to initialize code tool from {self.code_space_id}: {str(e)}")
+            traceback.print_exc()
         
         # Try each fallback space until one works
         for space in CODE_GENERATION_SPACES:
@@ -180,12 +246,37 @@ class CodeGenerationAgent(BaseAgent):
                 return
             except Exception as e:
                 self.logger.warning(f"Failed to initialize code tool from fallback space {space}: {str(e)}")
+                traceback.print_exc()
                 # Add a small delay before trying the next space to avoid rate limiting
                 time.sleep(1)
         
-        # If all fallbacks fail, create a dummy tool that returns an error message
+        # If all fallbacks fail, create a dummy tool as a last resort
         self.logger.error("All code generation spaces failed to initialize")
-        raise RuntimeError("Failed to initialize any code generation space")
+        
+        # Create a dummy tool as a last resort
+        self.code_tool = self._create_dummy_tool()
+    
+    def _create_dummy_tool(self):
+        """Create a dummy tool that returns an error message
+        
+        Returns:
+            A dummy tool function
+        """
+        class DummyTool(Tool):
+            name = "code_generator"
+            description = "Generate code from a text prompt"
+            inputs = {
+                "prompt": {
+                    "type": "string", 
+                    "description": "Text prompt for code generation"
+                }
+            }
+            output_type = "string"
+            
+            def forward(self, prompt):
+                return f"Failed to initialize any code generation space. Unable to generate code for: {prompt}"
+        
+        return DummyTool()
     
     def run(self, input_text: str, callback: Optional[Callable[[str], None]] = None) -> str:
         """Run the agent with the given input
@@ -211,7 +302,7 @@ class CodeGenerationAgent(BaseAgent):
             if callback:
                 callback("Generating code...")
             
-            # Try direct tool usage
+            # Try direct tool usage first (more reliable)
             try:
                 # Direct tool usage approach
                 self.logger.info(f"Directly using code_generator tool with prompt: {prompt}")
@@ -233,6 +324,7 @@ class CodeGenerationAgent(BaseAgent):
                 
             except Exception as direct_error:
                 self.logger.warning(f"Direct tool usage failed: {str(direct_error)}. Falling back to agent.")
+                traceback.print_exc()
                 
                 # Fall back to using the agent
                 result = self.agent.run(
@@ -249,6 +341,7 @@ class CodeGenerationAgent(BaseAgent):
         except Exception as e:
             error_msg = f"Error running code generation agent: {str(e)}"
             self.logger.error(error_msg)
+            traceback.print_exc()
             return f"Sorry, I encountered an error while generating code: {error_msg}"
     
     def _extract_code_from_result(self, result) -> str:
@@ -295,9 +388,7 @@ Here's the code generated for your prompt: "{prompt}"
 
 ```{language}
 {code}
-```
-
-The code was generated using the {self.code_space_id} model.
+```.
 """
     
     def _guess_language(self, code: str) -> str:

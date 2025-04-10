@@ -311,7 +311,8 @@ class FineTuningAgent(BaseAgent):
             per_device_train_batch_size=self.per_device_train_batch_size,
             per_device_eval_batch_size=self.per_device_eval_batch_size,
             gradient_accumulation_steps=4,  # Reduces memory requirements
-            evaluation_strategy="epoch",
+            # Remove evaluation_strategy which might not be supported
+            # evaluation_strategy="epoch",
             save_strategy="epoch",
             learning_rate=self.learning_rate,
             weight_decay=self.weight_decay,
