@@ -1199,7 +1199,7 @@ class MainWindow(QMainWindow):
             self.logger.error(traceback.format_exc())
 
     def create_media_generation_agent(self):
-        """Create a new media generation agent"""
+        """Create a new media generation agent with enhanced capabilities"""
         from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
         
         # Create dialog
@@ -1210,10 +1210,30 @@ class MainWindow(QMainWindow):
         if index >= 0:
             dialog.agent_type_combo.setCurrentIndex(index)
         
+        # Show note about video generation capabilities
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(
+            self,
+            "Media Generation Capabilities",
+            "The media generation agent can create both images and videos from text prompts.\n\n"
+            "The default configuration uses 'black-forest-labs/FLUX.1-schnell' for images and "
+            "'SahaniJi/Instant-Video' for videos, but you can customize these in the dialog."
+        )
+        
         # Show dialog
         if dialog.exec():
             # Get agent configuration
             agent_config = dialog.get_agent_config()
+            
+            # Ensure we have the required configurations
+            if "additional_config" not in agent_config:
+                agent_config["additional_config"] = {}
+            
+            if "image_space_id" not in agent_config["additional_config"] or not agent_config["additional_config"]["image_space_id"]:
+                agent_config["additional_config"]["image_space_id"] = "black-forest-labs/FLUX.1-schnell"
+            
+            if "video_space_id" not in agent_config["additional_config"] or not agent_config["additional_config"]["video_space_id"]:
+                agent_config["additional_config"]["video_space_id"] = "SahaniJi/Instant-Video"
             
             # Create agent
             agent_id = self.agent_manager.create_agent(
@@ -1233,6 +1253,12 @@ class MainWindow(QMainWindow):
                 
                 # Switch to media generation tab
                 self.tabs.setCurrentWidget(self.media_gen_tab)
+            else:
+                QMessageBox.warning(
+                    self,
+                    "Agent Creation Failed",
+                    "Failed to create media generation agent. Check the logs for details."
+                )
 
         
 

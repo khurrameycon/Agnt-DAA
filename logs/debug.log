@@ -670,3 +670,297 @@ Access to model meta-llama/Llama-3.2-3B-Instruct is restricted and you are not i
 2025-04-09 21:14:43,611 - httpx - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/queue/join "HTTP/1.1 200 OK"
 2025-04-09 21:14:44,692 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/queue/data?session_hash=cd3d44e6-48bb-4b82-8c35-4dec82e26b06 "HTTP/1.1 200 OK"
 2025-04-09 21:14:49,872 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/file=/tmp/gradio/0e5a53c79649c2a287ff0ff740ed6334e93aa980/image.webp "HTTP/1.1 200 OK"
+2025-04-10 12:29:47,581 - sagax1 - INFO - Logging initialized
+2025-04-10 12:29:49,012 - app.utils.license_manager - INFO - No valid license found
+2025-04-10 12:29:49,012 - sagax1 - INFO - No valid license found, showing license dialog
+2025-04-10 12:29:55,082 - app.utils.license_manager - INFO - No valid license found
+2025-04-10 12:30:04,072 - app.utils.license_manager - INFO - No valid license found
+2025-04-10 12:30:04,073 - app.utils.license_manager - INFO - License saved successfully
+2025-04-10 12:30:05,899 - sagax1 - INFO - License activated successfully
+2025-04-10 12:30:06,013 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-10 12:30:06,013 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-10 12:30:06,013 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-10 12:30:06,013 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-10 12:30:06,013 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-10 12:30:06,013 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-10 12:30:06,038 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-10 12:30:06,053 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-10 12:30:07,374 - sagax1 - INFO - Application started
+2025-04-10 12:30:19,320 - sagax1 - INFO - Logging initialized
+2025-04-10 12:30:20,437 - app.utils.license_manager - INFO - Valid license found
+2025-04-10 12:30:20,437 - sagax1 - INFO - Valid license found
+2025-04-10 12:30:20,457 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-10 12:30:20,457 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-10 12:30:20,458 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-10 12:30:20,458 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-10 12:30:20,458 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-10 12:30:20,458 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-10 12:30:20,489 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-10 12:30:20,504 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-10 12:30:21,768 - sagax1 - INFO - Application started
+2025-04-10 13:18:29,017 - sagax1 - INFO - Logging initialized
+2025-04-10 13:18:30,474 - app.utils.license_manager - INFO - Valid license found
+2025-04-10 13:18:30,474 - sagax1 - INFO - Valid license found
+2025-04-10 13:18:30,583 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-10 13:18:30,584 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-10 13:18:30,584 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-10 13:18:30,584 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-10 13:18:30,584 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-10 13:18:30,584 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-10 13:18:30,639 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-10 13:18:30,654 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-10 13:18:32,221 - sagax1 - INFO - Application started
+2025-04-10 13:40:37,918 - sagax1 - INFO - Logging initialized
+2025-04-10 13:40:39,093 - app.utils.license_manager - INFO - Valid license found
+2025-04-10 13:40:39,093 - sagax1 - INFO - Valid license found
+2025-04-10 13:40:39,149 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-10 13:40:39,149 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-10 13:40:39,149 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-10 13:40:39,149 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-10 13:40:39,149 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-10 13:40:39,149 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-10 13:40:39,222 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-10 13:40:39,242 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-10 13:40:40,783 - sagax1 - INFO - Application started
+2025-04-10 13:40:58,905 - app.core.agent_manager - INFO - Created agent with ID Chatagent of type local_model
+2025-04-10 13:41:17,134 - app.core.agent_manager - INFO - Running agent Chatagent with input: What is epic ? can you tell me in urdu?...
+2025-04-10 13:41:17,569 - agent.Chatagent - ERROR - Error checking model availability: 403 Client Error. (Request ID: Root=1-67f7842b-4d58a0e97c130da375c7b904;d27ed1fb-8c71-449e-aefb-ff24595da0ea)
+
+Cannot access gated repo for url https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct/resolve/main/config.json.
+Access to model meta-llama/Llama-3.2-3B-Instruct is restricted and you are not in the authorized list. Visit https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct to ask for access.
+2025-04-10 13:41:17,571 - app.core.agent_manager - ERROR - Error running agent Chatagent: 403 Client Error. (Request ID: Root=1-67f7842b-4d58a0e97c130da375c7b904;d27ed1fb-8c71-449e-aefb-ff24595da0ea)
+
+Cannot access gated repo for url https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct/resolve/main/config.json.
+Access to model meta-llama/Llama-3.2-3B-Instruct is restricted and you are not in the authorized list. Visit https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct to ask for access.
+2025-04-10 13:41:46,831 - app.core.agent_manager - WARNING - Agent with ID Chatagent already exists. It will be replaced.
+2025-04-10 13:41:46,831 - app.core.agent_manager - INFO - Created agent with ID Chatagent of type local_model
+2025-04-10 13:41:54,661 - app.core.agent_manager - INFO - Running agent Chatagent with input: What is epic ? can you tell me in urdu?...
+2025-04-10 13:41:55,090 - agent.Chatagent - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct is available
+2025-04-10 13:41:55,092 - agent.Chatagent - INFO - Initializing model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-10 13:41:55,142 - smolagents.models - INFO - Using device: auto
+2025-04-10 13:41:59,773 - agent.Chatagent - INFO - Model HuggingFaceTB/SmolLM2-1.7B-Instruct initialized successfully
+2025-04-10 13:42:33,839 - app.core.agent_manager - INFO - Created agent with ID as of type media_generation
+2025-04-10 13:42:53,778 - app.core.agent_manager - INFO - Running agent as with input: Generate a video: Generate a video of a mobile usi...
+2025-04-10 13:42:53,778 - agent.as - INFO - Initializing media generation agent with model None
+2025-04-10 13:42:53,780 - smolagents.models - INFO - Using device: auto
+2025-04-10 13:43:00,627 - accelerate.big_modeling - WARNING - Some parameters are on the meta device because they were offloaded to the cpu and disk.
+2025-04-10 13:43:01,373 - agent.as - INFO - Using TransformersModel for None
+2025-04-10 13:43:01,374 - agent.as - INFO - Attempting to initialize image tool from stabilityai/stable-diffusion-xl-base-1.0
+2025-04-10 13:43:02,465 - agent.as - WARNING - Failed to initialize image tool from stabilityai/stable-diffusion-xl-base-1.0: 404 Client Error. (Request ID: Root=1-67f78493-76a3d6f9472d29bd11d4226e;09c4901d-0ca0-4d26-bfb8-f2c839d60795)
+
+Repository Not Found for url: https://huggingface.co/api/spaces/stabilityai/stable-diffusion-xl-base-1.0.
+Please make sure you specified the correct `repo_id` and `repo_type`.
+If you are trying to access a private or gated repo, make sure you are authenticated. For more details, see https://huggingface.co/docs/huggingface_hub/authentication
+2025-04-10 13:43:02,466 - agent.as - INFO - Attempting fallback: initializing image tool from black-forest-labs/FLUX.1-schnell
+2025-04-10 13:43:04,616 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2025-04-10 13:43:05,689 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/info?serialize=False "HTTP/1.1 200 OK"
+2025-04-10 13:43:05,775 - smolagents.tools - WARNING - Since `api_name` was not defined, it was automatically set to the first available API: `/infer`.
+2025-04-10 13:43:05,776 - agent.as - INFO - Successfully initialized image tool from fallback space black-forest-labs/FLUX.1-schnell
+2025-04-10 13:43:05,776 - agent.as - INFO - Attempting to initialize video tool from damo-vilab/text-to-video-ms
+2025-04-10 13:43:06,019 - agent.as - WARNING - Failed to initialize video tool from damo-vilab/text-to-video-ms: 404 Client Error. (Request ID: Root=1-67f78497-4c2662891a59580f034c9252;7d4009f0-f29f-4f02-abe9-c21385b3208e)
+
+Repository Not Found for url: https://huggingface.co/api/spaces/damo-vilab/text-to-video-ms.
+Please make sure you specified the correct `repo_id` and `repo_type`.
+If you are trying to access a private or gated repo, make sure you are authenticated. For more details, see https://huggingface.co/docs/huggingface_hub/authentication
+2025-04-10 13:43:06,020 - agent.as - INFO - Attempting fallback: initializing video tool from SahaniJi/Instant-Video
+2025-04-10 13:43:06,855 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/heartbeat/92a924f0-e2ea-4c40-8fc3-808440ceee9d "HTTP/1.1 200 OK"
+2025-04-10 13:43:07,656 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/config "HTTP/1.1 200 OK"
+2025-04-10 13:43:08,734 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/info?serialize=False "HTTP/1.1 200 OK"
+2025-04-10 13:43:08,736 - smolagents.tools - WARNING - Since `api_name` was not defined, it was automatically set to the first available API: `/generate_image`.
+2025-04-10 13:43:08,736 - agent.as - INFO - Successfully initialized video tool from fallback space SahaniJi/Instant-Video
+2025-04-10 13:43:08,799 - agent.as - INFO - Media generation agent as initialized successfully
+2025-04-10 13:43:08,799 - agent.as - INFO - Generating video with prompt: Generate a video of a mobile using lady
+2025-04-10 13:43:08,806 - agent.as - INFO - Directly using video_generator tool with prompt: Generate a video of a mobile using lady
+2025-04-10 13:43:09,833 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/heartbeat/bd87ea61-a997-4403-b7db-9d77279f65c2 "HTTP/1.1 200 OK"
+2025-04-10 13:43:11,375 - httpx - INFO - HTTP Request: GET https://api.gradio.app/gradio-messaging/en "HTTP/1.1 200 OK"
+2025-04-10 13:43:12,876 - httpx - INFO - HTTP Request: POST https://sahaniji-instant-video.hf.space/queue/join "HTTP/1.1 200 OK"
+2025-04-10 13:43:13,947 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/queue/data?session_hash=bd87ea61-a997-4403-b7db-9d77279f65c2 "HTTP/1.1 200 OK"
+2025-04-10 13:43:23,857 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/file=/tmp/gradio/e14b13e2cf29028c3a91cca4bb9a80b9a9104d96/3bb6be163cf34c4ab02ba1eea8077a51.mp4 "HTTP/1.1 200 OK"
+2025-04-10 13:45:43,450 - app.core.agent_manager - INFO - Running agent as with input: Generate a video: Generate a video of 10 seconds :...
+2025-04-10 13:45:43,451 - agent.as - INFO - Generating video with prompt: Generate a video of 10 seconds : A lady is using mobile phone and smiling
+2025-04-10 13:45:43,451 - agent.as - INFO - Directly using video_generator tool with prompt: Generate a video of 10 seconds : A lady is using mobile phone and smiling
+2025-04-10 13:45:44,600 - httpx - INFO - HTTP Request: POST https://sahaniji-instant-video.hf.space/queue/join "HTTP/1.1 200 OK"
+2025-04-10 13:45:45,677 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/queue/data?session_hash=bd87ea61-a997-4403-b7db-9d77279f65c2 "HTTP/1.1 200 OK"
+2025-04-10 13:45:51,330 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/file=/tmp/gradio/9fcee2ad9d7e29ce284f3a70512cf8ccb9ef5ced/1f38b5a7000b456899ef78b69ef6c8e1.mp4 "HTTP/1.1 200 OK"
+2025-04-10 13:47:36,854 - app.core.agent_manager - INFO - Running agent as with input: Generate an image: image of a lady singing song...
+2025-04-10 13:47:36,855 - agent.as - INFO - Generating image with prompt: image of a lady singing song
+2025-04-10 13:47:36,855 - agent.as - INFO - Directly using image_generator tool with prompt: image of a lady singing song
+2025-04-10 13:47:37,973 - httpx - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/queue/join "HTTP/1.1 200 OK"
+2025-04-10 13:47:39,039 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/queue/data?session_hash=92a924f0-e2ea-4c40-8fc3-808440ceee9d "HTTP/1.1 200 OK"
+2025-04-10 13:47:45,775 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/file=/tmp/gradio/b42d513a936109fc83c1ff63c3a508dee4c644c2/image.webp "HTTP/1.1 200 OK"
+2025-04-10 13:56:15,680 - sagax1 - INFO - Logging initialized
+2025-04-10 13:56:16,819 - app.utils.license_manager - INFO - Valid license found
+2025-04-10 13:56:16,820 - sagax1 - INFO - Valid license found
+2025-04-10 13:56:16,867 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-10 13:56:16,867 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-10 13:56:16,867 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-10 13:56:16,867 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-10 13:56:16,868 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-10 13:56:16,868 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-10 13:56:16,917 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-10 13:56:16,934 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-10 13:56:18,445 - sagax1 - INFO - Application started
+2025-04-10 13:56:27,984 - app.core.agent_manager - INFO - Created agent with ID as of type media_generation
+2025-04-10 13:56:38,310 - app.core.agent_manager - INFO - Running agent as with input: Generate an image: image of a watch lying on bed...
+2025-04-10 13:56:38,311 - agent.as - INFO - Initializing media generation agent with model None
+2025-04-10 13:56:38,349 - smolagents.models - INFO - Using device: auto
+2025-04-10 13:56:42,512 - agent.as - INFO - Using TransformersModel for None
+2025-04-10 13:56:42,513 - agent.as - INFO - Attempting to initialize image tool from stabilityai/stable-diffusion-xl-base-1.0
+2025-04-10 13:56:42,847 - agent.as - WARNING - Failed to initialize image tool from stabilityai/stable-diffusion-xl-base-1.0: 404 Client Error. (Request ID: Root=1-67f787c8-31e8257269afb63b3e87aaf7;9c3bbb5e-8d16-4f81-869f-bda58afc98e1)
+
+Repository Not Found for url: https://huggingface.co/api/spaces/stabilityai/stable-diffusion-xl-base-1.0.
+Please make sure you specified the correct `repo_id` and `repo_type`.
+If you are trying to access a private or gated repo, make sure you are authenticated. For more details, see https://huggingface.co/docs/huggingface_hub/authentication
+2025-04-10 13:56:42,849 - agent.as - INFO - Attempting fallback: initializing image tool from black-forest-labs/FLUX.1-schnell
+2025-04-10 13:56:44,654 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2025-04-10 13:56:45,734 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/info?serialize=False "HTTP/1.1 200 OK"
+2025-04-10 13:56:45,742 - smolagents.tools - WARNING - Since `api_name` was not defined, it was automatically set to the first available API: `/infer`.
+2025-04-10 13:56:45,742 - agent.as - INFO - Successfully initialized image tool from fallback space black-forest-labs/FLUX.1-schnell
+2025-04-10 13:56:45,744 - agent.as - INFO - Attempting to initialize video tool from damo-vilab/text-to-video-ms
+2025-04-10 13:56:46,295 - agent.as - WARNING - Failed to initialize video tool from damo-vilab/text-to-video-ms: 404 Client Error. (Request ID: Root=1-67f787cb-64cafbc7318aee980dd3cbfd;03783841-7644-42f9-a42b-4a45e694c3c7)
+
+Repository Not Found for url: https://huggingface.co/api/spaces/damo-vilab/text-to-video-ms.
+Please make sure you specified the correct `repo_id` and `repo_type`.
+If you are trying to access a private or gated repo, make sure you are authenticated. For more details, see https://huggingface.co/docs/huggingface_hub/authentication
+2025-04-10 13:56:46,296 - agent.as - INFO - Attempting fallback: initializing video tool from SahaniJi/Instant-Video
+2025-04-10 13:56:46,802 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/heartbeat/f04eb623-562c-44bd-83d0-0a13c8f9009d "HTTP/1.1 200 OK"
+2025-04-10 13:56:47,955 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/config "HTTP/1.1 200 OK"
+2025-04-10 13:56:49,034 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/info?serialize=False "HTTP/1.1 200 OK"
+2025-04-10 13:56:49,042 - smolagents.tools - WARNING - Since `api_name` was not defined, it was automatically set to the first available API: `/generate_image`.
+2025-04-10 13:56:49,044 - agent.as - INFO - Successfully initialized video tool from fallback space SahaniJi/Instant-Video
+2025-04-10 13:56:49,058 - agent.as - INFO - Media generation agent as initialized successfully
+2025-04-10 13:56:49,059 - agent.as - INFO - Generating image with prompt: image of a watch lying on bed
+2025-04-10 13:56:49,059 - agent.as - INFO - Directly using image_generator tool with prompt: image of a watch lying on bed
+2025-04-10 13:56:50,119 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/heartbeat/47d556e6-51c5-4b08-a6b6-d28dcf89acbc "HTTP/1.1 200 OK"
+2025-04-10 13:56:51,240 - httpx - INFO - HTTP Request: GET https://api.gradio.app/gradio-messaging/en "HTTP/1.1 200 OK"
+2025-04-10 13:56:51,506 - httpx - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/queue/join "HTTP/1.1 200 OK"
+2025-04-10 13:56:52,568 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/queue/data?session_hash=f04eb623-562c-44bd-83d0-0a13c8f9009d "HTTP/1.1 200 OK"
+2025-04-10 13:56:57,835 - httpx - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/file=/tmp/gradio/e5e3fb8c00b7262ed1309834ebe63e86d99b5612/image.webp "HTTP/1.1 200 OK"
+2025-04-10 13:57:24,574 - app.core.agent_manager - INFO - Running agent as with input: Generate a video: 3 seconds video  of a lady lying...
+2025-04-10 13:57:24,574 - agent.as - INFO - Generating video with prompt: 3 seconds video  of a lady lying on bed smiling with kinky eyes
+2025-04-10 13:57:24,575 - agent.as - INFO - Generating video with prompt: 3 seconds video  of a lady lying on bed smiling with kinky eyes
+2025-04-10 13:57:26,742 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/config "HTTP/1.1 200 OK"
+2025-04-10 13:57:27,796 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/info?serialize=False "HTTP/1.1 200 OK"
+2025-04-10 13:57:27,803 - agent.as - INFO - Connected to SahaniJi/Instant-Video
+2025-04-10 13:57:27,803 - agent.as - INFO - Video generation parameters: prompt='3 seconds video  of a lady lying on bed smiling with kinky eyes', base='Realistic', motion='guoyww/animatediff-motion-lora-zoom-in', step='4'
+2025-04-10 13:57:28,912 - httpx - INFO - HTTP Request: POST https://sahaniji-instant-video.hf.space/queue/join "HTTP/1.1 200 OK"
+2025-04-10 13:57:28,938 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/heartbeat/a4030b62-ed3a-4a71-a074-37de2f4c7684 "HTTP/1.1 200 OK"
+2025-04-10 13:57:29,971 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/queue/data?session_hash=a4030b62-ed3a-4a71-a074-37de2f4c7684 "HTTP/1.1 200 OK"
+2025-04-10 13:57:35,714 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/file=/tmp/gradio/f56d317c9bacaae898c40d43d69039dff0ed58b2/d7a21b01d803493791060c3a2864fa53.mp4 "HTTP/1.1 200 OK"
+2025-04-10 13:57:35,944 - agent.as - INFO - Video generation result type: <class 'dict'>
+2025-04-10 13:57:35,945 - agent.as - INFO - Found video path in result dictionary: C:\Users\Umair\AppData\Local\Temp\gradio\976736d7749c3537e4d0ddd04e1a361b0e49cf4c819c6d60a6fe88fc57bf9efc\d7a21b01d803493791060c3a2864fa53.mp4
+2025-04-10 13:57:35,946 - agent.as - INFO - Video file size: 77066 bytes
+2025-04-10 13:58:36,938 - app.core.agent_manager - INFO - Running agent as with input: Generate a video: 5 seconds video of a lady smilin...
+2025-04-10 13:58:36,938 - agent.as - INFO - Generating video with prompt: 5 seconds video of a lady smiling, lying in bed, reading news paper, and waiting for his partner
+2025-04-10 13:58:36,938 - agent.as - INFO - Generating video with prompt: 5 seconds video of a lady smiling, lying in bed, reading news paper, and waiting for his partner
+2025-04-10 13:58:39,381 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/config "HTTP/1.1 200 OK"
+2025-04-10 13:58:40,441 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/info?serialize=False "HTTP/1.1 200 OK"
+2025-04-10 13:58:40,445 - agent.as - INFO - Connected to SahaniJi/Instant-Video
+2025-04-10 13:58:40,446 - agent.as - INFO - Video generation parameters: prompt='5 seconds video of a lady smiling, lying in bed, reading news paper, and waiting for his partner', base='Realistic', motion='guoyww/animatediff-motion-lora-zoom-in', step='4'
+2025-04-10 13:58:41,556 - httpx - INFO - HTTP Request: POST https://sahaniji-instant-video.hf.space/queue/join "HTTP/1.1 200 OK"
+2025-04-10 13:58:41,572 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/heartbeat/9aaf0e2e-74d8-44f7-95d9-b101b9a271f0 "HTTP/1.1 200 OK"
+2025-04-10 13:58:42,607 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/queue/data?session_hash=9aaf0e2e-74d8-44f7-95d9-b101b9a271f0 "HTTP/1.1 200 OK"
+2025-04-10 13:58:53,392 - httpx - INFO - HTTP Request: GET https://sahaniji-instant-video.hf.space/file=/tmp/gradio/efc1153327c84daa5a52e8f3c41634752a138589/66cfbd5591164a65899ae108411a8951.mp4 "HTTP/1.1 200 OK"
+2025-04-10 13:58:53,837 - agent.as - INFO - Video generation result type: <class 'dict'>
+2025-04-10 13:58:53,838 - agent.as - INFO - Found video path in result dictionary: C:\Users\Umair\AppData\Local\Temp\gradio\be789d5d22f03083cfedea2c799ef4bf8803cff6edc014393d3ef53da72f1476\66cfbd5591164a65899ae108411a8951.mp4
+2025-04-10 13:58:53,839 - agent.as - INFO - Video file size: 101589 bytes
+2025-04-10 14:39:17,714 - sagax1 - INFO - Logging initialized
+2025-04-10 14:39:18,850 - app.utils.license_manager - INFO - Valid license found
+2025-04-10 14:39:18,850 - sagax1 - INFO - Valid license found
+2025-04-10 14:39:18,871 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-10 14:39:18,871 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-10 14:39:18,871 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-10 14:39:18,871 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-10 14:39:18,872 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-10 14:39:18,872 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-10 14:39:18,894 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-10 14:39:18,908 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-10 14:39:20,351 - sagax1 - INFO - Application started
+2025-04-10 14:40:54,200 - sagax1 - INFO - Logging initialized
+2025-04-10 14:40:55,298 - app.utils.license_manager - INFO - Valid license found
+2025-04-10 14:40:55,299 - sagax1 - INFO - Valid license found
+2025-04-10 14:40:55,317 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-10 14:40:55,317 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-10 14:40:55,317 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-10 14:40:55,317 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-10 14:40:55,318 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-10 14:40:55,318 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-10 14:40:55,354 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-10 14:40:55,369 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-10 14:40:56,630 - sagax1 - INFO - Application started
+2025-04-10 14:41:25,040 - sagax1 - INFO - Logging initialized
+2025-04-10 14:41:26,145 - app.utils.license_manager - INFO - Valid license found
+2025-04-10 14:41:26,145 - sagax1 - INFO - Valid license found
+2025-04-10 14:41:26,162 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-10 14:41:26,162 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-10 14:41:26,162 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-10 14:41:26,162 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-10 14:41:26,163 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-10 14:41:26,163 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-10 14:41:26,202 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-10 14:41:26,215 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-10 14:41:27,476 - sagax1 - INFO - Application started
+2025-04-10 14:43:55,687 - sagax1 - INFO - Logging initialized
+2025-04-10 14:43:56,792 - app.utils.license_manager - INFO - Valid license found
+2025-04-10 14:43:56,792 - sagax1 - INFO - Valid license found
+2025-04-10 14:43:56,810 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-10 14:43:56,811 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-10 14:43:56,811 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-10 14:43:56,811 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-10 14:43:56,811 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-10 14:43:56,811 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-10 14:43:56,843 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-10 14:43:56,857 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-10 14:43:58,128 - sagax1 - INFO - Application started
+2025-04-10 14:44:39,759 - app.core.agent_manager - INFO - Created agent with ID as of type code_generation
+2025-04-10 14:45:02,809 - app.core.agent_manager - INFO - Running agent as with input: give me code of a calculator in python...
+2025-04-10 14:45:02,809 - agent.as - INFO - Initializing code generation agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-10 14:45:02,827 - smolagents.models - INFO - Using device: auto
+2025-04-10 14:45:06,238 - agent.as - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-10 14:45:06,238 - agent.as - INFO - Attempting to initialize code generation tool from sitammeur/Qwen-Coder-llamacpp
+2025-04-10 14:45:08,369 - httpx - INFO - HTTP Request: GET https://sitammeur-qwen-coder-llamacpp.hf.space/config "HTTP/1.1 200 OK"
+2025-04-10 14:45:09,676 - httpx - INFO - HTTP Request: GET https://sitammeur-qwen-coder-llamacpp.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2025-04-10 14:45:09,684 - agent.as - INFO - Successfully initialized Qwen Coder tool from sitammeur/Qwen-Coder-llamacpp
+2025-04-10 14:45:09,738 - agent.as - ERROR - Error initializing code generation agent: All elements must be instance of Tool (or a subclass)
+2025-04-10 14:45:09,739 - app.core.agent_manager - ERROR - Error running agent as: All elements must be instance of Tool (or a subclass)
+2025-04-10 17:13:57,913 - sagax1 - INFO - Logging initialized
+2025-04-10 17:13:59,013 - app.utils.license_manager - INFO - Valid license found
+2025-04-10 17:13:59,014 - sagax1 - INFO - Valid license found
+2025-04-10 17:13:59,048 - app.agents.agent_registry - INFO - Registered agent type: local_model
+2025-04-10 17:13:59,048 - app.agents.agent_registry - INFO - Registered agent type: web_browsing
+2025-04-10 17:13:59,048 - app.agents.agent_registry - INFO - Registered agent type: visual_web
+2025-04-10 17:13:59,048 - app.agents.agent_registry - INFO - Registered agent type: code_generation
+2025-04-10 17:13:59,049 - app.agents.agent_registry - INFO - Registered agent type: media_generation
+2025-04-10 17:13:59,049 - app.agents.agent_registry - INFO - Registered agent type: fine_tuning
+2025-04-10 17:13:59,082 - app.ui.components.visual_web_tab - INFO - Agent selected: 'No visual web agents available'
+2025-04-10 17:13:59,099 - app.ui.main_window - INFO - Media generation tab created successfully
+2025-04-10 17:14:00,434 - sagax1 - INFO - Application started
+2025-04-10 17:14:07,696 - app.core.agent_manager - INFO - Created agent with ID as of type code_generation
+2025-04-10 17:14:19,621 - app.core.agent_manager - INFO - Running agent as with input: Create a calculator in python...
+2025-04-10 17:14:19,622 - agent.as - INFO - Initializing code generation agent with model HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-10 17:14:19,657 - smolagents.models - INFO - Using device: auto
+2025-04-10 17:14:25,762 - accelerate.big_modeling - WARNING - Some parameters are on the meta device because they were offloaded to the cpu and disk.
+2025-04-10 17:14:26,618 - agent.as - INFO - Using TransformersModel for HuggingFaceTB/SmolLM2-1.7B-Instruct
+2025-04-10 17:14:26,703 - agent.as - INFO - Attempting to initialize code generation tool from sitammeur/Qwen-Coder-llamacpp
+2025-04-10 17:14:28,562 - httpx - INFO - HTTP Request: GET https://sitammeur-qwen-coder-llamacpp.hf.space/config "HTTP/1.1 200 OK"
+2025-04-10 17:14:30,088 - httpx - INFO - HTTP Request: GET https://sitammeur-qwen-coder-llamacpp.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2025-04-10 17:14:30,100 - agent.as - WARNING - Failed to initialize code tool from sitammeur/Qwen-Coder-llamacpp: You must set an attribute description.
+2025-04-10 17:14:30,100 - agent.as - INFO - Attempting fallback: initializing code tool from Pradipta01/Code_Generator
+2025-04-10 17:14:31,160 - httpx - INFO - HTTP Request: GET https://sitammeur-qwen-coder-llamacpp.hf.space/gradio_api/heartbeat/d6b12001-8add-4505-9056-6b9f3b1a737b "HTTP/1.1 200 OK"
+2025-04-10 17:14:32,261 - httpx - INFO - HTTP Request: GET https://pradipta01-code-generator.hf.space/config "HTTP/1.1 200 OK"
+2025-04-10 17:14:32,263 - agent.as - WARNING - Failed to initialize code tool from fallback space Pradipta01/Code_Generator: Expecting value: line 1 column 1 (char 0)
+2025-04-10 17:14:33,264 - agent.as - INFO - Attempting fallback: initializing code tool from microsoft/CodeX-code-generation
+2025-04-10 17:14:33,517 - agent.as - WARNING - Failed to initialize code tool from fallback space microsoft/CodeX-code-generation: 404 Client Error. (Request ID: Root=1-67f7b627-05e530ae76219148191521d9;c191a9f4-fc67-4e2b-b563-33e8b00d20b7)
+
+Repository Not Found for url: https://huggingface.co/api/spaces/microsoft/CodeX-code-generation.
+Please make sure you specified the correct `repo_id` and `repo_type`.
+If you are trying to access a private or gated repo, make sure you are authenticated. For more details, see https://huggingface.co/docs/huggingface_hub/authentication
+2025-04-10 17:14:34,519 - agent.as - INFO - Attempting fallback: initializing code tool from meta/code-llama
+2025-04-10 17:14:34,809 - agent.as - WARNING - Failed to initialize code tool from fallback space meta/code-llama: 404 Client Error. (Request ID: Root=1-67f7b628-744e1d3959d835196ade67c5;daf8e3da-e0ae-4ed4-9e7c-6ad2b014dfc7)
+
+Repository Not Found for url: https://huggingface.co/api/spaces/meta/code-llama.
+Please make sure you specified the correct `repo_id` and `repo_type`.
+If you are trying to access a private or gated repo, make sure you are authenticated. For more details, see https://huggingface.co/docs/huggingface_hub/authentication
+2025-04-10 17:14:35,812 - agent.as - ERROR - All code generation spaces failed to initialize
+2025-04-10 17:14:35,815 - agent.as - ERROR - Error initializing code generation agent: Failed to initialize any code generation space
+2025-04-10 17:14:35,816 - app.core.agent_manager - ERROR - Error running agent as: Failed to initialize any code generation space

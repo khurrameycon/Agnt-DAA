@@ -232,14 +232,13 @@ class CreateAgentDialog(QDialog):
         self.agent_specific_layout.addWidget(self.visual_web_options)
         self.visual_web_options.setVisible(False)
         
-        # Code Generation Agent Options
+         # Code Generation Agent Options
         self.code_gen_options = QGroupBox("Code Generation Agent Options")
         code_gen_layout = QFormLayout(self.code_gen_options)
         
-        # Sandbox option
-        self.sandbox_check = QCheckBox("Run code in sandbox (safer but more limited)")
-        self.sandbox_check.setChecked(True)
-        code_gen_layout.addRow("", self.sandbox_check)
+        # Code Generation Space
+        self.code_space_edit = QLineEdit("sitammeur/Qwen-Coder-llamacpp")
+        code_gen_layout.addRow("Code Space ID:", self.code_space_edit)
         
         self.agent_specific_layout.addWidget(self.code_gen_options)
         self.code_gen_options.setVisible(False)
@@ -378,6 +377,7 @@ class CreateAgentDialog(QDialog):
         elif agent_type == "visual_web":
             self.visual_web_options.setVisible(True)
             self.authorized_imports_edit.setEnabled(True)
+        
         elif agent_type == "code_generation":
             self.code_gen_options.setVisible(True)
             self.authorized_imports_edit.setEnabled(True)
@@ -393,6 +393,11 @@ class CreateAgentDialog(QDialog):
             self.authorized_imports_edit.setEnabled(False)
         
     
+    """
+    Update to create_agent_dialog.py for video generation
+    """
+
+    # Update the get_agent_config method in CreateAgentDialog class
     def get_agent_config(self) -> Dict[str, Any]:
         """Get the agent configuration from the dialog
         
@@ -453,12 +458,12 @@ class CreateAgentDialog(QDialog):
             config["additional_config"]["browser_width"] = self.browser_width_spin.value()
             config["additional_config"]["browser_height"] = self.browser_height_spin.value()
         elif agent_type == "code_generation":
-            config["additional_config"]["sandbox"] = self.sandbox_check.isChecked()
-        
+            config["additional_config"]["code_space_id"] = self.code_space_edit.text().strip()
         elif agent_type == "media_generation":
             config["additional_config"]["image_space_id"] = self.image_space_edit.text().strip()
             config["additional_config"]["video_space_id"] = self.video_space_edit.text().strip()
         elif agent_type == "fine_tuning":
             config["additional_config"]["output_dir"] = self.ft_output_dir_edit.text()
             config["additional_config"]["push_to_hub"] = self.ft_push_to_hub_check.isChecked()
+        
         return config

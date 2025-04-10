@@ -1,6 +1,6 @@
 """
 Media Generation Agent for sagax1
-Agent for generating images from text prompts using Hugging Face spaces
+Agent for generating images and videos from text prompts using Hugging Face spaces
 """
 
 import os
@@ -15,15 +15,22 @@ from app.agents.base_agent import BaseAgent
 from smolagents import Tool, CodeAgent
 
 # Known working image generation spaces
-FALLBACK_SPACES = [
+FALLBACK_IMAGE_SPACES = [
     "black-forest-labs/FLUX.1-schnell",  # Fast version
     "black-forest-labs/FLUX.1-dev",      # Higher quality version
     "stabilityai/sdxl",                  # Another alternative
     "runwayml/stable-diffusion-v1-5"     # Last resort fallback
 ]
 
+# Video generation spaces
+VIDEO_SPACES = [
+    "SahaniJi/Instant-Video",            # Primary video generation space
+    "KingNish/Instant-Video",       # Fallback video space
+    "camenduru/text-to-video"            # Last resort fallback
+]
+
 class MediaGenerationAgent(BaseAgent):
-    """Agent for generating images from text prompts"""
+    """Agent for generating images and videos from text prompts"""
     
     def __init__(self, agent_id: str, config: Dict[str, Any]):
         """Initialize the media generation agent
@@ -36,6 +43,7 @@ class MediaGenerationAgent(BaseAgent):
                 max_tokens: Maximum number of tokens to generate
                 temperature: Temperature for generation
                 image_space_id: Hugging Face space ID for image generation
+                video_space_id: Hugging Face space ID for video generation
         """
         super().__init__(agent_id, config)
         
@@ -46,12 +54,17 @@ class MediaGenerationAgent(BaseAgent):
         
         # CRITICAL: Override the image_space_id here, regardless of what's in config
         # This ensures we use a working space even if old config is loaded
-        config["image_space_id"] = "black-forest-labs/FLUX.1-schnell"
-        self.image_space_id = "black-forest-labs/FLUX.1-schnell"  # Use the fast version by default
+        config["image_space_id"] = config.get("image_space_id", "black-forest-labs/FLUX.1-schnell")
+        self.image_space_id = config.get("image_space_id", "black-forest-labs/FLUX.1-schnell")  # Use the fast version by default
+        
+        # Video space configuration
+        config["video_space_id"] = config.get("video_space_id", "SahaniJi/Instant-Video")
+        self.video_space_id = config.get("video_space_id", "SahaniJi/Instant-Video")
         
         self.authorized_imports = config.get("authorized_imports", [])
         
         self.image_tool = None
+        self.video_tool = None
         self.agent = None
         self.is_initialized = False
         
@@ -66,7 +79,7 @@ class MediaGenerationAgent(BaseAgent):
         try:
             from smolagents import TransformersModel, HfApiModel, OpenAIServerModel, LiteLLMModel
             
-            self.logger.info(f"Initializing image generation agent with model {self.model_id}")
+            self.logger.info(f"Initializing media generation agent with model {self.model_id}")
             
             # Try to create the model based on the model_id
             try:
@@ -113,26 +126,37 @@ class MediaGenerationAgent(BaseAgent):
                         )
                         self.logger.info(f"Using LiteLLMModel for {self.model_id}")
             
-            # Initialize image generation tool
+            # Initialize image and video generation tools
             self._initialize_tools_with_failsafe()
             
-            # Create the agent
+            # Create the agent with both tools
+            tools = [tool for tool in [self.image_tool, self.video_tool] if tool is not None]
             self.agent = CodeAgent(
-                tools=[self.image_tool],
+                tools=tools,
                 model=model,
                 additional_authorized_imports=["PIL", "gradio_client"] + self.authorized_imports,
                 verbosity_level=1
             )
             
             self.is_initialized = True
-            self.logger.info(f"Image generation agent {self.agent_id} initialized successfully")
+            self.logger.info(f"Media generation agent {self.agent_id} initialized successfully")
             
         except Exception as e:
-            self.logger.error(f"Error initializing image generation agent: {str(e)}")
+            self.logger.error(f"Error initializing media generation agent: {str(e)}")
             raise
     
     def _initialize_tools_with_failsafe(self) -> None:
-        """Initialize image generation tool with failsafe fallbacks"""
+        """Initialize image and video generation tools with failsafe fallbacks"""
+        from smolagents import Tool
+        
+        # Initialize image generation tool
+        self._initialize_image_tool()
+        
+        # Initialize video generation tool
+        self._initialize_video_tool()
+    
+    def _initialize_image_tool(self) -> None:
+        """Initialize image generation tool with fallbacks"""
         from smolagents import Tool
         
         # First try the specified space
@@ -150,7 +174,7 @@ class MediaGenerationAgent(BaseAgent):
             self.logger.warning(f"Failed to initialize image tool from {self.image_space_id}: {str(e)}")
         
         # Try each fallback space until one works
-        for space in FALLBACK_SPACES:
+        for space in FALLBACK_IMAGE_SPACES:
             if space == self.image_space_id:
                 continue  # Skip if it's the same as the one we already tried
                 
@@ -167,9 +191,49 @@ class MediaGenerationAgent(BaseAgent):
             except Exception as e:
                 self.logger.warning(f"Failed to initialize image tool from fallback space {space}: {str(e)}")
         
-        # If all fallbacks fail, create a dummy tool that returns an error message
+        # If all fallbacks fail, log error but continue (we might still have video tool)
         self.logger.error("All image generation spaces failed to initialize")
-        raise RuntimeError("Failed to initialize any image generation space")
+        self.image_tool = None
+    
+    def _initialize_video_tool(self) -> None:
+        """Initialize video generation tool with fallbacks"""
+        from smolagents import Tool
+        
+        # First try the specified space
+        self.logger.info(f"Attempting to initialize video tool from {self.video_space_id}")
+        
+        try:
+            self.video_tool = Tool.from_space(
+                self.video_space_id,
+                name="video_generator",
+                description="Generate a video from a text prompt"
+            )
+            self.logger.info(f"Successfully initialized video tool from {self.video_space_id}")
+            return
+        except Exception as e:
+            self.logger.warning(f"Failed to initialize video tool from {self.video_space_id}: {str(e)}")
+        
+        # Try each fallback space until one works
+        for space in VIDEO_SPACES:
+            if space == self.video_space_id:
+                continue  # Skip if it's the same as the one we already tried
+                
+            self.logger.info(f"Attempting fallback: initializing video tool from {space}")
+            try:
+                self.video_tool = Tool.from_space(
+                    space,
+                    name="video_generator",
+                    description="Generate a video from a text prompt"
+                )
+                self.logger.info(f"Successfully initialized video tool from fallback space {space}")
+                self.video_space_id = space  # Update the space ID to the one that worked
+                return
+            except Exception as e:
+                self.logger.warning(f"Failed to initialize video tool from fallback space {space}: {str(e)}")
+        
+        # If all fallbacks fail, log error but continue (we might still have image tool)
+        self.logger.error("All video generation spaces failed to initialize")
+        self.video_tool = None
     
     def run(self, input_text: str, callback: Optional[Callable[[str], None]] = None) -> str:
         """Run the agent with the given input
@@ -185,28 +249,57 @@ class MediaGenerationAgent(BaseAgent):
             self.initialize()
         
         try:
-            # Extract the prompt part after "Generate an image:" if present
+            # Determine if this is a request for image or video generation
+            is_video_request = False
+            if "generate a video" in input_text.lower() or "video:" in input_text.lower():
+                is_video_request = True
+                if not self.video_tool:
+                    return "Sorry, video generation is not available at the moment. The video generation tool could not be initialized."
+            elif "generate an image" in input_text.lower() or "image:" in input_text.lower():
+                if not self.image_tool:
+                    return "Sorry, image generation is not available at the moment. The image generation tool could not be initialized."
+            
+            # Extract the prompt part after any prefix
             prompt = input_text
             if ":" in input_text:
                 prompt = input_text.split(":", 1)[1].strip()
             
             # Log the prompt
-            self.logger.info(f"Generating image with prompt: {prompt}")
+            if is_video_request:
+                self.logger.info(f"Generating video with prompt: {prompt}")
+                return self._generate_video(prompt, callback)
+            else:
+                self.logger.info(f"Generating image with prompt: {prompt}")
+                return self._generate_image(prompt, callback)
             
+        except Exception as e:
+            error_msg = f"Error running media generation agent: {str(e)}"
+            self.logger.error(error_msg)
+            return f"Sorry, I encountered an error while generating the media: {error_msg}"
+    
+    def _generate_image(self, prompt: str, callback: Optional[Callable[[str], None]] = None) -> str:
+        """Generate an image based on the prompt
+        
+        Args:
+            prompt: Text prompt for image generation
+            callback: Optional callback for progress updates
+            
+        Returns:
+            Result message with image information
+        """
+        try:
             # Simplified direct tool usage to bypass CodeAgent complexities
-            try:
-                # Try direct tool usage first (most reliable approach)
-                self.logger.info(f"Directly using image_generator tool with prompt: {prompt}")
-                image_result = self.image_tool(prompt)
-                
-                # Save image to temp file if it's a PIL Image
-                if isinstance(image_result, Image.Image):
-                    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
-                        image_path = temp_file.name
-                        image_result.save(image_path)
-                        self.generated_media.append(image_path)
-                        
-                        result_message = f"""
+            self.logger.info(f"Directly using image_generator tool with prompt: {prompt}")
+            image_result = self.image_tool(prompt)
+            
+            # Save image to temp file if it's a PIL Image
+            if isinstance(image_result, Image.Image):
+                with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
+                    image_path = temp_file.name
+                    image_result.save(image_path)
+                    self.generated_media.append(image_path)
+                    
+                    result_message = f"""
 I've generated an image based on your prompt: "{prompt}"
 
 The image has been created using the {self.image_space_id} model.
@@ -214,34 +307,188 @@ Image saved to: {image_path}
 
 You can view the image in the display area above and save it using the 'Save Media' button.
 """
-                        # Add to history
-                        self.add_to_history(input_text, result_message)
-                        return result_message
-                else:
-                    # Handle other return types (like URLs or base64)
-                    return f"Image generated successfully using {self.image_space_id}. Result: {str(image_result)}"
+                    # Add to history
+                    self.add_to_history(f"Generate an image: {prompt}", result_message)
+                    return result_message
+            else:
+                # Handle other return types (like URLs or base64)
+                return f"Image generated successfully using {self.image_space_id}. Result: {str(image_result)}"
+                
+        except Exception as direct_error:
+            self.logger.warning(f"Direct tool usage failed: {str(direct_error)}. Falling back to agent.")
+            
+            # Fall back to using the agent
+            result = self.agent.run(
+                f"""Generate an image based on this prompt: '{prompt}'
+                Use the image_generator tool to create the image.
+                When complete, combine the description and file location into a single string 
+                like "The image shows [description]. It has been saved to [location]." 
+                and pass that to final_answer()."""
+            )
+            
+            # Add to history
+            self.add_to_history(f"Generate an image: {prompt}", str(result))
+            return str(result)
+    
+    def _generate_video(self, prompt: str, callback: Optional[Callable[[str], None]] = None) -> str:
+        """Generate a video based on the prompt
+        
+        Args:
+            prompt: Text prompt for video generation
+            callback: Optional callback for progress updates
+            
+        Returns:
+            Result message with video information
+        """
+        try:
+            # Update progress if callback is provided
+            if callback:
+                callback("Generating video, this may take a minute...")
+            
+            # Import required libraries
+            from gradio_client import Client
+            import os
+            
+            self.logger.info(f"Generating video with prompt: {prompt}")
+            
+            # Create a direct client connection to the video space
+            client = Client(self.video_space_id)
+            self.logger.info(f"Connected to {self.video_space_id}")
+            
+            # For SahaniJi/Instant-Video, use the specific endpoint and parameters
+            # Based on our testing, we know the correct API endpoint and parameters
+            api_name = "/instant_video"
+            
+            # Default parameters 
+            base = "Realistic"
+            motion = "guoyww/animatediff-motion-lora-zoom-in"
+            step = "4"
+            
+            # Check if the prompt includes specific style instructions
+            lower_prompt = prompt.lower()
+            if "cartoon" in lower_prompt or "animated" in lower_prompt:
+                base = "Cartoon"
+            elif "anime" in lower_prompt:
+                base = "Anime"
+            elif "3d" in lower_prompt:
+                base = "3d"
+            
+            # Check for motion instructions
+            if "zoom in" in lower_prompt:
+                motion = "guoyww/animatediff-motion-lora-zoom-in"
+            elif "zoom out" in lower_prompt:
+                motion = "guoyww/animatediff-motion-lora-zoom-out"
+            elif "pan left" in lower_prompt:
+                motion = "guoyww/animatediff-motion-lora-pan-left"
+            elif "pan right" in lower_prompt:
+                motion = "guoyww/animatediff-motion-lora-pan-right"
+            elif "tilt up" in lower_prompt:
+                motion = "guoyww/animatediff-motion-lora-tilt-up"
+            elif "tilt down" in lower_prompt:
+                motion = "guoyww/animatediff-motion-lora-tilt-down"
+            elif "roll clockwise" in lower_prompt:
+                motion = "guoyww/animatediff-motion-lora-rolling-clockwise"
+            elif "roll counterclockwise" in lower_prompt or "roll anticlockwise" in lower_prompt:
+                motion = "guoyww/animatediff-motion-lora-rolling-anticlockwise"
+            
+            # Log the parameters we're using
+            self.logger.info(f"Video generation parameters: prompt='{prompt}', base='{base}', motion='{motion}', step='{step}'")
+            
+            # Generate the video with the specific parameters
+            result = client.predict(
+                prompt,
+                base,
+                motion,
+                step,
+                api_name=api_name
+            )
+            
+            self.logger.info(f"Video generation result type: {type(result)}")
+            
+            # The result should be a dictionary with a 'video' key
+            video_path = None
+            
+            if isinstance(result, dict) and 'video' in result:
+                video_path = result['video']
+                self.logger.info(f"Found video path in result dictionary: {video_path}")
+                
+                # Add to generated media list for cleanup later
+                self.generated_media.append(video_path)
+            else:
+                self.logger.warning(f"Unexpected result format: {result}")
+                
+                # If we don't get the expected format, create a temp file
+                with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as temp_file:
+                    video_path = temp_file.name
+                    self.logger.info(f"Saving result to temporary file: {video_path}")
                     
-            except Exception as direct_error:
-                self.logger.warning(f"Direct tool usage failed: {str(direct_error)}. Falling back to agent.")
+                    if isinstance(result, bytes):
+                        temp_file.write(result)
+                    elif hasattr(result, 'read'):
+                        temp_file.write(result.read())
+                    elif isinstance(result, str):
+                        temp_file.write(result.encode('utf-8'))
+                    else:
+                        # Just write the string representation
+                        temp_file.write(str(result).encode('utf-8'))
+                    
+                    self.generated_media.append(video_path)
+            
+            # Check that the video file exists and has a reasonable size
+            if video_path and os.path.exists(video_path):
+                file_size = os.path.getsize(video_path)
+                self.logger.info(f"Video file size: {file_size} bytes")
                 
-                # Fall back to using the agent
-                # Fall back to using the agent
-                result = self.agent.run(
-                    f"""Generate an image based on this prompt: '{prompt}'
-                    Use the image_generator tool to create the image.
-                    When complete, combine the description and file location into a single string 
-                    like "The image shows [description]. It has been saved to [location]." 
-                    and pass that to final_answer()."""
-                )
+                if file_size < 1000:  # Less than 1KB is suspicious
+                    self.logger.warning(f"Video file is suspiciously small: {file_size} bytes")
+                    return f"""
+    The video generation attempt completed, but the resulting file is too small ({file_size} bytes) to be a valid video.
+
+    This usually happens when the video generation service didn't return actual video content. You might want to:
+    1. Try a different prompt
+    2. Try again later as the service might be experiencing issues
+    3. Check if the service has usage limits
+
+    Technical details: Attempted to generate video with prompt: "{prompt}" using {self.video_space_id}.
+    """
                 
+                # Success! Return a message with the video path
+                result_message = f"""
+    I've generated a video based on your prompt: "{prompt}"
+
+    The video has been created using the {self.video_space_id} model.
+    Video saved to: {video_path}
+
+    You can view the video in your media player and save it using the 'Save Media' button.
+    """
                 # Add to history
-                self.add_to_history(input_text, str(result))
-                return str(result)
+                self.add_to_history(f"Generate a video: {prompt}", result_message)
+                return result_message
+            else:
+                self.logger.error(f"Video file not found at path: {video_path}")
+                return f"""
+    Sorry, the video generation service ran but didn't produce a valid video file.
+
+    This could be due to:
+    - The video generation service being temporarily overloaded
+    - An issue with processing your specific prompt
+    - Service limitations
+
+    Please try again with a different prompt or try later when the service might be less busy.
+    """
             
         except Exception as e:
-            error_msg = f"Error running image generation agent: {str(e)}"
-            self.logger.error(error_msg)
-            return f"Sorry, I encountered an error while generating the image: {error_msg}"
+            self.logger.error(f"Error in video generation: {str(e)}", exc_info=True)
+            return f"""
+    Sorry, I encountered an error while generating the video: {str(e)}
+
+    This could be due to:
+    - The video generation service being temporarily unavailable
+    - An issue with the prompt
+    - Connection problems with the Hugging Face space
+
+    Please try again with a different prompt or try later when the service might be available.
+    """
     
     def _clean_old_media(self, max_files: int = 20):
         """Clean up old media files to avoid filling up disk space
@@ -279,7 +526,15 @@ You can view the image in the display area above and save it using the 'Save Med
         Returns:
             List of capability names
         """
-        return ["image_generation", "prompt_improvement"]
+        capabilities = ["prompt_improvement"]
+        
+        if self.image_tool:
+            capabilities.append("image_generation")
+        
+        if self.video_tool:
+            capabilities.append("video_generation")
+            
+        return capabilities
     
     def cleanup(self) -> None:
         """Clean up resources"""

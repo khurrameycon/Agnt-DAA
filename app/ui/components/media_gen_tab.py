@@ -7,14 +7,16 @@ import os
 import logging
 from typing import Optional
 import tempfile
+import subprocess
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QTextEdit, 
     QPushButton, QComboBox, QSplitter, QTabWidget,
-    QRadioButton, QButtonGroup, QScrollArea, QFileDialog
+    QRadioButton, QButtonGroup, QScrollArea, QFileDialog,
+    QMessageBox
 )
-from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QSize
-from PyQt6.QtGui import QPixmap, QImage
+from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QSize, QUrl
+from PyQt6.QtGui import QPixmap, QImage, QDesktopServices
 
 from app.core.agent_manager import AgentManager
 from app.ui.components.conversation import ConversationWidget
@@ -110,10 +112,21 @@ class MediaGenTab(QWidget):
         scroll_area.setWidget(self.media_display)
         media_layout.addWidget(scroll_area)
         
+        # Add media controls
+        media_controls = QHBoxLayout()
+        
         # Add save button
         save_button = QPushButton("Save Media")
         save_button.clicked.connect(self.save_media)
-        media_layout.addWidget(save_button)
+        media_controls.addWidget(save_button)
+        
+        # Add play button for videos
+        self.play_button = QPushButton("Open Media")
+        self.play_button.clicked.connect(self.open_media)
+        self.play_button.setEnabled(False)
+        media_controls.addWidget(self.play_button)
+        
+        media_layout.addLayout(media_controls)
         
         # Add to splitter
         splitter.addWidget(media_panel)
@@ -252,6 +265,12 @@ class MediaGenTab(QWidget):
         self.prompt_input.setEnabled(False)
         self.generate_button.setEnabled(False)
         
+        # Update display to show processing
+        if self.media_type == "image":
+            self.media_display.setText("Generating image... Please wait.")
+        else:
+            self.media_display.setText("Generating video... This may take a minute or two.")
+        
         # Find the main window
         main_window = self
         while main_window and not hasattr(main_window, 'run_agent_in_thread'):
@@ -283,6 +302,7 @@ class MediaGenTab(QWidget):
         import re
         
         # Look for image or video file paths
+        # Match common media file extensions
         media_path_match = re.search(r"(?:saved to|generated at|created at|file:|path:)\s*([^\s]+\.(?:png|jpg|jpeg|gif|mp4|avi|mov|webm))", result, re.IGNORECASE)
         
         if media_path_match:
@@ -294,6 +314,8 @@ class MediaGenTab(QWidget):
             if temp_path_match:
                 media_path = temp_path_match.group(1)
                 self.display_media(media_path)
+            else:
+                self.media_display.setText("Media generated, but couldn't locate the file path in the response.")
         
         # Enable input
         self.prompt_input.setEnabled(True)
@@ -312,6 +334,7 @@ class MediaGenTab(QWidget):
             # Check if path exists
             if not os.path.exists(media_path):
                 self.media_display.setText(f"Media file not found: {media_path}")
+                self.play_button.setEnabled(False)
                 return
             
             # Check file extension
@@ -321,8 +344,10 @@ class MediaGenTab(QWidget):
                 # For videos, show a placeholder and link to open
                 self.media_display.setText(
                     f"Video generated at {media_path}\n\n"
-                    "Click 'Save Media' to save or open it."
+                    "Click 'Open Media' to play the video or 'Save Media' to save it to a new location."
                 )
+                # Enable play button for videos
+                self.play_button.setEnabled(True)
             else:
                 # For images, display directly
                 pixmap = QPixmap(media_path)
@@ -336,13 +361,42 @@ class MediaGenTab(QWidget):
                 )
                 
                 self.media_display.setPixmap(pixmap)
+                # Disable play button for images
+                self.play_button.setEnabled(False)
         except Exception as e:
             self.logger.error(f"Error displaying media: {str(e)}")
             self.media_display.setText(f"Error displaying media: {str(e)}")
+            self.play_button.setEnabled(False)
+    
+    def open_media(self):
+        """Open the generated media file with the default system application"""
+        if not self.current_media_path or not os.path.exists(self.current_media_path):
+            QMessageBox.warning(
+                self,
+                "Media Not Found",
+                "No media file is available to open."
+            )
+            return
+        
+        try:
+            # Open with default system application
+            QDesktopServices.openUrl(QUrl.fromLocalFile(self.current_media_path))
+        except Exception as e:
+            self.logger.error(f"Error opening media: {str(e)}")
+            QMessageBox.warning(
+                self,
+                "Open Failed",
+                f"Failed to open media file: {str(e)}"
+            )
     
     def save_media(self):
         """Save media to file"""
         if not self.current_media_path or not os.path.exists(self.current_media_path):
+            QMessageBox.warning(
+                self,
+                "Media Not Found",
+                "No media file is available to save."
+            )
             return
         
         # Get file extension
@@ -379,13 +433,16 @@ class MediaGenTab(QWidget):
                 main_window.status_bar.showMessage(f"Media saved to {file_path}", 3000)
             else:
                 # Fallback
+                QMessageBox.information(
+                    self,
+                    "Save Successful",
+                    f"Media saved to {file_path}"
+                )
                 self.logger.info(f"Media saved to {file_path}")
         except Exception as e:
             self.logger.error(f"Error saving media: {str(e)}")
-            # Try to show error message
-            main_window = self
-            while main_window and not hasattr(main_window, 'status_bar'):
-                main_window = main_window.parent()
-            
-            if main_window and hasattr(main_window, 'status_bar'):
-                main_window.status_bar.showMessage(f"Error saving media: {str(e)}", 3000)
+            QMessageBox.warning(
+                self,
+                "Save Failed",
+                f"Failed to save media: {str(e)}"
+            )

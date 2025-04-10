@@ -1,16 +1,17 @@
 """
 Code Generation Tab Component for sagax1
-Tab for code generation agent interaction
+Tab for code generation agent interaction with Hugging Face spaces
 """
 
 import os
 import logging
+import re
 from typing import Optional
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QTextEdit, 
     QPushButton, QComboBox, QSplitter, QTabWidget,
-    QCheckBox, QRadioButton, QGroupBox, QFormLayout
+    QMessageBox
 )
 from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot
 from PyQt6.QtGui import QSyntaxHighlighter, QTextCharFormat, QFont, QColor
@@ -48,7 +49,7 @@ class PythonSyntaxHighlighter(QSyntaxHighlighter):
         
         # Add keyword rules
         for word in keywords:
-            pattern = f"\\b{word}\\b"
+            pattern = r"\b" + word + r"\b"  # Fixed regex pattern
             self.highlighting_rules.append((pattern, keyword_format))
         
         # String format
@@ -64,7 +65,7 @@ class PythonSyntaxHighlighter(QSyntaxHighlighter):
         number_format.setForeground(QColor(181, 206, 168))  # Light green
         
         # Add number rules
-        self.highlighting_rules.append((r"\\b[0-9]+\\b", number_format))
+        self.highlighting_rules.append((r"\b[0-9]+\b", number_format))
         
         # Function format
         function_format = QTextCharFormat()
@@ -72,7 +73,7 @@ class PythonSyntaxHighlighter(QSyntaxHighlighter):
         function_format.setFontWeight(QFont.Weight.Bold)
         
         # Add function rules
-        self.highlighting_rules.append((r"\\b[A-Za-z0-9_]+(?=\\()", function_format))
+        self.highlighting_rules.append((r"\b[A-Za-z0-9_]+(?=\()", function_format))
         
         # Comment format
         comment_format = QTextCharFormat()
@@ -90,14 +91,18 @@ class PythonSyntaxHighlighter(QSyntaxHighlighter):
         import re
         
         for pattern, format in self.highlighting_rules:
-            # Find all matches
-            for match in re.finditer(pattern, text):
-                start, end = match.span()
-                self.setFormat(start, end - start, format)
+            # Find all matches with error handling
+            try:
+                for match in re.finditer(pattern, text):
+                    start, end = match.span()
+                    self.setFormat(start, end - start, format)
+            except Exception as e:
+                # Skip this pattern if there's an error
+                continue
 
 
 class CodeGenTab(QWidget):
-    """Tab for code generation"""
+    """Tab for code generation using Hugging Face spaces"""
     
     def __init__(self, agent_manager: AgentManager, parent=None):
         """Initialize the code generation tab
@@ -144,11 +149,6 @@ class CodeGenTab(QWidget):
         create_button.clicked.connect(self.create_new_agent)
         top_layout.addWidget(create_button)
         
-        # Options button
-        options_button = QPushButton("Options")
-        options_button.clicked.connect(self.show_options)
-        top_layout.addWidget(options_button)
-        
         top_layout.addStretch()
         
         self.layout.addLayout(top_layout)
@@ -164,31 +164,31 @@ class CodeGenTab(QWidget):
         
         # Create code editor
         self.code_editor = QTextEdit()
-        self.code_editor.setPlaceholderText("# Write your Python code here...")
+        self.code_editor.setPlaceholderText("# Generated code will appear here...")
         self.code_editor.setFont(QFont("Courier New", 10))
         
         # Add syntax highlighting
         self.highlighter = PythonSyntaxHighlighter(self.code_editor.document())
         
-        code_layout.addWidget(QLabel("Code Editor:"))
+        code_layout.addWidget(QLabel("Generated Code:"))
         code_layout.addWidget(self.code_editor)
         
-        # Create run button
-        run_button = QPushButton("Run Code")
-        run_button.clicked.connect(self.run_code)
-        code_layout.addWidget(run_button)
+        # Create copy and save buttons
+        button_layout = QHBoxLayout()
         
-        # Create output area
-        self.code_output = QTextEdit()
-        self.code_output.setReadOnly(True)
-        self.code_output.setPlaceholderText("Code execution output will appear here...")
-        self.code_output.setFont(QFont("Courier New", 10))
+        copy_button = QPushButton("Copy Code")
+        copy_button.clicked.connect(self.copy_code)
+        button_layout.addWidget(copy_button)
         
-        code_layout.addWidget(QLabel("Output:"))
-        code_layout.addWidget(self.code_output)
+        save_button = QPushButton("Save Code")
+        save_button.clicked.connect(self.save_code)
+        button_layout.addWidget(save_button)
+        
+        button_layout.addStretch()
+        code_layout.addLayout(button_layout)
         
         # Add code editor tab
-        self.tabs.addTab(code_tab, "Code Editor")
+        self.tabs.addTab(code_tab, "Generated Code")
         
         # Create conversation tab
         conversation_tab = QWidget()
@@ -205,20 +205,20 @@ class CodeGenTab(QWidget):
         self.layout.addWidget(self.tabs, stretch=1)
     
     def create_input_panel(self):
-        """Create input panel for user commands"""
+        """Create input panel for user prompts"""
         input_layout = QHBoxLayout()
         
-        # Command input
-        self.command_input = QTextEdit()
-        self.command_input.setPlaceholderText("Describe what code you want to generate...")
-        self.command_input.setMaximumHeight(100)
-        input_layout.addWidget(self.command_input)
+        # Prompt input
+        self.prompt_input = QTextEdit()
+        self.prompt_input.setPlaceholderText("Enter your prompt for code generation here...\nFor example: 'Create a Python function to sort a list of dictionaries by a specific key'")
+        self.prompt_input.setMinimumHeight(100)
+        input_layout.addWidget(self.prompt_input)
         
-        # Send button
-        self.send_button = QPushButton("Generate Code")
-        self.send_button.clicked.connect(self.send_command)
-        self.send_button.setEnabled(False)
-        input_layout.addWidget(self.send_button)
+        # Generate button
+        self.generate_button = QPushButton("Generate Code")
+        self.generate_button.clicked.connect(self.generate_code)
+        self.generate_button.setEnabled(False)
+        input_layout.addWidget(self.generate_button)
         
         self.layout.addLayout(input_layout)
     
@@ -238,7 +238,7 @@ class CodeGenTab(QWidget):
         
         if not code_gen_agents:
             self.agent_selector.addItem("No code generation agents available")
-            self.send_button.setEnabled(False)
+            self.generate_button.setEnabled(False)
             return
         
         # Add to combo box
@@ -257,19 +257,19 @@ class CodeGenTab(QWidget):
         """
         if agent_id == "No code generation agents available":
             self.current_agent_id = None
-            self.send_button.setEnabled(False)
+            self.generate_button.setEnabled(False)
             return
         
         try:
             # Update current agent
             self.current_agent_id = agent_id
             
-            # Enable send button
-            self.send_button.setEnabled(True)
+            # Enable generate button
+            self.generate_button.setEnabled(True)
         except Exception as e:
             self.logger.error(f"Error selecting agent: {str(e)}")
             self.current_agent_id = None
-            self.send_button.setEnabled(False)
+            self.generate_button.setEnabled(False)
     
     def create_new_agent(self):
         """Create a new code generation agent"""
@@ -281,160 +281,113 @@ class CodeGenTab(QWidget):
             main_window.create_code_generation_agent()
         else:
             # Fallback if we can't find the method
-            from PyQt6.QtWidgets import QMessageBox
             QMessageBox.warning(
                 self,
                 "Not Implemented",
                 "Create code generation agent functionality not found in main window."
             )
     
-    def show_options(self):
-        """Show options dialog"""
-        from PyQt6.QtWidgets import QDialog
+    def copy_code(self):
+        """Copy the generated code to clipboard"""
+        from PyQt6.QtWidgets import QApplication
         
-        # Create dialog
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Code Generation Options")
-        dialog.resize(400, 300)
-        
-        # Create layout
-        layout = QVBoxLayout(dialog)
-        
-        # Create options
-        sandbox_group = QGroupBox("Code Execution")
-        sandbox_layout = QVBoxLayout(sandbox_group)
-        
-        # Sandbox options
-        self.sandbox_checkbox = QCheckBox("Run code in sandbox (safer but more limited)")
-        self.sandbox_checkbox.setChecked(True)
-        sandbox_layout.addWidget(self.sandbox_checkbox)
-        
-        # Add to layout
-        layout.addWidget(sandbox_group)
-        
-        # Create import options
-        import_group = QGroupBox("Authorized Imports")
-        import_layout = QFormLayout(import_group)
-        
-        # Import options
-        self.import_edit = QTextEdit()
-        self.import_edit.setPlaceholderText("Enter comma-separated list of authorized imports...")
-        
-        # Get default imports from config
-        default_imports = self.agent_manager.config_manager.get("execution.authorized_imports", [])
-        self.import_edit.setText(", ".join(default_imports))
-        import_layout.addRow("Imports:", self.import_edit)
-        
-        # Add to layout
-        layout.addWidget(import_group)
-        
-        # Create button box
-        from PyQt6.QtWidgets import QDialogButtonBox
-        button_box = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok | 
-            QDialogButtonBox.StandardButton.Cancel
-        )
-        button_box.accepted.connect(dialog.accept)
-        button_box.rejected.connect(dialog.reject)
-        layout.addWidget(button_box)
-        
-        # Show dialog
-        if dialog.exec():
-            # Save options
-            if self.current_agent_id:
-                # Get agent config
-                agent_config = self.agent_manager.get_agent_config(self.current_agent_id)
-                
-                # Update sandbox option
-                agent_config["additional_config"]["sandbox"] = self.sandbox_checkbox.isChecked()
-                
-                # Update authorized imports
-                import_text = self.import_edit.toPlainText()
-                authorized_imports = [imp.strip() for imp in import_text.split(",") if imp.strip()]
-                agent_config["additional_config"]["authorized_imports"] = authorized_imports
-                
-                # Update config
-                self.agent_manager.agent_configs[self.current_agent_id] = agent_config
-    
-    def run_code(self):
-        """Run the code in the editor"""
-        if self.current_agent_id is None:
-            return
-        
-        # Get code
-        code = self.code_editor.toPlainText().strip()
+        # Get the code
+        code = self.code_editor.toPlainText()
         if not code:
             return
         
-        # Clear output
-        self.code_output.clear()
+        # Copy to clipboard
+        clipboard = QApplication.clipboard()
+        clipboard.setText(code)
         
-        # Get agent
-        agent = self.agent_manager.active_agents.get(self.current_agent_id)
-        
-        if agent is None:
-            # Create agent if it doesn't exist
-            self.agent_manager.create_agent(
-                agent_id=self.current_agent_id,
-                agent_type="code_generation",
-                model_config=self.agent_manager.get_agent_config(self.current_agent_id)["model_config"],
-                tools=self.agent_manager.get_agent_config(self.current_agent_id)["tools"],
-                additional_config=self.agent_manager.get_agent_config(self.current_agent_id)["additional_config"]
-            )
-            
-            agent = self.agent_manager.active_agents.get(self.current_agent_id)
-            
-            if agent is None:
-                self.logger.error(f"Failed to create agent {self.current_agent_id}")
-                self.code_output.setText("Error: Failed to create agent")
-                return
-        
-        # Initialize agent
-        if not getattr(agent, "is_initialized", False):
-            agent.initialize()
-        
-        # Run code
-        try:
-            # Get python execution tool
-            python_tool = agent._initialize_tools()[0]
-            
-            # Run code
-            result = python_tool(code)
-            
-            # Show result
-            self.code_output.setText(result)
-        except Exception as e:
-            self.code_output.setText(f"Error: {str(e)}")
+        # Show success message
+        main_window = self.window()
+        if hasattr(main_window, 'status_bar'):
+            main_window.status_bar.showMessage("Code copied to clipboard", 3000)
     
-    def send_command(self):
-        """Send command to agent"""
+    def save_code(self):
+        """Save the generated code to a file"""
+        from PyQt6.QtWidgets import QFileDialog
+        
+        # Get the code
+        code = self.code_editor.toPlainText()
+        if not code:
+            return
+        
+        # Guess the file extension
+        extension = ".py"  # Default to Python
+        if "function" in code and "{" in code:
+            extension = ".js"
+        elif "public class" in code or "public static void" in code:
+            extension = ".java"
+        elif "#include" in code:
+            extension = ".cpp"
+        
+        # Open file dialog
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Code",
+            "",
+            f"Code Files (*{extension});;All Files (*.*)"
+        )
+        
+        if not file_path:
+            return
+        
+        try:
+            # Save code to file
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(code)
+            
+            # Show success message
+            main_window = self.window()
+            if hasattr(main_window, 'status_bar'):
+                main_window.status_bar.showMessage(f"Code saved to {file_path}", 3000)
+        except Exception as e:
+            QMessageBox.warning(
+                self,
+                "Save Failed",
+                f"Failed to save code: {str(e)}"
+            )
+    
+    def generate_code(self):
+        """Generate code from prompt using AI"""
         if self.current_agent_id is None:
             return
         
-        # Get command
-        command = self.command_input.toPlainText().strip()
-        if not command:
+        # Get prompt
+        prompt = self.prompt_input.toPlainText().strip()
+        if not prompt:
             return
         
         # Add to conversation
-        self.conversation.add_message(command, is_user=True)
+        self.conversation.add_message(prompt, is_user=True)
         
         # Clear input
-        self.command_input.clear()
+        self.prompt_input.clear()
         
         # Disable input
-        self.command_input.setEnabled(False)
-        self.send_button.setEnabled(False)
+        self.prompt_input.setEnabled(False)
+        self.generate_button.setEnabled(False)
         
-        # Switch to conversation tab
-        self.tabs.setCurrentIndex(1)
+        # Update status
+        main_window = self.window()
+        if hasattr(main_window, 'status_bar'):
+            main_window.status_bar.showMessage("Generating code...", 0)
         
         # Run agent in thread
-        self.parent().run_agent_in_thread(
-            self.current_agent_id, 
-            command,
-            self.handle_agent_result
-        )
+        main_window = self.window()
+        if hasattr(main_window, 'run_agent_in_thread'):
+            main_window.run_agent_in_thread(
+                self.current_agent_id, 
+                prompt,
+                self.handle_agent_result
+            )
+        else:
+            # Enable input again if we can't find the method
+            self.prompt_input.setEnabled(True)
+            self.generate_button.setEnabled(True)
+            self.conversation.add_message("Error: Unable to run agent thread", is_user=False)
     
     def handle_agent_result(self, result: str):
         """Handle agent result
@@ -445,20 +398,39 @@ class CodeGenTab(QWidget):
         # Add to conversation
         self.conversation.add_message(result, is_user=False)
         
-        # Parse code blocks from result
-        import re
-        code_blocks = re.findall(r"```python\n(.*?)```", result, re.DOTALL)
+        # Extract code blocks from result
+        code = self.extract_code_from_result(result)
         
-        if code_blocks:
-            # Get first code block
-            code = code_blocks[0].strip()
-            
-            # Set code in editor
-            self.code_editor.setText(code)
-            
-            # Switch to code editor tab
-            self.tabs.setCurrentIndex(0)
+        # Set code in editor
+        self.code_editor.setText(code)
+        
+        # Switch to code tab
+        self.tabs.setCurrentIndex(0)
         
         # Enable input
-        self.command_input.setEnabled(True)
-        self.send_button.setEnabled(True)
+        self.prompt_input.setEnabled(True)
+        self.generate_button.setEnabled(True)
+        
+        # Update status
+        main_window = self.window()
+        if hasattr(main_window, 'status_bar'):
+            main_window.status_bar.showMessage("Code generation complete", 3000)
+    
+    def extract_code_from_result(self, result: str) -> str:
+        """Extract code blocks from the result
+        
+        Args:
+            result: Result from the agent
+            
+        Returns:
+            Extracted code
+        """
+        # Extract code from markdown code blocks
+        code_blocks = re.findall(r"```(?:\w+)?\n(.*?)```", result, re.DOTALL)
+        
+        if code_blocks:
+            # Return the first code block
+            return code_blocks[0].strip()
+        
+        # If no code blocks found, just return the result
+        return result

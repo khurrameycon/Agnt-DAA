@@ -279,3 +279,16 @@ Access to model meta-llama/Llama-3.2-3B-Instruct is restricted and you are not i
 
 Cannot access gated repo for url https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct/resolve/main/config.json.
 Access to model meta-llama/Llama-3.2-3B-Instruct is restricted and you are not in the authorized list. Visit https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct to ask for access.
+2025-04-10 13:41:17,569 - agent.Chatagent - ERROR - Error checking model availability: 403 Client Error. (Request ID: Root=1-67f7842b-4d58a0e97c130da375c7b904;d27ed1fb-8c71-449e-aefb-ff24595da0ea)
+
+Cannot access gated repo for url https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct/resolve/main/config.json.
+Access to model meta-llama/Llama-3.2-3B-Instruct is restricted and you are not in the authorized list. Visit https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct to ask for access.
+2025-04-10 13:41:17,571 - app.core.agent_manager - ERROR - Error running agent Chatagent: 403 Client Error. (Request ID: Root=1-67f7842b-4d58a0e97c130da375c7b904;d27ed1fb-8c71-449e-aefb-ff24595da0ea)
+
+Cannot access gated repo for url https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct/resolve/main/config.json.
+Access to model meta-llama/Llama-3.2-3B-Instruct is restricted and you are not in the authorized list. Visit https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct to ask for access.
+2025-04-10 14:45:09,738 - agent.as - ERROR - Error initializing code generation agent: All elements must be instance of Tool (or a subclass)
+2025-04-10 14:45:09,739 - app.core.agent_manager - ERROR - Error running agent as: All elements must be instance of Tool (or a subclass)
+2025-04-10 17:14:35,812 - agent.as - ERROR - All code generation spaces failed to initialize
+2025-04-10 17:14:35,815 - agent.as - ERROR - Error initializing code generation agent: Failed to initialize any code generation space
+2025-04-10 17:14:35,816 - app.core.agent_manager - ERROR - Error running agent as: Failed to initialize any code generation space

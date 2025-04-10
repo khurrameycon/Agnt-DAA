@@ -1,145 +1,27 @@
 """
 Code Generation Agent for sagax1
-Agent that can generate and execute code to solve problems
+Agent that uses Hugging Face spaces to generate code from text prompts
 """
 
 import os
-import sys
 import logging
 import tempfile
-import subprocess
-import traceback
+import time
 from typing import Dict, Any, List, Optional, Callable
 
 from app.agents.base_agent import BaseAgent
-from smolagents import CodeAgent
+from smolagents import Tool, CodeAgent
 
-# Define PythonExecutionTool as a regular class
-class PythonExecutionTool:
-    """Tool for executing Python code"""
-    
-    def __init__(self, sandbox=True):
-        """Initialize the Python execution tool
-        
-        Args:
-            sandbox: Whether to run in a sandboxed environment
-        """
-        self.sandbox = sandbox
-        self.logger = logging.getLogger(__name__)
-        
-        # Define the tool's name, description, etc.
-        self.name = "python_execution"
-        self.description = "Execute Python code and return the result"
-    
-    def __call__(self, code: str) -> str:
-        """Execute Python code and return the result
-        
-        Args:
-            code: Python code to execute
-            
-        Returns:
-            Output of code execution
-        """
-        if self.sandbox:
-            return self._run_in_sandbox(code)
-        else:
-            return self._run_locally(code)
-    
-    def _run_locally(self, code: str) -> str:
-        """Run code locally using exec()
-        
-        Args:
-            code: Python code to execute
-            
-        Returns:
-            Output of code execution
-        """
-        import io
-        from contextlib import redirect_stdout, redirect_stderr
-        
-        # Create output buffers
-        stdout_buffer = io.StringIO()
-        stderr_buffer = io.StringIO()
-        
-        # Create local scope
-        local_scope = {}
-        
-        try:
-            # Execute code with redirected output
-            with redirect_stdout(stdout_buffer), redirect_stderr(stderr_buffer):
-                exec(code, globals(), local_scope)
-            
-            # Get output
-            stdout_output = stdout_buffer.getvalue()
-            stderr_output = stderr_buffer.getvalue()
-            
-            # Return result
-            if stderr_output:
-                result = f"Code execution completed with errors:\n\n{stderr_output}\n\nStandard output:\n{stdout_output}"
-            else:
-                result = f"Code execution completed successfully:\n\n{stdout_output}"
-            
-            return result
-            
-        except Exception as e:
-            # Get traceback
-            tb = traceback.format_exc()
-            
-            # Get any output before the error
-            stdout_output = stdout_buffer.getvalue()
-            stderr_output = stderr_buffer.getvalue()
-            
-            # Return error
-            return f"Code execution failed with error:\n\n{tb}\n\nStandard output:\n{stdout_output}\n\nStandard error:\n{stderr_output}"
-    
-    def _run_in_sandbox(self, code: str) -> str:
-        """Run code in a sandbox (separate process)
-        
-        Args:
-            code: Python code to execute
-            
-        Returns:
-            Output of code execution
-        """
-        # Create a temporary file
-        with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as f:
-            f.write(code)
-            temp_file = f.name
-        
-        try:
-            # Run code in a separate process
-            result = subprocess.run(
-                [sys.executable, temp_file],
-                capture_output=True,
-                text=True,
-                timeout=30
-            )
-            
-            # Get output
-            stdout_output = result.stdout
-            stderr_output = result.stderr
-            
-            # Return result
-            if result.returncode != 0:
-                output = f"Code execution failed with error code {result.returncode}:\n\n{stderr_output}\n\nStandard output:\n{stdout_output}"
-            else:
-                output = f"Code execution completed successfully:\n\n{stdout_output}"
-            
-            return output
-            
-        except subprocess.TimeoutExpired:
-            return "Code execution timed out after 30 seconds"
-        except Exception as e:
-            return f"Error running code: {str(e)}"
-        finally:
-            # Clean up temporary file
-            try:
-                os.unlink(temp_file)
-            except:
-                pass
+# Known working code generation spaces
+CODE_GENERATION_SPACES = [
+    "sitammeur/Qwen-Coder-llamacpp",  # Primary code generation space
+    "Pradipta01/Code_Generator",       # Fallback code generation space
+    "microsoft/CodeX-code-generation", # Another alternative
+    "meta/code-llama"                  # Last resort fallback
+]
 
 class CodeGenerationAgent(BaseAgent):
-    """Agent for generating and executing code"""
+    """Agent for generating code from text prompts"""
     
     def __init__(self, agent_id: str, config: Dict[str, Any]):
         """Initialize the code generation agent
@@ -151,7 +33,7 @@ class CodeGenerationAgent(BaseAgent):
                 device: Device to use (e.g., 'cpu', 'cuda', 'mps')
                 max_tokens: Maximum number of tokens to generate
                 temperature: Temperature for generation
-                sandbox: Whether to run code in a sandbox
+                code_space_id: Hugging Face space ID for code generation
         """
         super().__init__(agent_id, config)
         
@@ -159,11 +41,20 @@ class CodeGenerationAgent(BaseAgent):
         self.device = config.get("device", "auto")
         self.max_tokens = config.get("max_tokens", 2048)
         self.temperature = config.get("temperature", 0.1)
-        self.authorized_imports = config.get("authorized_imports", [])
-        self.sandbox = config.get("sandbox", True)
         
+        # CRITICAL: Override the code_space_id here, regardless of what's in config
+        # This ensures we use a working space even if old config is loaded
+        config["code_space_id"] = config.get("code_space_id", "sitammeur/Qwen-Coder-llamacpp")
+        self.code_space_id = config.get("code_space_id", "sitammeur/Qwen-Coder-llamacpp")
+        
+        self.authorized_imports = config.get("authorized_imports", [])
+        
+        self.code_tool = None
         self.agent = None
         self.is_initialized = False
+        
+        # Store generated code snippets
+        self.generated_code = []
     
     def initialize(self) -> None:
         """Initialize the model and agent"""
@@ -183,8 +74,8 @@ class CodeGenerationAgent(BaseAgent):
                     device_map=self.device,
                     max_new_tokens=self.max_tokens,
                     temperature=self.temperature,
-                    trust_remote_code=True,
-                    do_sample=True
+                    do_sample=True,
+                    trust_remote_code=True
                 )
                 self.logger.info(f"Using TransformersModel for {self.model_id}")
             except Exception as e:
@@ -220,14 +111,14 @@ class CodeGenerationAgent(BaseAgent):
                         )
                         self.logger.info(f"Using LiteLLMModel for {self.model_id}")
             
-            # Initialize tools
-            tools = self._initialize_tools()
+            # Initialize code generation tool
+            self._initialize_tools_with_failsafe()
             
             # Create the agent
             self.agent = CodeAgent(
-                tools=tools,
+                tools=[self.code_tool],
                 model=model,
-                additional_authorized_imports=self.authorized_imports,
+                additional_authorized_imports=["gradio_client"] + self.authorized_imports,
                 verbosity_level=1
             )
             
@@ -238,18 +129,63 @@ class CodeGenerationAgent(BaseAgent):
             self.logger.error(f"Error initializing code generation agent: {str(e)}")
             raise
     
-    def _initialize_tools(self) -> List[Any]:
-        """Initialize tools for the agent
+    def _initialize_tools_with_failsafe(self) -> None:
+        """Initialize code generation tool with failsafe fallbacks"""
+        from app.utils.qwen_coder_tool import QwenCoderTool
+        from smolagents import Tool
+        import time
         
-        Returns:
-            List of tools
-        """
-        tools = []
+        # First try the specified space
+        self.logger.info(f"Attempting to initialize code generation tool from {self.code_space_id}")
         
-        # Add Python execution tool
-        tools.append(PythonExecutionTool(sandbox=self.sandbox))
+        try:
+            # For the primary space (sitammeur/Qwen-Coder-llamacpp), we need to handle it specially
+            if "sitammeur/Qwen-Coder" in self.code_space_id:
+                self.code_tool = QwenCoderTool(self.code_space_id)
+                self.logger.info(f"Successfully initialized Qwen Coder tool from {self.code_space_id}")
+                return
+            else:
+                # For other spaces, use the standard Tool.from_space method
+                self.code_tool = Tool.from_space(
+                    self.code_space_id,
+                    name="code_generator",
+                    description="Generate code from a text prompt"
+                )
+                self.logger.info(f"Successfully initialized code tool from {self.code_space_id}")
+                return
+        except Exception as e:
+            self.logger.warning(f"Failed to initialize code tool from {self.code_space_id}: {str(e)}")
         
-        return tools
+        # Try each fallback space until one works
+        for space in CODE_GENERATION_SPACES:
+            if space == self.code_space_id:
+                continue  # Skip if it's the same as the one we already tried
+                
+            self.logger.info(f"Attempting fallback: initializing code tool from {space}")
+            try:
+                # Special handling for Qwen-Coder space
+                if "sitammeur/Qwen-Coder" in space:
+                    self.code_tool = QwenCoderTool(space)
+                    self.logger.info(f"Successfully initialized Qwen Coder tool from {space}")
+                else:
+                    # For other spaces, use the standard Tool.from_space method
+                    self.code_tool = Tool.from_space(
+                        space,
+                        name="code_generator",
+                        description="Generate code from a text prompt"
+                    )
+                    self.logger.info(f"Successfully initialized code tool from fallback space {space}")
+                
+                self.code_space_id = space  # Update the space ID to the one that worked
+                return
+            except Exception as e:
+                self.logger.warning(f"Failed to initialize code tool from fallback space {space}: {str(e)}")
+                # Add a small delay before trying the next space to avoid rate limiting
+                time.sleep(1)
+        
+        # If all fallbacks fail, create a dummy tool that returns an error message
+        self.logger.error("All code generation spaces failed to initialize")
+        raise RuntimeError("Failed to initialize any code generation space")
     
     def run(self, input_text: str, callback: Optional[Callable[[str], None]] = None) -> str:
         """Run the agent with the given input
@@ -265,37 +201,136 @@ class CodeGenerationAgent(BaseAgent):
             self.initialize()
         
         try:
-            # Enhance the prompt with code generation guidance
-            enhanced_prompt = f"""
-You are a code generation agent that can write and execute Python code to solve problems.
-You have the ability to:
-1. Generate Python code to solve a given problem
-2. Execute the code and see the results
-3. Refine the code based on the execution results
-
-When writing code, follow these best practices:
-- Include appropriate comments to explain your code
-- Handle potential errors with try-except blocks
-- Break down complex problems into smaller functions
-- Use clear variable and function names
-
-USER PROBLEM: {input_text}
-
-First, understand the problem clearly. Then write Python code to solve it, and execute it to verify your solution.
-"""
+            # Clean prompt for code generation
+            prompt = input_text.strip()
             
-            # Run the agent
-            result = self.agent.run(enhanced_prompt)
+            # Log the prompt
+            self.logger.info(f"Generating code with prompt: {prompt}")
             
-            # Add to history
-            self.add_to_history(input_text, str(result))
+            # Update progress if callback is provided
+            if callback:
+                callback("Generating code...")
             
-            return str(result)
+            # Try direct tool usage
+            try:
+                # Direct tool usage approach
+                self.logger.info(f"Directly using code_generator tool with prompt: {prompt}")
+                code_result = self.code_tool(prompt)
+                
+                # Extract the code from the result
+                code_snippet = self._extract_code_from_result(code_result)
+                
+                # Store the generated code
+                if code_snippet:
+                    self.generated_code.append(code_snippet)
+                
+                # Format the response
+                result_message = self._format_code_response(prompt, code_snippet)
+                
+                # Add to history
+                self.add_to_history(input_text, result_message)
+                return result_message
+                
+            except Exception as direct_error:
+                self.logger.warning(f"Direct tool usage failed: {str(direct_error)}. Falling back to agent.")
+                
+                # Fall back to using the agent
+                result = self.agent.run(
+                    f"""Generate code based on this prompt: '{prompt}'
+                    Use the code_generator tool to create the code.
+                    When complete, format the code response with markdown code blocks 
+                    and pass that to final_answer()."""
+                )
+                
+                # Add to history
+                self.add_to_history(input_text, str(result))
+                return str(result)
             
         except Exception as e:
             error_msg = f"Error running code generation agent: {str(e)}"
             self.logger.error(error_msg)
             return f"Sorry, I encountered an error while generating code: {error_msg}"
+    
+    def _extract_code_from_result(self, result) -> str:
+        """Extract code from the tool result
+        
+        Args:
+            result: Result from the code generation tool
+            
+        Returns:
+            Extracted code snippet
+        """
+        # Check the type of result
+        if isinstance(result, str):
+            # The result is already a string, check if it contains code blocks
+            if "```" in result:
+                # Extract code from markdown code blocks
+                import re
+                code_blocks = re.findall(r"```(?:\w+)?\n(.*?)```", result, re.DOTALL)
+                if code_blocks:
+                    return code_blocks[0].strip()
+                
+            # Return the entire string as code
+            return result.strip()
+        
+        # If it's a complex object, convert to string
+        return str(result).strip()
+    
+    def _format_code_response(self, prompt: str, code: str) -> str:
+        """Format code response with markdown
+        
+        Args:
+            prompt: Original prompt
+            code: Generated code
+            
+        Returns:
+            Formatted response
+        """
+        # Try to determine the language from the code
+        language = self._guess_language(code)
+        
+        # Format the response
+        return f"""
+Here's the code generated for your prompt: "{prompt}"
+
+```{language}
+{code}
+```
+
+The code was generated using the {self.code_space_id} model.
+"""
+    
+    def _guess_language(self, code: str) -> str:
+        """Try to guess the programming language of the code
+        
+        Args:
+            code: Code snippet
+            
+        Returns:
+            Language name or empty string
+        """
+        # Check for language-specific patterns
+        if "def " in code and ("import " in code or "print(" in code):
+            return "python"
+        elif "function " in code and ("{" in code or "=>" in code):
+            return "javascript"
+        elif "public class " in code or "public static void main" in code:
+            return "java"
+        elif "#include" in code and (("<" in code and ">" in code) or "int main" in code):
+            return "cpp"
+        elif "using namespace" in code or "int main" in code:
+            return "cpp"
+        elif "package main" in code and "func " in code:
+            return "go"
+        elif "<?php" in code:
+            return "php"
+        elif "<html" in code or "<!DOCTYPE" in code:
+            return "html"
+        elif "SELECT " in code.upper() and "FROM " in code.upper():
+            return "sql"
+        else:
+            # Default to empty string if we can't determine
+            return ""
     
     def reset(self) -> None:
         """Reset the agent's state"""
@@ -311,4 +346,4 @@ First, understand the problem clearly. Then write Python code to solve it, and e
         Returns:
             List of capability names
         """
-        return ["code_generation", "code_execution", "problem_solving"]
+        return ["code_generation", "programming_assistance"]

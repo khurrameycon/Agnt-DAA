@@ -9,6 +9,10 @@ import os
 import logging
 import tempfile
 from dotenv import load_dotenv
+from app.utils.license_manager import LicenseManager
+from app.ui.license_dialog import LicenseDialog
+from PyQt6.QtWidgets import QApplication, QMessageBox, QDialog
+
 
 # Fix for MultiplexedPath issue - MUST be before any imports that might use transformers
 if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
@@ -34,6 +38,26 @@ from app.utils.logging_utils import setup_logging
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import Qt, QCoreApplication
 
+
+#!/usr/bin/env python
+"""
+sagax1 - An Opensource AI-powered agent platform for everyday tasks
+Main application entry point
+"""
+
+import sys
+import os
+import logging
+from dotenv import load_dotenv
+from app.core.config_manager import ConfigManager
+from app.core.agent_manager import AgentManager
+from app.ui.main_window import MainWindow
+from app.utils.logging_utils import setup_logging
+from app.utils.license_manager import LicenseManager
+from app.ui.license_dialog import LicenseDialog
+from PyQt6.QtWidgets import QApplication, QMessageBox
+from PyQt6.QtCore import Qt, QCoreApplication
+
 def setup_environment():
     """Set up the environment variables and paths"""
     # Set application info for QSettings
@@ -48,6 +72,38 @@ def setup_environment():
     os.makedirs('config', exist_ok=True)
     os.makedirs('assets/icons', exist_ok=True)
     os.makedirs('logs', exist_ok=True)
+
+def check_license(logger):
+    """Check for a valid license and prompt for one if needed
+    
+    Args:
+        logger: Logger instance
+    
+    Returns:
+        bool: True if licensed, False otherwise
+    """
+    # Initialize license manager
+    license_manager = LicenseManager()
+    
+    # Check if we already have a valid license
+    if license_manager.is_licensed():
+        logger.info("Valid license found")
+        return True
+    
+    # Need to prompt for license
+    logger.info("No valid license found, showing license dialog")
+    
+    # Create and show the license dialog
+    dialog = LicenseDialog(license_manager)
+    result = dialog.exec()
+    
+    # Check if license was successfully activated
+    if result == QDialog.DialogCode.Accepted:
+        logger.info("License activated successfully")
+        return True
+    else:
+        logger.warning("User canceled license activation")
+        return False
 
 def main():
     """Main application entry point"""
@@ -81,6 +137,22 @@ def main():
         # Apply stylesheet
         StyleSystem.apply_stylesheet(app)
         
+        # Show splash screen
+        splash = sagax1SplashScreen()
+        splash.show()
+        app.processEvents()
+        
+        # Check for valid license
+        if not check_license(logger):
+            logger.error("License check failed, exiting application")
+            QMessageBox.critical(
+                None,
+                "License Required",
+                "A valid license is required to use sagax1.\n"
+                "Please purchase a license from www.yourdomain.com and try again."
+            )
+            return 1
+        
         # Initialize configuration
         config_manager = ConfigManager()
         
@@ -90,9 +162,9 @@ def main():
         # Create main window
         window = MainWindow(agent_manager, config_manager)
         
-        # Show splash screen
-        splash = sagax1SplashScreen()
-        splash.show_with_timer(app, window, 2500)  # Show splash for 2.5 seconds
+        # Finish splash and show window
+        splash.finish(window)
+        window.show()
         
         logger.info("Application started")
         sys.exit(app.exec())
@@ -102,4 +174,4 @@ def main():
         raise
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
