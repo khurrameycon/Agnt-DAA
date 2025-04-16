@@ -197,12 +197,12 @@ class LicenseManager:
                 "message": "Invalid license key"
             }
             
-        # Real SendOwl implementation would look something like:
+        # Real SendOwl implementation :
         """
         response = requests.get(
             self.sendowl_api_url,
             params={"license_key": license_key},
-            auth=("your_sendowl_api_key", "your_sendowl_api_secret")
+            auth=("sendowl_api_key", "sendowl_api_secret")
         )
         
         if response.status_code == 200:

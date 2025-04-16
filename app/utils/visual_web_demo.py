@@ -17,7 +17,7 @@ class VisualWebDemo:
             {
                 "name": "Wikipedia Search",
                 "description": "Navigate to Wikipedia and search for a topic",
-                "prompt": "Go to wikipedia.org, search for 'Artificial Intelligence', and tell me the first sentence of the article."
+                "prompt": "Go to wikipedia.org search for 'Artificial Intelligence', and tell me the first sentence of the article."
             },
             {
                 "name": "GitHub Trending",
@@ -37,7 +37,7 @@ class VisualWebDemo:
             {
                 "name": "Product Search",
                 "description": "Search for products on Amazon",
-                "prompt": "Go to amazon.com, search for 'bluetooth headphones', and tell me the name and price of the top 3 results."
+                "prompt": "Go to amazon.com search for 'bluetooth headphones', and tell me the name and price of the top 3 results."
             }
         ]
 

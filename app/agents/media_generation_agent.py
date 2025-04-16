@@ -456,7 +456,6 @@ You can view the image in the display area above and save it using the 'Save Med
                 result_message = f"""
     I've generated a video based on your prompt: "{prompt}"
 
-    The video has been created using the {self.video_space_id} model.
     Video saved to: {video_path}
 
     You can view the video in your media player and save it using the 'Save Media' button.

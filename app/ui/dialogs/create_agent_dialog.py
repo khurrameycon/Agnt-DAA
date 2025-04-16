@@ -13,10 +13,10 @@ from PyQt6.QtWidgets import (
     QLabel, QLineEdit, QComboBox, QCheckBox,
     QPushButton, QTabWidget, QWidget, QListWidget,
     QListWidgetItem, QSpinBox, QDoubleSpinBox, QDialogButtonBox,
-    QGroupBox, QScrollArea
+    QGroupBox, QScrollArea, QRadioButton  
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QSize
-
+from app.ui.dialogs.execution_mode_guide import ExecutionModeGuideDialog
 from app.core.agent_manager import AgentManager
 from app.core.model_manager import ModelManager
 
@@ -104,27 +104,84 @@ class CreateAgentDialog(QDialog):
         """Create model configuration tab"""
         model_tab = QWidget()
         layout = QVBoxLayout(model_tab)
+        layout.setSpacing(8)  # Reduce spacing between elements
         
-        # Model search
+        # Model search - more compact layout
         search_layout = QHBoxLayout()
+        search_layout.setSpacing(5)
         self.model_search_edit = QLineEdit()
         self.model_search_edit.setPlaceholderText("Search for models")
-        search_layout.addWidget(self.model_search_edit)
+        search_layout.addWidget(self.model_search_edit, 4)  # Give search box more space
         
         self.model_search_button = QPushButton("Search")
-        search_layout.addWidget(self.model_search_button)
+        search_layout.addWidget(self.model_search_button, 1)  # Give button less space
         
         layout.addLayout(search_layout)
         
-        # Model list
+        # Model list - make it larger
+        model_list_label = QLabel("Select Model:")
+        model_list_label.setStyleSheet("font-weight: bold;")
+        layout.addWidget(model_list_label)
+        
         self.model_list = QListWidget()
         self.model_list.setSelectionMode(QListWidget.SelectionMode.SingleSelection)
-        layout.addWidget(QLabel("Select Model:"))
-        layout.addWidget(self.model_list)
+        self.model_list.setMinimumHeight(180)  # Make model list taller
+        layout.addWidget(self.model_list, 3)  # Give model list more weight in the layout
         
-        # Model parameters group
+        # Create horizontal layout for execution mode and parameters
+        bottom_layout = QHBoxLayout()
+        
+        # Add model execution mode selection - more compact
+        self.execution_mode_group = QGroupBox("Execution Mode")
+        self.execution_mode_group.setMaximumWidth(300)  # Limit width to make it compact
+        
+        # Use horizontal layout for mode controls
+        mode_container = QVBoxLayout()
+        mode_container.setSpacing(2)  # Minimal spacing
+        
+        # Radio buttons in their own section
+        radio_layout = QVBoxLayout()
+        radio_layout.setSpacing(1)  # Minimal spacing
+        radio_layout.setContentsMargins(5, 5, 5, 5)  # Small margins
+        
+        self.local_mode_radio = QRadioButton("Local Execution")
+        self.local_mode_radio.setToolTip("Download and run the model locally")
+        self.local_mode_radio.setChecked(True)
+        radio_layout.addWidget(self.local_mode_radio)
+        
+        self.api_mode_radio = QRadioButton("HF API (Remote)")
+        self.api_mode_radio.setToolTip("Use the Hugging Face Inference API")
+        radio_layout.addWidget(self.api_mode_radio)
+        
+        mode_container.addLayout(radio_layout)
+        
+        # Help button and note in a row
+        help_row = QHBoxLayout()
+        
+        # Add API key info - smaller font
+        api_note = QLabel("API requires HF key in Settings")
+        api_note.setStyleSheet("color: #666; font-style: italic; font-size: 10px;")
+        help_row.addWidget(api_note)
+        
+        help_button = QPushButton("HELP")
+        help_button.setToolTip("Learn about execution modes")
+        help_button.setFixedSize(10, 30)  # Small square button
+        help_button.clicked.connect(self.show_execution_mode_guide)
+        help_row.addWidget(help_button)
+        
+        mode_container.addLayout(help_row)
+        
+        # Set the layout for the group box
+        self.execution_mode_group.setLayout(mode_container)
+        
+        # Add execution mode to bottom layout
+        bottom_layout.addWidget(self.execution_mode_group)
+        
+        # Model parameters group - compact
         params_group = QGroupBox("Model Parameters")
         params_layout = QFormLayout(params_group)
+        params_layout.setVerticalSpacing(5)  # Reduce vertical spacing
+        params_layout.setHorizontalSpacing(10)  # Keep reasonable horizontal spacing
         
         # Temperature
         self.temperature_spin = QDoubleSpinBox()
@@ -140,14 +197,41 @@ class CreateAgentDialog(QDialog):
         self.max_tokens_spin.setValue(2048)
         params_layout.addRow("Max Tokens:", self.max_tokens_spin)
         
-        # Device
+        # Device - only meaningful for local execution
         self.device_combo = QComboBox()
         self.device_combo.addItems(["auto", "cpu", "cuda", "mps"])
         params_layout.addRow("Device:", self.device_combo)
         
-        layout.addWidget(params_group)
+        # Add parameters to bottom layout
+        bottom_layout.addWidget(params_group, 1)  # Give parameters more space
+        
+        # Add the bottom layout to the main layout
+        layout.addLayout(bottom_layout, 1)  # Give bottom section less height proportion
+        
         self.tabs.addTab(model_tab, "Model")
+        
+        # Connect signals for mode selection
+        self.local_mode_radio.toggled.connect(self.on_execution_mode_changed)
+        self.api_mode_radio.toggled.connect(self.on_execution_mode_changed)
     
+    def show_execution_mode_guide(self):
+        """Show the execution mode guide dialog"""
+        guide_dialog = ExecutionModeGuideDialog(self)
+        guide_dialog.exec()
+
+    def on_execution_mode_changed(self, checked):
+        """Handle execution mode change
+        
+        Args:
+            checked: Whether the radio button is checked
+        """
+        if not checked:
+            return
+        
+        # Update the Device selector availability based on mode
+        is_local = self.local_mode_radio.isChecked()
+        self.device_combo.setEnabled(is_local)
+
     def create_tools_tab(self):
         """Create tools configuration tab"""
         tools_tab = QWidget()
@@ -430,6 +514,9 @@ class CreateAgentDialog(QDialog):
         agent_name = self.agent_name_edit.text().strip()
         agent_id = agent_name if agent_name else f"agent_{uuid.uuid4().hex[:8]}"
         
+        # Determine execution mode
+        use_local_execution = self.local_mode_radio.isChecked()
+        
         # Base configuration
         config = {
             "agent_id": agent_id,
@@ -438,7 +525,9 @@ class CreateAgentDialog(QDialog):
                 "model_id": model_id,
                 "temperature": self.temperature_spin.value(),
                 "max_tokens": self.max_tokens_spin.value(),
-                "device": self.device_combo.currentText()
+                "device": self.device_combo.currentText(),
+                "use_local_execution": use_local_execution,  # Added this flag
+                "use_api": not use_local_execution  # Added this flag
             },
             "tools": selected_tools,
             "additional_config": {

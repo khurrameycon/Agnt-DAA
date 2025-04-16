@@ -6,7 +6,7 @@ Manages the creation, configuration, and execution of agents
 import logging
 import uuid
 from typing import Dict, Any, List, Optional, Callable
-
+import os 
 from app.core.config_manager import ConfigManager
 from app.core.model_manager import ModelManager
 from app.agents.local_model_agent import LocalModelAgent
@@ -17,6 +17,7 @@ from app.agents.media_generation_agent import MediaGenerationAgent
 from app.agents.agent_registry import AgentRegistry
 from smolagents import Tool, DuckDuckGoSearchTool
 from app.agents.fine_tuning_agent import FineTuningAgent
+from app.core.agent_persistence import AgentPersistenceManager
 
 class AgentManager:
     """Manages agents and their execution"""
@@ -35,15 +36,39 @@ class AgentManager:
         # Initialize model manager
         self.model_manager = ModelManager(config_manager)
         
+        # Initialize persistence manager
+        self.persistence_manager = AgentPersistenceManager(
+            config_path=os.path.expanduser(config_manager.get("agents.persistence_path", "~/.sagax1"))
+        )
+        
         # Initialize available tools
         self.available_tools = self._initialize_available_tools()
         
         # Register agent types
         self._register_agent_types()
         
+        # Load saved agents from disk
+        self.load_saved_agents()
+        
         # Create default agent if specified in config
         self._create_default_agent()
-    
+    def load_saved_agents(self) -> None:
+        """Load all saved agents from disk"""
+        agent_ids = self.persistence_manager.get_all_agent_ids()
+        self.logger.info(f"Found {len(agent_ids)} saved agents")
+        
+        for agent_id in agent_ids:
+            # Load agent config
+            agent_config = self.persistence_manager.load_agent_config(agent_id)
+            
+            if agent_config:
+                # Store in agent_configs dictionary
+                self.agent_configs[agent_id] = agent_config
+                
+                # No need to create the agent instance immediately
+                # They will be created on demand when needed
+                self.logger.info(f"Loaded saved agent configuration for {agent_id}")
+
     def _initialize_available_tools(self) -> Dict[str, Tool]:
         """Initialize the available tools for agents
         
@@ -120,11 +145,11 @@ class AgentManager:
         ]
     
     def create_agent(self, 
-                   agent_id: str, 
-                   agent_type: str, 
-                   model_config: Dict[str, Any],
-                   tools: List[str] = None,
-                   additional_config: Dict[str, Any] = None) -> str:
+               agent_id: str, 
+               agent_type: str, 
+               model_config: Dict[str, Any],
+               tools: List[str] = None,
+               additional_config: Dict[str, Any] = None) -> str:
         """Create a new agent with the specified configuration
         
         Args:
@@ -169,7 +194,10 @@ class AgentManager:
                 )
                 self.active_agents[agent_id] = agent_instance
                 self.logger.info(f"Created web browsing agent with ID {agent_id}" + 
-                                 (" (multi-agent)" if additional_config.get("multi_agent") else ""))
+                                (" (multi-agent)" if additional_config.get("multi_agent") else ""))
+                
+                # Save agent configuration to disk
+                self.persistence_manager.save_agent_config(agent_id, agent_config)
                 return agent_id
             else:
                 # Use the registry for other agent types
@@ -181,6 +209,9 @@ class AgentManager:
                 if agent:
                     self.active_agents[agent_id] = agent
                     self.logger.info(f"Created agent with ID {agent_id} of type {agent_type}")
+                    
+                    # Save agent configuration to disk
+                    self.persistence_manager.save_agent_config(agent_id, agent_config)
                     return agent_id
                 else:
                     self.logger.error(f"Failed to create agent with ID {agent_id}")
@@ -191,9 +222,9 @@ class AgentManager:
             return None
     
     def run_agent(self, 
-                agent_id: str, 
-                input_text: str,
-                callback: Optional[Callable[[str], None]] = None) -> str:
+            agent_id: str, 
+            input_text: str,
+            callback: Optional[Callable[[str], None]] = None) -> str:
         """Run an agent with the given input
         
         Args:
@@ -225,12 +256,32 @@ class AgentManager:
             if agent is None:
                 self.logger.error(f"Failed to create agent with ID {agent_id}")
                 return f"Error: Unable to create agent {agent_id}"
+            
+            # Load history if available
+            history = self.persistence_manager.load_agent_history(agent_id)
+            if history:
+                try:
+                    for entry in history:
+                        agent.add_to_history(entry["user_input"], entry["agent_output"])
+                    self.logger.info(f"Loaded {len(history)} history entries for agent {agent_id}")
+                except Exception as e:
+                    self.logger.error(f"Error loading history for agent {agent_id}: {str(e)}")
         
         # Run the agent
         self.logger.info(f"Running agent {agent_id} with input: {input_text[:50]}...")
         
         try:
-            return agent.run(input_text, callback=callback)
+            output = agent.run(input_text, callback=callback)
+            
+            # Save updated history
+            try:
+                history = agent.get_history()
+                if history:
+                    self.persistence_manager.save_agent_history(agent_id, history)
+            except Exception as e:
+                self.logger.error(f"Error saving history for agent {agent_id}: {str(e)}")
+                
+            return output
         except Exception as e:
             error_msg = f"Error running agent {agent_id}: {str(e)}"
             self.logger.error(error_msg)
@@ -250,12 +301,18 @@ class AgentManager:
         
         return self.agent_configs[agent_id]
     
+    # In AgentManager class, make sure get_active_agents returns saved agents too:
+
     def get_active_agents(self) -> List[Dict[str, Any]]:
         """Get the list of active agents
         
         Returns:
             List of agent information
         """
+        # Make sure we load all saved agents
+        if not self.agent_configs and hasattr(self, 'persistence_manager'):
+            self.load_saved_agents()
+            
         return [
             {
                 "agent_id": agent_id,
@@ -265,7 +322,7 @@ class AgentManager:
                 "multi_agent": self.agent_configs[agent_id]["additional_config"].get("multi_agent", False) 
                 if self.agent_configs[agent_id]["agent_type"] == "web_browsing" else False
             }
-            for agent_id in self.active_agents.keys()
+            for agent_id in self.agent_configs.keys()
         ]
     
     def reset_agent(self, agent_id: str) -> bool:
@@ -296,10 +353,21 @@ class AgentManager:
             agent_id: ID of the agent to remove
         """
         if agent_id in self.active_agents:
+            # Save history before removing
+            try:
+                history = self.active_agents[agent_id].get_history()
+                if history:
+                    self.persistence_manager.save_agent_history(agent_id, history)
+            except Exception as e:
+                self.logger.error(f"Error saving history for agent {agent_id}: {str(e)}")
+                
             del self.active_agents[agent_id]
         
         if agent_id in self.agent_configs:
             del self.agent_configs[agent_id]
+            
+        # Delete from disk
+        self.persistence_manager.delete_agent(agent_id)
             
         self.logger.info(f"Removed agent with ID {agent_id}")
     

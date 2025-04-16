@@ -152,8 +152,7 @@ class MainWindow(QMainWindow):
         self.check_api_key()
 
         # After creating the visual_web_tab
-        from app.utils.visual_web_demo import VisualWebDemo
-        VisualWebDemo.add_demo_menu(self.visual_web_tab)
+       
         
     def check_api_key(self):
         """Check if API key is set and prompt if not"""
@@ -1216,8 +1215,8 @@ class MainWindow(QMainWindow):
             self,
             "Media Generation Capabilities",
             "The media generation agent can create both images and videos from text prompts.\n\n"
-            "The default configuration uses 'black-forest-labs/FLUX.1-schnell' for images and "
-            "'SahaniJi/Instant-Video' for videos, but you can customize these in the dialog."
+            "If in-case media (image or video) preview is not loaded then goto defined path to "
+            "get the generated media (as shown in user interface)."
         )
         
         # Show dialog

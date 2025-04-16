@@ -41,10 +41,10 @@ class AgentRegistry:
     
     @classmethod
     def create_agent(cls, 
-                   agent_id: str, 
-                   agent_type: str, 
-                   config: Dict[str, Any]) -> Optional[BaseAgent]:
-        """Create an agent instance of the specified type
+                agent_id: str, 
+                agent_type: str, 
+                config: Dict[str, Any]) -> Optional[BaseAgent]:
+        """Create an agent instance of the specified type with enhanced execution mode support
         
         Args:
             agent_id: Unique identifier for the agent
@@ -61,6 +61,16 @@ class AgentRegistry:
             return None
         
         try:
+            # For local agents and those based on language models, apply execution mode settings
+            if agent_type in ["local_model", "chat_agent", "code_generation", "web_browsing", "visual_web"]:
+                # Ensure model_config values are copied to the top level config for agents that need them
+                if "model_config" in config and isinstance(config["model_config"], dict):
+                    # Copy any model configuration to the top level for agents that access config directly
+                    for key, value in config["model_config"].items():
+                        if key not in config:
+                            config[key] = value
+            
+            # Create the agent with the updated configuration
             return agent_class(agent_id, config)
         except Exception as e:
             cls._logger.exception(f"Error creating agent of type '{agent_type}': {str(e)}")

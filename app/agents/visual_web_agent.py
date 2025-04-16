@@ -1,28 +1,31 @@
 """
-Visual Web Automation Agent for sagax1
+Improved Visual Web Agent for sagax1
 Agent for visually interacting with websites through screenshots and automation
-Enhanced with features from the web_browser.ipynb example
+Based on the web_browser.ipynb notebook implementation
 """
 
 import os
 import time
 import logging
 import threading
-import tempfile
+import traceback
 from io import BytesIO
 from typing import Dict, Any, List, Optional, Callable
 
 from PIL import Image
 from PyQt6.QtCore import QObject, pyqtSignal, QTimer, QThread
 
-from app.agents.base_agent import BaseAgent
-from smolagents import CodeAgent, Tool, DuckDuckGoSearchTool, tool
-
-# Add these imports
+# Required imports from the notebook implementation
+import helium
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
-import traceback
+
+from app.agents.base_agent import BaseAgent
+from smolagents import CodeAgent, Tool, HfApiModel, tool
+
 
 class VisualWebAutomationTool(Tool):
     """Tool for visual web automation"""
@@ -48,34 +51,32 @@ class VisualWebAutomationTool(Tool):
         self.webdriver = None
         self.logger = logging.getLogger(__name__)
     
-    
     def _ensure_browser_started(self):
         """Ensure the browser is started with optimal settings for visual automation"""
         if self.browser is None:
             try:
-                self.logger.info("Starting browser with improved settings...")
+                self.logger.info("Starting browser with notebook-based settings...")
                 
-                # Configure browser options
-                options = webdriver.ChromeOptions()
-                options.add_argument("--force-device-scale-factor=1")
-                options.add_argument("--window-size=1000,800")
-                options.add_argument("--disable-pdf-viewer")
-                options.add_argument("--window-position=0,0")
-                options.add_argument("--no-sandbox")
-                options.add_argument("--disable-dev-shm-usage")
+                # Configure browser options - matching the notebook implementation
+                chrome_options = webdriver.ChromeOptions()
+                chrome_options.add_argument("--force-device-scale-factor=1")
+                chrome_options.add_argument("--window-size=1000,800")
+                chrome_options.add_argument("--disable-pdf-viewer")
+                chrome_options.add_argument("--window-position=0,0")
+                chrome_options.add_argument("--no-sandbox")
+                chrome_options.add_argument("--disable-dev-shm-usage")
                 
-                # Force browser to be visible
-                options.add_argument("--headless=new")  # Use new headless mode
+                # Force browser to be headless for more reliability in the app context
+                chrome_options.add_argument("--headless=new")
                 
                 # Use WebDriver Manager to get the correct ChromeDriver
                 service = Service(ChromeDriverManager().install())
                 
                 # Start the browser using Selenium
                 self.logger.info("Creating Chrome driver...")
-                self.webdriver = webdriver.Chrome(service=service, options=options)
+                self.webdriver = webdriver.Chrome(service=service, options=chrome_options)
                 
                 # Initialize helium with the driver
-                import helium
                 self.logger.info("Setting Helium driver...")
                 helium.set_driver(self.webdriver)
                 self.browser = helium
@@ -147,6 +148,7 @@ class VisualWebAutomationTool(Tool):
                 screenshot = self.webdriver.get_screenshot_as_png()
                 
                 # Save to a temporary file
+                import tempfile
                 with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
                     temp_file.write(screenshot)
                     return f"Screenshot saved to {temp_file.name}"
@@ -242,6 +244,56 @@ class VisualWebAutomationTool(Tool):
             self.logger.error(traceback.format_exc())
             return f"Error: {str(e)}"
 
+
+# Adding the custom tools from the notebook
+@tool
+def search_item_ctrl_f(text: str, nth_result: int = 1) -> str:
+    """
+    Searches for text on the current page via Ctrl + F and jumps to the nth occurrence.
+    Args:
+        text: The text to search for
+        nth_result: Which occurrence to jump to (default: 1)
+    """
+    # Note: This requires webdriver to be set properly
+    driver = helium.get_driver()
+    if not driver:
+        return "Browser not initialized"
+        
+    elements = driver.find_elements(By.XPATH, f"//*[contains(text(), '{text}')]")
+    if not elements:
+        return f"No matches found for '{text}'"
+    if nth_result > len(elements):
+        return f"Match n°{nth_result} not found (only {len(elements)} matches found)"
+    result = f"Found {len(elements)} matches for '{text}'."
+    elem = elements[nth_result - 1]
+    driver.execute_script("arguments[0].scrollIntoView(true);", elem)
+    result += f" Focused on element {nth_result} of {len(elements)}"
+    return result
+
+@tool
+def go_back() -> str:
+    """Goes back to previous page."""
+    driver = helium.get_driver()
+    if driver:
+        driver.back()
+        return "Navigated back to previous page"
+    return "No browser session to navigate back"
+
+@tool
+def close_popups() -> str:
+    """
+    Closes any visible modal or pop-up on the page. Use this to dismiss pop-up windows!
+    This does not work on cookie consent banners.
+    """
+    driver = helium.get_driver()
+    if driver:
+        from selenium import webdriver
+        from selenium.webdriver.common.keys import Keys
+        webdriver.ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+        return "Attempted to close popups using Escape key"
+    return "No browser session to close popups"
+
+
 class ScreenshotTool(Tool):
     """Tool for taking screenshots of the current browser window"""
     
@@ -281,6 +333,7 @@ class ScreenshotTool(Tool):
             img = Image.new('RGB', (800, 100), color='red')
             return img
 
+
 class BrowserThread(QThread):
     """Thread for running the browser"""
     
@@ -318,6 +371,7 @@ class BrowserThread(QThread):
         self.running = False
         self.wait()
 
+
 class VisualWebSignals(QObject):
     """Signal handler for VisualWebAgent"""
     screenshot_updated = pyqtSignal(object)
@@ -332,10 +386,6 @@ class VisualWebAgent(BaseAgent):
         Args:
             agent_id: Unique identifier for this agent
             config: Agent configuration dictionary
-                model_id: Hugging Face model ID
-                device: Device to use (e.g., 'cpu', 'cuda', 'mps')
-                max_tokens: Maximum number of tokens to generate
-                temperature: Temperature for generation
         """
         super().__init__(agent_id, config)
         
@@ -343,11 +393,8 @@ class VisualWebAgent(BaseAgent):
         self.signals = VisualWebSignals()
         self.screenshot_updated = self.signals.screenshot_updated
         
+        # Get model settings from config
         self.model_id = config.get("model_id", "meta-llama/Llama-3.2-3B-Instruct")
-        self.device = config.get("device", "auto")
-        self.max_tokens = config.get("max_tokens", 2048)
-        self.temperature = config.get("temperature", 0.1)
-        self.authorized_imports = config.get("authorized_imports", [])
         
         # Initialize tools
         self.visual_tool = VisualWebAutomationTool()
@@ -361,7 +408,7 @@ class VisualWebAgent(BaseAgent):
         self.browser_thread.screenshot_ready.connect(self._on_screenshot_ready)
     
     def _on_screenshot_ready(self, screenshot):
-        """Handle screenshot ready
+        """Handle screenshot ready signal
         
         Args:
             screenshot: Screenshot image
@@ -369,77 +416,39 @@ class VisualWebAgent(BaseAgent):
         self.signals.screenshot_updated.emit(screenshot)
     
     def initialize(self) -> None:
-        """Initialize the model and agent"""
+        """Initialize the model and agent using the notebook approach"""
         if self.is_initialized:
             return
         
         try:
-            from smolagents import TransformersModel, HfApiModel, OpenAIServerModel, LiteLLMModel
-            from smolagents import CodeAgent, Tool
+            from smolagents import HfApiModel
             import helium
             import selenium
+            
             self.logger.info(f"Initializing visual web agent with model {self.model_id}")
             
-            # Try to create the model based on the model_id
-            try:
-                # First try TransformersModel for local models
-                model = TransformersModel(
-                    model_id=self.model_id,
-                    device_map=self.device,
-                    max_new_tokens=self.max_tokens,
-                    temperature=self.temperature,
-                    trust_remote_code=True,
-                    do_sample=True
-                )
-                self.logger.info(f"Using TransformersModel for {self.model_id}")
-            except Exception as e:
-                self.logger.warning(f"Failed to load model with TransformersModel: {str(e)}")
-                
-                # Try HfApiModel for API-based models
-                try:
-                    model = HfApiModel(
-                        model_id=self.model_id,
-                        max_tokens=self.max_tokens,
-                        temperature=self.temperature
-                    )
-                    self.logger.info(f"Using HfApiModel for {self.model_id}")
-                except Exception as e:
-                    self.logger.warning(f"Failed to load model with HfApiModel: {str(e)}")
-                    
-                    # Fallback to OpenAI-compatible API
-                    try:
-                        model = OpenAIServerModel(
-                            model_id=self.model_id,
-                            max_tokens=self.max_tokens,
-                            temperature=self.temperature
-                        )
-                        self.logger.info(f"Using OpenAIServerModel for {self.model_id}")
-                    except Exception as e:
-                        self.logger.warning(f"Failed to load model with OpenAIServerModel: {str(e)}")
-                        
-                        # Final fallback to LiteLLM
-                        model = LiteLLMModel(
-                            model_id=self.model_id,
-                            max_tokens=self.max_tokens,
-                            temperature=self.temperature
-                        )
-                        self.logger.info(f"Using LiteLLMModel for {self.model_id}")
+            # Initialize model using HfApiModel as in the notebook
+            model = HfApiModel(model_id=self.model_id)
             
             # Initialize tools
-            tools = self._initialize_tools()
+            tools = [
+                self.visual_tool,
+                self.screenshot_tool,
+                search_item_ctrl_f,
+                go_back,
+                close_popups
+            ]
             
-            # Define screenshot callback for agent memory
-            # In app/agents/visual_web_agent.py, find the save_screenshot_to_memory function:
-
+            # Define screenshot callback for agent memory - following the notebook approach
             def save_screenshot_to_memory(memory_step, agent):
                 """Save screenshot to agent memory step"""
                 try:
-                    # Wait a bit for page to load
+                    # Wait a bit for page to load (like in the notebook)
                     time.sleep(1.0)
                     
                     # Get screenshot
                     if self.visual_tool.browser is not None:
-                        # Remove previous screenshots for lean processing
+                        # Remove previous screenshots for lean processing (like in the notebook)
                         current_step = memory_step.step_number
                         for previous_memory_step in agent.memory.steps:
                             if hasattr(previous_memory_step, 'step_number') and previous_memory_step.step_number <= current_step - 2:
@@ -454,7 +463,7 @@ class VisualWebAgent(BaseAgent):
                             # Set screenshot in memory step
                             memory_step.observations_images = [image.copy()]
                             
-                            # Update observations with current URL
+                            # Update observations with current URL (like in the notebook)
                             url_info = f"Current url: {self.visual_tool.webdriver.current_url}"
                             memory_step.observations = (
                                 url_info if memory_step.observations is None 
@@ -481,16 +490,15 @@ class VisualWebAgent(BaseAgent):
             self.agent = CodeAgent(
                 tools=tools,
                 model=model,
-                additional_authorized_imports=["helium", "selenium", "time"] + self.authorized_imports,
+                additional_authorized_imports=["helium", "selenium", "time"],
                 verbosity_level=2,
                 step_callbacks=[save_screenshot_to_memory],
                 max_steps=20  # Limit to 20 steps to avoid infinite loops
-                # flatten_messages_as_text=False 
             )
             
-            # Import helium for the agent
-            # self.agent.python_executor("from helium import *", self.agent.state)
+            # Import helium for the agent - just like in the notebook
             self.agent.python_executor("from helium import *")
+            
             # Start browser thread
             self.browser_thread.start()
             
@@ -501,78 +509,6 @@ class VisualWebAgent(BaseAgent):
             self.logger.error(f"Error initializing visual web agent: {str(e)}")
             self.logger.error(traceback.format_exc())
             raise
-    
-    def _initialize_tools(self) -> List[Tool]:
-        """Initialize tools for the agent
-        
-        Returns:
-            List of tools
-        """
-        tools = []
-        
-        # Add web search tool
-        tools.append(DuckDuckGoSearchTool())
-        
-        # Add visual web automation tool
-        tools.append(self.visual_tool)
-        
-        # Add screenshot tool
-        tools.append(self.screenshot_tool)
-        
-        # Add additional tools from the notebook
-        
-        # Add search_item_ctrl_f tool
-        @tool
-        def search_item_ctrl_f(text: str, nth_result: int = 1) -> str:
-            """
-            Searches for text on the current page via Ctrl + F and jumps to the nth occurrence.
-            Args:
-                text: The text to search for
-                nth_result: Which occurrence to jump to (default: 1)
-            """
-            driver = self.visual_tool.webdriver
-            from selenium.webdriver.common.by import By
-            
-            elements = driver.find_elements(By.XPATH, f"//*[contains(text(), '{text}')]")
-            if nth_result > len(elements):
-                raise Exception(f"Match n°{nth_result} not found (only {len(elements)} matches found)")
-            result = f"Found {len(elements)} matches for '{text}'."
-            elem = elements[nth_result - 1]
-            driver.execute_script("arguments[0].scrollIntoView(true);", elem)
-            result += f" Focused on element {nth_result} of {len(elements)}"
-            return result
-        
-        tools.append(search_item_ctrl_f)
-        
-        # Add go_back tool
-        @tool
-        def go_back() -> str:
-            """Goes back to previous page."""
-            if self.visual_tool.webdriver:
-                self.visual_tool.webdriver.back()
-                return "Navigated back to previous page"
-            return "No browser session to navigate back"
-        
-        tools.append(go_back)
-        
-        # Add close_popups tool
-        @tool
-        def close_popups() -> str:
-            """
-            Closes any visible modal or pop-up on the page. Use this to dismiss pop-up windows!
-            This does not work on cookie consent banners.
-            """
-            from selenium.webdriver.common.keys import Keys
-            
-            if self.visual_tool.webdriver:
-                from selenium import webdriver
-                webdriver.ActionChains(self.visual_tool.webdriver).send_keys(Keys.ESCAPE).perform()
-                return "Attempted to close popups using Escape key"
-            return "No browser session to close popups"
-        
-        tools.append(close_popups)
-        
-        return tools
     
     def run(self, input_text: str, callback: Optional[Callable[[str], None]] = None) -> str:
         """Run the agent with the given input
@@ -588,7 +524,13 @@ class VisualWebAgent(BaseAgent):
             self.initialize()
         
         try:
-            # Add detailed instructions for helium
+            # Check if browser is running
+            if self.visual_tool.browser is None:
+                self.logger.info("Browser not started, starting browser...")
+                self.visual_tool._ensure_browser_started()
+                time.sleep(1)  # Wait for browser to initialize
+            
+            # Helium instructions from the notebook
             helium_instructions = """
 You can use helium to access websites. Don't bother about the helium driver, it's already managed.
 We've already ran "from helium import *"
@@ -637,7 +579,6 @@ You can see screenshots of the browser window and interact with it using command
 {helium_instructions}
 
 You have access to these tools:
-- web_search: Search the web for information
 - search_item_ctrl_f: Search for text on the current page and jump to it
 - close_popups: Close any popups using the Escape key
 - go_back: Go back to the previous page
@@ -648,6 +589,13 @@ USER TASK: {input_text}
 First, take a screenshot to see the current state of the browser.
 Then, complete the task step by step, making sure to check the results after each action by observing the screenshot.
 """
+            
+            # Log the task
+            self.logger.info(f"Running visual web task: {input_text}")
+            
+            # Progress update
+            if callback:
+                callback("Processing your request and controlling the browser...")
             
             # Run the agent
             result = self.agent.run(enhanced_prompt)
@@ -660,6 +608,7 @@ Then, complete the task step by step, making sure to check the results after eac
         except Exception as e:
             error_msg = f"Error running visual web agent: {str(e)}"
             self.logger.error(error_msg)
+            self.logger.error(traceback.format_exc())
             return f"Sorry, I encountered an error while automating the web browser: {error_msg}"
     
     def reset(self) -> None:

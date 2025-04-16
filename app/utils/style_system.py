@@ -178,10 +178,12 @@ class StyleSystem:
             padding: 8px;
             background-color: {colors["white"]};
             selection-background-color: {colors["primary_light"]};
+            color: black;
         }}
         
         QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus, QComboBox:focus {{
             border: 1px solid {colors["primary"]};
+            color: black;
         }}
         
         QComboBox {{
