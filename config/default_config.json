@@ -1,9 +1,9 @@
 {
     "api_keys": {
-        "huggingface": ""
+        "huggingface": "hfH"
     },
     "models": {
-        "default_model": "meta-llama/Llama-3-8B-Instruct",
+        "default_model": "meta-llama/Llama-3.2-3B-Instruct",
         "cache_dir": "~/.cache/sagax1/models"
     },
     "ui": {
@@ -12,7 +12,10 @@
     },
     "agents": {
         "default_agent": "text_completion",
-        "max_history": 100
+        "max_history": 100,
+        "persistence_path": "~/.sagax1",
+        "persistence_enabled": true,
+        "auto_save_history": true
     },
     "execution": {
         "python_executor": "local",
