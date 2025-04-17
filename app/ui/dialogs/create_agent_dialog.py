@@ -1,11 +1,12 @@
 """
 Create Agent Dialog for sagax1
-Dialog for creating new agents
+Dialog for creating new agents with enhanced Inference API support
 """
 
 import os
 import logging
 import uuid
+import requests
 from typing import Dict, List, Any, Optional
 
 from PyQt6.QtWidgets import (
@@ -13,15 +14,16 @@ from PyQt6.QtWidgets import (
     QLabel, QLineEdit, QComboBox, QCheckBox,
     QPushButton, QTabWidget, QWidget, QListWidget,
     QListWidgetItem, QSpinBox, QDoubleSpinBox, QDialogButtonBox,
-    QGroupBox, QScrollArea, QRadioButton  
+    QGroupBox, QScrollArea, QRadioButton, QMessageBox  
 )
-from PyQt6.QtCore import Qt, pyqtSignal, QSize
+from PyQt6.QtCore import Qt, pyqtSignal, QSize, QTimer
+from PyQt6.QtGui import QCursor
 from app.ui.dialogs.execution_mode_guide import ExecutionModeGuideDialog
 from app.core.agent_manager import AgentManager
 from app.core.model_manager import ModelManager
 
 class CreateAgentDialog(QDialog):
-    """Dialog for creating a new agent"""
+    """Dialog for creating a new agent with enhanced model filtering"""
     
     def __init__(self, agent_manager: AgentManager, parent=None):
         """Initialize the create agent dialog
@@ -38,6 +40,10 @@ class CreateAgentDialog(QDialog):
         
         self.setWindowTitle("Create New Agent")
         self.resize(600, 500)
+        
+        # Track if we've loaded inference models
+        self.inference_models_loaded = False
+        self.inference_models = []
         
         # Create layout
         self.layout = QVBoxLayout(self)
@@ -77,7 +83,7 @@ class CreateAgentDialog(QDialog):
         # Initialize UI
         self.load_available_models()
         self.load_available_tools()
-        
+    
     def create_basic_tab(self):
         """Create basic configuration tab"""
         basic_tab = QWidget()
@@ -106,6 +112,42 @@ class CreateAgentDialog(QDialog):
         layout = QVBoxLayout(model_tab)
         layout.setSpacing(8)  # Reduce spacing between elements
         
+        # Add execution mode selection at the top
+        execution_layout = QHBoxLayout()
+        execution_layout.addWidget(QLabel("Select Execution Mode:"))
+        
+        # Radio button group for execution mode
+        self.execution_mode_group = QGroupBox()
+        execution_mode_layout = QHBoxLayout(self.execution_mode_group)
+        
+        self.local_mode_radio = QRadioButton("Local Execution")
+        self.local_mode_radio.setToolTip("Download and run the model locally")
+        self.local_mode_radio.setChecked(True)
+        self.local_mode_radio.toggled.connect(self.on_execution_mode_changed)
+        execution_mode_layout.addWidget(self.local_mode_radio)
+        
+        self.api_mode_radio = QRadioButton("HF API (Remote)")
+        self.api_mode_radio.setToolTip("Use the Hugging Face Inference API")
+        self.api_mode_radio.toggled.connect(self.on_execution_mode_changed)
+        execution_mode_layout.addWidget(self.api_mode_radio)
+        
+        # Help button
+        help_button = QPushButton("?")
+        help_button.setToolTip("Learn about execution modes")
+        help_button.setFixedSize(25, 25)
+        help_button.clicked.connect(self.show_execution_mode_guide)
+        execution_mode_layout.addWidget(help_button)
+        
+        execution_layout.addWidget(self.execution_mode_group)
+        execution_layout.addStretch()
+        
+        layout.addLayout(execution_layout)
+        
+        # Add API key info
+        api_info = QLabel("Note: API mode requires a Hugging Face API key in Settings")
+        api_info.setStyleSheet("color: #666; font-style: italic;")
+        layout.addWidget(api_info)
+        
         # Model search - more compact layout
         search_layout = QHBoxLayout()
         search_layout.setSpacing(5)
@@ -127,55 +169,6 @@ class CreateAgentDialog(QDialog):
         self.model_list.setSelectionMode(QListWidget.SelectionMode.SingleSelection)
         self.model_list.setMinimumHeight(180)  # Make model list taller
         layout.addWidget(self.model_list, 3)  # Give model list more weight in the layout
-        
-        # Create horizontal layout for execution mode and parameters
-        bottom_layout = QHBoxLayout()
-        
-        # Add model execution mode selection - more compact
-        self.execution_mode_group = QGroupBox("Execution Mode")
-        self.execution_mode_group.setMaximumWidth(300)  # Limit width to make it compact
-        
-        # Use horizontal layout for mode controls
-        mode_container = QVBoxLayout()
-        mode_container.setSpacing(2)  # Minimal spacing
-        
-        # Radio buttons in their own section
-        radio_layout = QVBoxLayout()
-        radio_layout.setSpacing(1)  # Minimal spacing
-        radio_layout.setContentsMargins(5, 5, 5, 5)  # Small margins
-        
-        self.local_mode_radio = QRadioButton("Local Execution")
-        self.local_mode_radio.setToolTip("Download and run the model locally")
-        self.local_mode_radio.setChecked(True)
-        radio_layout.addWidget(self.local_mode_radio)
-        
-        self.api_mode_radio = QRadioButton("HF API (Remote)")
-        self.api_mode_radio.setToolTip("Use the Hugging Face Inference API")
-        radio_layout.addWidget(self.api_mode_radio)
-        
-        mode_container.addLayout(radio_layout)
-        
-        # Help button and note in a row
-        help_row = QHBoxLayout()
-        
-        # Add API key info - smaller font
-        api_note = QLabel("API requires HF key in Settings")
-        api_note.setStyleSheet("color: #666; font-style: italic; font-size: 10px;")
-        help_row.addWidget(api_note)
-        
-        help_button = QPushButton("HELP")
-        help_button.setToolTip("Learn about execution modes")
-        help_button.setFixedSize(10, 30)  # Small square button
-        help_button.clicked.connect(self.show_execution_mode_guide)
-        help_row.addWidget(help_button)
-        
-        mode_container.addLayout(help_row)
-        
-        # Set the layout for the group box
-        self.execution_mode_group.setLayout(mode_container)
-        
-        # Add execution mode to bottom layout
-        bottom_layout.addWidget(self.execution_mode_group)
         
         # Model parameters group - compact
         params_group = QGroupBox("Model Parameters")
@@ -202,23 +195,15 @@ class CreateAgentDialog(QDialog):
         self.device_combo.addItems(["auto", "cpu", "cuda", "mps"])
         params_layout.addRow("Device:", self.device_combo)
         
-        # Add parameters to bottom layout
-        bottom_layout.addWidget(params_group, 1)  # Give parameters more space
-        
-        # Add the bottom layout to the main layout
-        layout.addLayout(bottom_layout, 1)  # Give bottom section less height proportion
+        layout.addWidget(params_group)
         
         self.tabs.addTab(model_tab, "Model")
-        
-        # Connect signals for mode selection
-        self.local_mode_radio.toggled.connect(self.on_execution_mode_changed)
-        self.api_mode_radio.toggled.connect(self.on_execution_mode_changed)
     
     def show_execution_mode_guide(self):
         """Show the execution mode guide dialog"""
         guide_dialog = ExecutionModeGuideDialog(self)
         guide_dialog.exec()
-
+    
     def on_execution_mode_changed(self, checked):
         """Handle execution mode change
         
@@ -231,7 +216,10 @@ class CreateAgentDialog(QDialog):
         # Update the Device selector availability based on mode
         is_local = self.local_mode_radio.isChecked()
         self.device_combo.setEnabled(is_local)
-
+        
+        # Refresh the model list based on execution mode
+        self.load_available_models()
+        
     def create_tools_tab(self):
         """Create tools configuration tab"""
         tools_tab = QWidget()
@@ -316,7 +304,7 @@ class CreateAgentDialog(QDialog):
         self.agent_specific_layout.addWidget(self.visual_web_options)
         self.visual_web_options.setVisible(False)
         
-         # Code Generation Agent Options
+        # Code Generation Agent Options
         self.code_gen_options = QGroupBox("Code Generation Agent Options")
         code_gen_layout = QFormLayout(self.code_gen_options)
         
@@ -327,13 +315,6 @@ class CreateAgentDialog(QDialog):
         self.agent_specific_layout.addWidget(self.code_gen_options)
         self.code_gen_options.setVisible(False)
         
-        # Add to tabs
-        self.tabs.addTab(agent_specific_tab, "Agent Options")
-
-
-        # For app/ui/dialogs/create_agent_dialog.py
-        # Add the media generation options to the create_agent_specific_tab method after the code_gen_options section:
-
         # Media Generation Agent Options
         self.media_gen_options = QGroupBox("Media Generation Agent Options")
         media_gen_layout = QFormLayout(self.media_gen_options)
@@ -372,25 +353,124 @@ class CreateAgentDialog(QDialog):
 
         self.agent_specific_layout.addWidget(self.media_gen_options)
         self.media_gen_options.setVisible(False)
-
         
+        # Add to tabs
+        self.tabs.addTab(agent_specific_tab, "Agent Options")
     
     def load_available_models(self):
-        """Load available models"""
+        """Load available models based on the selected execution mode"""
+        # Clear the list
+        self.model_list.clear()
+        
+        # Show different models based on execution mode
+        if self.api_mode_radio.isChecked():
+            # Show "Loading..." while fetching inference models
+            loading_item = QListWidgetItem("Loading inference models...")
+            loading_item.setFlags(loading_item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+            self.model_list.addItem(loading_item)
+            
+            # Load inference models if we haven't already
+            if not self.inference_models_loaded:
+                QTimer.singleShot(100, self.fetch_inference_models)
+            else:
+                # If we already loaded them, just populate the list
+                self.populate_inference_models()
+                
+        else:
+            # Local execution mode - load cached and popular models
+            self._load_local_models()
+    
+    def fetch_inference_models(self):
+        """Fetch available models from the Hugging Face API that support inference"""
+        self.setCursor(QCursor(Qt.CursorShape.WaitCursor))
+        
+        try:
+            # Fetch models with inference endpoints
+            url = "https://huggingface.co/api/models?limit=50&inference_endpoints=true"
+            response = requests.get(url)
+            
+            if response.status_code == 200:
+                self.inference_models = response.json()
+                self.inference_models_loaded = True
+                
+                # Update the UI with the fetched models
+                self.populate_inference_models()
+            else:
+                self.model_list.clear()
+                error_item = QListWidgetItem(f"Error fetching models: {response.status_code}")
+                error_item.setFlags(error_item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+                self.model_list.addItem(error_item)
+                
+                # Add some default models as fallback
+                fallback_inference_models = [
+                    "meta-llama/Llama-3.2-3B-Instruct",
+                    "mistralai/Mistral-7B-Instruct-v0.2",
+                    "meta-llama/Llama-3.2-70B-Instruct",
+                    "microsoft/Phi-3-mini-4k-instruct",
+                    "microsoft/Phi-3-mini-128k-instruct",
+                    "google/gemma-7b-it"
+                ]
+                
+                for model_id in fallback_inference_models:
+                    item = QListWidgetItem(model_id)
+                    item.setData(Qt.ItemDataRole.UserRole, {"id": model_id, "is_cached": False})
+                    self.model_list.addItem(item)
+        except Exception as e:
+            self.model_list.clear()
+            error_item = QListWidgetItem(f"Error fetching models: {str(e)}")
+            error_item.setFlags(error_item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+            self.model_list.addItem(error_item)
+            
+            self.logger.error(f"Error fetching inference models: {str(e)}")
+        
+        finally:
+            self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
+    
+    def populate_inference_models(self):
+        """Populate the model list with available inference models"""
+        self.model_list.clear()
+        
+        if not self.inference_models:
+            no_models_item = QListWidgetItem("No inference models found")
+            no_models_item.setFlags(no_models_item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+            self.model_list.addItem(no_models_item)
+            return
+        
+        # Add each model to the list
+        for model in self.inference_models:
+            model_id = model["id"]
+            item = QListWidgetItem(model_id)
+            item.setData(Qt.ItemDataRole.UserRole, {"id": model_id, "is_cached": False})
+            
+            # Add more details in tooltip if available
+            tooltip = f"Model: {model_id}"
+            if "downloads" in model:
+                tooltip += f"\nDownloads: {model['downloads']:,}"
+            
+                
+            item.setToolTip(tooltip)
+            self.model_list.addItem(item)
+    
+    def _load_local_models(self):
+        """Load cached models for local execution"""
         # Load cached models first
         cached_models = self.model_manager.get_cached_models()
         
         for model_id in cached_models:
             item = QListWidgetItem(model_id)
             item.setData(Qt.ItemDataRole.UserRole, {"id": model_id, "is_cached": True})
+            # Add (cached) tag to the text
+            item.setText(f"{model_id} (cached)")
             self.model_list.addItem(item)
         
-        # Add some popular models
+        # Add some popular chat models
         popular_models = [
             "meta-llama/Llama-3.2-3B-Instruct",
             "mistralai/Mistral-7B-Instruct-v0.2",
             "HuggingFaceTB/SmolLM2-1.7B-Instruct",
-            "Gryphe/MythoMax-L2-13B"
+            "microsoft/Phi-3-mini-4k-instruct",
+            "Qwen/Qwen1.5-0.5B-Chat",
+            "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
         ]
         
         for model_id in popular_models:
@@ -400,7 +480,7 @@ class CreateAgentDialog(QDialog):
                 self.model_list.addItem(item)
     
     def search_models(self):
-        """Search for models"""
+        """Search for models based on execution mode"""
         query = self.model_search_edit.text().strip()
         
         if not query:
@@ -409,14 +489,108 @@ class CreateAgentDialog(QDialog):
         # Clear the list
         self.model_list.clear()
         
-        # Search for models
-        models = self.model_manager.search_models(query)
+        # Show loading item
+        loading_item = QListWidgetItem(f"Searching for '{query}'...")
+        loading_item.setFlags(loading_item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+        self.model_list.addItem(loading_item)
         
-        # Add to list
-        for model in models:
-            item = QListWidgetItem(model["id"])
-            item.setData(Qt.ItemDataRole.UserRole, model)
-            self.model_list.addItem(item)
+        if self.api_mode_radio.isChecked():
+            # For API mode, search within the loaded inference models
+            QTimer.singleShot(100, lambda: self._search_inference_models(query))
+        else:
+            # For local mode, use the model manager search
+            QTimer.singleShot(100, lambda: self._search_local_models(query))
+    
+    def _search_inference_models(self, query):
+        """Search for models with inference API support
+        
+        Args:
+            query: Search query
+        """
+        self.setCursor(QCursor(Qt.CursorShape.WaitCursor))
+        
+        try:
+            # Directly search Hugging Face API for inference models
+            url = f"https://huggingface.co/api/models?search={query}&inference_endpoints=true"
+            response = requests.get(url)
+            
+            self.model_list.clear()
+            
+            if response.status_code == 200:
+                models = response.json()
+                
+                if not models:
+                    no_results = QListWidgetItem(f"No inference models found for '{query}'")
+                    no_results.setFlags(no_results.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+                    self.model_list.addItem(no_results)
+                    return
+                
+                # Add each model to the list
+                for model in models:
+                    model_id = model["id"]
+                    item = QListWidgetItem(model_id)
+                    item.setData(Qt.ItemDataRole.UserRole, {"id": model_id, "is_cached": False})
+                    
+                    # Add more details in tooltip if available
+                    tooltip = f"Model: {model_id}"
+                    if "downloads" in model:
+                        tooltip += f"\nDownloads: {model['downloads']:,}"
+                    
+                        
+                    item.setToolTip(tooltip)
+                    self.model_list.addItem(item)
+            else:
+                error_item = QListWidgetItem(f"Error searching models: {response.status_code}")
+                error_item.setFlags(error_item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+                self.model_list.addItem(error_item)
+        
+        except Exception as e:
+            self.model_list.clear()
+            error_item = QListWidgetItem(f"Error searching models: {str(e)}")
+            error_item.setFlags(error_item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+            self.model_list.addItem(error_item)
+            self.logger.error(f"Error searching inference models: {str(e)}")
+        
+        finally:
+            self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
+    
+    def _search_local_models(self, query):
+        """Search for models using the model manager
+        
+        Args:
+            query: Search query
+        """
+        try:
+            # Search for models using the model manager
+            models = self.model_manager.search_models(query)
+            
+            # Clear the list
+            self.model_list.clear()
+            
+            if not models:
+                no_results = QListWidgetItem(f"No models found for '{query}'")
+                no_results.setFlags(no_results.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+                self.model_list.addItem(no_results)
+                return
+            
+            # Get cached models for reference
+            cached_models = self.model_manager.get_cached_models()
+            
+            # Add to list
+            for model in models:
+                model_id = model["id"]
+                is_cached = model_id in cached_models
+                
+                item = QListWidgetItem(model_id + (" (cached)" if is_cached else ""))
+                item.setData(Qt.ItemDataRole.UserRole, {"id": model_id, "is_cached": is_cached})
+                self.model_list.addItem(item)
+                
+        except Exception as e:
+            self.model_list.clear()
+            error_item = QListWidgetItem(f"Error searching models: {str(e)}")
+            error_item.setFlags(error_item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+            self.model_list.addItem(error_item)
+            self.logger.error(f"Error searching local models: {str(e)}")
     
     def load_available_tools(self):
         """Load available tools"""
@@ -427,7 +601,6 @@ class CreateAgentDialog(QDialog):
             item.setData(Qt.ItemDataRole.UserRole, tool)
             self.tools_list.addItem(item)
     
-
     def browse_ft_output_dir(self):
         """Browse for fine-tuning output directory"""
         from PyQt6.QtWidgets import QFileDialog
@@ -440,7 +613,7 @@ class CreateAgentDialog(QDialog):
         
         if dir_path:
             self.ft_output_dir_edit.setText(dir_path)
-
+    
     def on_agent_type_changed(self, agent_type):
         """Handle agent type change
         
@@ -475,13 +648,7 @@ class CreateAgentDialog(QDialog):
             self.authorized_imports_edit.setEnabled(True)
         else:
             self.authorized_imports_edit.setEnabled(False)
-        
     
-    """
-    Update to create_agent_dialog.py for video generation
-    """
-
-    # Update the get_agent_config method in CreateAgentDialog class
     def get_agent_config(self) -> Dict[str, Any]:
         """Get the agent configuration from the dialog
         
@@ -526,7 +693,7 @@ class CreateAgentDialog(QDialog):
                 "temperature": self.temperature_spin.value(),
                 "max_tokens": self.max_tokens_spin.value(),
                 "device": self.device_combo.currentText(),
-                "use_local_execution": use_local_execution,  # Added this flag
+                "use_local_execution": use_local_execution,
                 "use_api": not use_local_execution  # Added this flag
             },
             "tools": selected_tools,
@@ -534,7 +701,9 @@ class CreateAgentDialog(QDialog):
                 "description": self.agent_description_edit.text().strip(),
                 "max_history": self.max_history_spin.value(),
                 "authorized_imports": authorized_imports,
-                "is_default": self.default_agent_check.isChecked()
+                "is_default": self.default_agent_check.isChecked(),
+                "use_local_execution": use_local_execution,  # Add to additional config too
+                "use_api": not use_local_execution  # Add to additional config too
             }
         }
         

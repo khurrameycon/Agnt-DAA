@@ -1,10 +1,12 @@
 """
 Local Model Agent for sagax1
 Runs local Hugging Face models for text generation and chat interactions
+Enhanced with better Inference API support
 """
 
 import os
 import logging
+import json
 from typing import Dict, Any, List, Optional, Callable
 
 from app.agents.base_agent import BaseAgent
@@ -22,6 +24,8 @@ class LocalModelAgent(BaseAgent):
             config: Agent configuration dictionary
                 model_id: Hugging Face model ID
                 device: Device to use (e.g., 'cpu', 'cuda', 'mps')
+                use_api: Whether to use the Hugging Face Inference API (remote execution)
+                use_local_execution: Whether to use local execution (download model)
         """
         super().__init__(agent_id, config)
         
@@ -31,6 +35,15 @@ class LocalModelAgent(BaseAgent):
         self.temperature = config.get("temperature", 0.1)
         self.authorized_imports = config.get("authorized_imports", [])
         
+        # Get execution mode - prioritize explicit flags
+        self.use_api = config.get("use_api", False)
+        self.use_local_execution = config.get("use_local_execution", not self.use_api)
+        
+        # If both flags are somehow set (shouldn't happen), prioritize API mode
+        if self.use_api and self.use_local_execution:
+            self.logger.warning("Both use_api and use_local_execution are set to True. Prioritizing API mode.")
+            self.use_local_execution = False
+        
         self.model = None
         self.is_initialized = False
     
@@ -38,16 +51,11 @@ class LocalModelAgent(BaseAgent):
         """Initialize the model based on config - local or API"""
         if self.is_initialized:
             return
-            
-        # Check execution mode
-        use_api = self.config.get("use_api", False)
-        use_local_execution = self.config.get("use_local_execution", True)
         
-        self.logger.info(f"Initializing model {self.model_id} with mode: " + 
-                        ("API" if use_api else "Local"))
+        self.logger.info(f"Initializing model {self.model_id} with mode: {'API' if self.use_api else 'Local'}")
         
         try:
-            if use_api:
+            if self.use_api:
                 # Use API mode - don't download the model at all
                 self._initialize_api_model()
             else:
@@ -64,123 +72,81 @@ class LocalModelAgent(BaseAgent):
             self.logger.error(traceback.format_exc())
             
             # Only try fallbacks for local execution - don't automatically download if API fails
-            if not use_api:
+            if not self.use_api:
                 self._initialize_with_fallbacks()
             else:
                 # For API mode, just raise the error without downloading
                 raise
 
     def _initialize_api_model(self):
-        """Initialize the model using a direct REST API request to Hugging Face Inference"""
-        # Get API key from environment or config
-        api_key = os.environ.get("HF_API_KEY")
+        """Initialize the model by wrapping a direct HTTP call to the HF Inference API."""
+        from app.core.config_manager import ConfigManager
+        import requests
+
+        # 1. Retrieve API key
+        api_key = ConfigManager().get_hf_api_key()
+        self.logger.info(f"Loaded HF API key: {api_key!r}")
         if not api_key:
-            # Try to get from config manager if available
+            self.logger.error("No API key found. Cannot use Inference API.")
+            raise ValueError("HuggingFace API key is required for Inference API mode")
+        
+        # 2. Prepare headers once
+        headers = {
+            "Authorization": f"Bearer {api_key}"
+        }
+
+        # 3. Build the base URL for your model
+        base_url = f"https://router.huggingface.co/hf-inference/models/{self.model_id}/v1/chat/completions"
+
+        # 4. The wrapper function
+        def generate_text(messages):
             try:
-                if hasattr(self, 'config_manager') and self.config_manager is not None:
-                    api_key = self.config_manager.get_hf_api_key()
-            except:
-                pass
-        
-        if not api_key:
-            self.logger.warning("No API key found for Inference API. API access may be limited.")
-        
-        # Use direct REST API approach for inference
-        try:
-            import requests
-            import json
-            
-            # Store API information
-            self.api_key = api_key
-            self.api_url = f"https://api-inference.huggingface.co/models/{self.model_id}"
-            self.headers = {"Authorization": f"Bearer {self.api_key}"}
-            
-            # Create a simple wrapper function that mimics the model interface
-            def generate_text(messages):
-                try:
-                    if isinstance(messages, list) and messages:
-                        # Format the input for the inference API
-                        if isinstance(messages[-1], dict) and 'content' in messages[-1]:
-                            # Handle modern message format
-                            prompt = messages[-1]["content"]
-                            if isinstance(prompt, list):  # Handle content lists
-                                prompt = " ".join([item.get("text", "") for item in prompt if item.get("type") == "text"])
+                # --- extract prompt from messages (your existing logic) ---
+                prompt = ""
+                if isinstance(messages, list) and messages:
+                    last = messages[-1]
+                    if isinstance(last, dict) and "content" in last:
+                        content = last["content"]
+                        if isinstance(content, list):
+                            prompt = " ".join(
+                                item.get("text", "")
+                                for item in content
+                                if item.get("type") == "text"
+                            )
                         else:
-                            # Handle string or other formats
-                            prompt = str(messages[-1])
-                        
-                        # Check if the model accepts chat format
-                        is_chat_model = any(chat_term in self.model_id.lower() for chat_term in ["chat", "instruct", "llama", "mistral"])
-                        
-                        if is_chat_model:
-                            # Use chat completions API for chat models
-                            payload = {
-                                "inputs": {
-                                    "messages": [
-                                        {"role": "user", "content": prompt}
-                                    ]
-                                },
-                                "parameters": {
-                                    "max_new_tokens": self.max_new_tokens,
-                                    "temperature": self.temperature,
-                                    "do_sample": True
-                                }
-                            }
-                        else:
-                            # Use text generation API for non-chat models
-                            payload = {
-                                "inputs": prompt,
-                                "parameters": {
-                                    "max_new_tokens": self.max_new_tokens,
-                                    "temperature": self.temperature,
-                                    "do_sample": True
-                                }
-                            }
-                        
-                        # Make request to API
-                        response = requests.post(self.api_url, headers=self.headers, json=payload)
-                        
-                        # Handle response
-                        if response.status_code == 200:
-                            result = response.json()
-                            
-                            # Different models return different formats
-                            if isinstance(result, list) and len(result) > 0:
-                                if 'generated_text' in result[0]:
-                                    return result[0]['generated_text']
-                                else:
-                                    return str(result[0])
-                            elif isinstance(result, dict):
-                                if 'generated_text' in result:
-                                    return result['generated_text']
-                                elif 'choices' in result and len(result['choices']) > 0:
-                                    return result['choices'][0].get('message', {}).get('content', str(result))
-                                else:
-                                    return str(result)
-                            else:
-                                return str(result)
-                        else:
-                            error_msg = f"API error: {response.status_code} - {response.text}"
-                            self.logger.error(error_msg)
-                            
-                            # If it's a payment issue, provide more helpful message
-                            if response.status_code == 402:
-                                return "Error: This model requires additional payment credits. Please try a smaller model or switch to local execution mode."
-                            
-                            return f"Error calling Inference API: {error_msg}"
+                            prompt = content
                     else:
-                        return "Error: Invalid input format for inference API."
-                except Exception as e:
-                    self.logger.error(f"Inference API error: {str(e)}")
-                    return f"Error calling Inference API: {str(e)}"
-            
-            # Assign the wrapper as our model
-            self.model = generate_text
-            self.logger.info(f"Initialized {self.model_id} using direct REST API for inference")
-            
-        except Exception as e:
-            self.logger.error(f"Failed to initialize Inference API: {str(e)}")
-            raise
+                        prompt = str(last)
+                # ----------------------------------------------------------
+
+                # 5. Build payload exactly as in your test
+                payload = {
+                    "model": self.model_id,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": self.max_new_tokens,
+                    "temperature": float(self.temperature),
+                }
+
+                # 6. POST to the inference endpoint
+                resp = requests.post(base_url, headers=headers, json=payload)
+
+                # 7. Error handling
+                if resp.status_code != 200:
+                    self.logger.error(f"Inference API HTTP {resp.status_code}: {resp.text}")
+                    return f"Error calling Inference API: {resp.status_code} {resp.text}"
+
+                data = resp.json()
+                return data["choices"][0]["message"]["content"]
+
+            except Exception as e:
+                self.logger.error(f"Inference API exception: {e}")
+                return f"Error calling Inference API: {e}"
+
+        # 8. Bind it and log
+        self.model = generate_text
+        self.logger.info(f"Initialized {self.model_id} via direct HTTP inference")
+
+
 
     def _initialize_local_model(self):
         """Initialize the model locally"""
@@ -282,6 +248,10 @@ class LocalModelAgent(BaseAgent):
                     ]
                 }
             ]
+            
+            # If using API mode and callback is provided, show "Processing with API..." message
+            if self.use_api and callback:
+                callback("Processing with Hugging Face Inference API...")
             
             # Call the model with the correctly formatted messages
             response = self.model(messages)

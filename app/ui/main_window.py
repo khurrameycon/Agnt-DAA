@@ -218,7 +218,7 @@ class MainWindow(QMainWindow):
         help_menu.addAction(about_action)
     
     def create_chat_tab(self):
-        """Create the chat tab"""
+        """Create the chat tab with enhanced support for execution mode display"""
         chat_tab = QWidget()
         layout = QVBoxLayout(chat_tab)
         
@@ -244,6 +244,11 @@ class MainWindow(QMainWindow):
         create_button = QPushButton("Create New")
         create_button.clicked.connect(self.create_new_agent)
         agent_layout.addWidget(create_button)
+        
+        # Add execution mode indicator label
+        self.execution_mode_label = QLabel("Mode: Not Selected")
+        self.execution_mode_label.setStyleSheet("font-style: italic; color: #666;")
+        agent_layout.addWidget(self.execution_mode_label)
         
         agent_layout.addStretch()
         top_layout.addLayout(agent_layout)
@@ -392,13 +397,14 @@ class MainWindow(QMainWindow):
             self.agent_list.addItem(item)
     
     def on_agent_selected(self, agent_id: str):
-        """Handle agent selection
+        """Handle agent selection with enhanced execution mode display
         
         Args:
             agent_id: ID of the selected agent
         """
         if not agent_id or agent_id == "No agents available":
             self.agent_info.setText("No agent selected")
+            self.execution_mode_label.setText("Mode: Not Selected")
             return
         
         try:
@@ -413,9 +419,20 @@ class MainWindow(QMainWindow):
             info_text = f"Agent: {agent_id}\nType: {agent_type}\nModel: {model_id}\nTools: {tools}"
             self.agent_info.setText(info_text)
             
+            # Update execution mode label
+            use_api = agent_config["model_config"].get("use_api", False)
+            if use_api:
+                self.execution_mode_label.setText("Mode: Inference API")
+                self.execution_mode_label.setStyleSheet("color: #2E86C1; font-weight: bold;")
+            else:
+                self.execution_mode_label.setText("Mode: Local Model")
+                self.execution_mode_label.setStyleSheet("color: #27AE60; font-weight: bold;")
+            
         except Exception as e:
             self.logger.error(f"Error getting agent config: {str(e)}")
             self.agent_info.setText(f"Error: {str(e)}")
+            self.execution_mode_label.setText("Mode: Unknown")
+            self.execution_mode_label.setStyleSheet("color: #E74C3C; font-style: italic;")
     
     def on_agent_list_selection_changed(self):
         """Handle agent list selection change"""
