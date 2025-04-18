@@ -75,16 +75,16 @@ class MediaGenTab(QWidget):
         # Media type selection
         media_type_group = QButtonGroup(self)
         
-        self.image_radio = QRadioButton("Image")
+        self.image_radio = QRadioButton("Image Generation")
         self.image_radio.setChecked(True)
         self.image_radio.toggled.connect(self.on_media_type_changed)
         media_type_group.addButton(self.image_radio)
         top_layout.addWidget(self.image_radio)
         
-        self.video_radio = QRadioButton("Video")
-        self.video_radio.toggled.connect(self.on_media_type_changed)
-        media_type_group.addButton(self.video_radio)
-        top_layout.addWidget(self.video_radio)
+        # self.video_radio = QRadioButton("Video")
+        # self.video_radio.toggled.connect(self.on_media_type_changed)
+        # media_type_group.addButton(self.video_radio)
+        # top_layout.addWidget(self.video_radio)
         
         top_layout.addStretch()
         

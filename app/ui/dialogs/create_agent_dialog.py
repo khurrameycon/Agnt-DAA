@@ -386,10 +386,10 @@ class CreateAgentDialog(QDialog):
         
         try:
             # Fetch models with inference endpoints
-            url = "https://huggingface.co/api/models?limit=50&inference_endpoints=true"
-            response = requests.get(url)
+            # url = "https://huggingface.co/api/models?limit=50&inference_endpoints=true"
+            # response = requests.get(url)
             
-            if response.status_code == 200:
+            if False:
                 self.inference_models = response.json()
                 self.inference_models_loaded = True
                 
@@ -397,18 +397,31 @@ class CreateAgentDialog(QDialog):
                 self.populate_inference_models()
             else:
                 self.model_list.clear()
-                error_item = QListWidgetItem(f"Error fetching models: {response.status_code}")
-                error_item.setFlags(error_item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
-                self.model_list.addItem(error_item)
+                # error_item = QListWidgetItem(f"Error fetching models: {response.status_code}")
+                # error_item.setFlags(error_item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+                # self.model_list.addItem(error_item)
                 
                 # Add some default models as fallback
                 fallback_inference_models = [
-                    "meta-llama/Llama-3.2-3B-Instruct",
-                    "mistralai/Mistral-7B-Instruct-v0.2",
-                    "meta-llama/Llama-3.2-70B-Instruct",
+                    "Qwen/QwQ-32B",
+                    "mistralai/Mistral-7B-Instruct-v0.3",
+                    "meta-llama/Llama-3.1-8B-Instruct",
+                    "meta-llama/Llama-3.3-70B-Instruct",
+                    "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+                    "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+                    "mistralai/Mixtral-8x7B-Instruct-v0.1",
+                    "Qwen/Qwen2.5-Coder-32B-Instruct",
                     "microsoft/Phi-3-mini-4k-instruct",
-                    "microsoft/Phi-3-mini-128k-instruct",
-                    "google/gemma-7b-it"
+                    "HuggingFaceH4/zephyr-7b-beta",
+                    "distilbert/distilgpt2",
+                    "Qwen/Qwen2.5-72B-Instruct",
+                    "NousResearch/Hermes-3-Llama-3.1-8B",
+                    "CohereLabs/c4ai-command-r-plus-08-2024",
+                    "nvidia/Llama-3.1-Nemotron-70B-Instruct-HF",
+                    "microsoft/DialoGPT-medium",
+                    "EleutherAI/gpt-neo-1.3B",
+                    "mistralai/Mistral-Nemo-Instruct-2407",
+                    "microsoft/Phi-3.5-mini-instruct"
                 ]
                 
                 for model_id in fallback_inference_models:

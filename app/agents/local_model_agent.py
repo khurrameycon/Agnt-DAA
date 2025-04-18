@@ -73,7 +73,7 @@ class LocalModelAgent(BaseAgent):
             
             # Only try fallbacks for local execution - don't automatically download if API fails
             if not self.use_api:
-                self._initialize_with_fallbacks()
+                raise # self._initialize_with_fallbacks()
             else:
                 # For API mode, just raise the error without downloading
                 raise

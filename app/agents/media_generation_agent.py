@@ -1,6 +1,7 @@
 """
 Media Generation Agent for sagax1
 Agent for generating images and videos from text prompts using Hugging Face spaces
+Updated to ignore user-selected model and use direct Space APIs
 """
 
 import os
@@ -16,6 +17,7 @@ from smolagents import Tool, CodeAgent
 
 # Known working image generation spaces
 FALLBACK_IMAGE_SPACES = [
+    "Efficient-Large-Model/SanaSprint",
     "black-forest-labs/FLUX.1-schnell",  # Fast version
     "black-forest-labs/FLUX.1-dev",      # Higher quality version
     "stabilityai/sdxl",                  # Another alternative
@@ -38,7 +40,7 @@ class MediaGenerationAgent(BaseAgent):
         Args:
             agent_id: Unique identifier for this agent
             config: Agent configuration dictionary
-                model_id: Hugging Face model ID
+                model_id: Hugging Face model ID (will be ignored for media generation)
                 device: Device to use (e.g., 'cpu', 'cuda', 'mps')
                 max_tokens: Maximum number of tokens to generate
                 temperature: Temperature for generation
@@ -47,6 +49,7 @@ class MediaGenerationAgent(BaseAgent):
         """
         super().__init__(agent_id, config)
         
+        # These model settings are kept for compatibility but won't affect media generation
         self.model_id = config.get("model_id", "meta-llama/Llama-3.2-3B-Instruct")
         self.device = config.get("device", "auto")
         self.max_tokens = config.get("max_tokens", 2048)
@@ -72,72 +75,18 @@ class MediaGenerationAgent(BaseAgent):
         self.generated_media = []
     
     def initialize(self) -> None:
-        """Initialize the model and agent"""
+        """Initialize media generation tools directly without using the language model"""
         if self.is_initialized:
             return
         
         try:
-            from smolagents import TransformersModel, HfApiModel, OpenAIServerModel, LiteLLMModel
-            
-            self.logger.info(f"Initializing media generation agent with model {self.model_id}")
-            
-            # Try to create the model based on the model_id
-            try:
-                # First try TransformersModel for local models
-                model = TransformersModel(
-                    model_id=self.model_id,
-                    device_map=self.device,
-                    max_new_tokens=self.max_tokens,
-                    temperature=self.temperature,
-                    do_sample=True,
-                    trust_remote_code=True
-                )
-                self.logger.info(f"Using TransformersModel for {self.model_id}")
-            except Exception as e:
-                self.logger.warning(f"Failed to load model with TransformersModel: {str(e)}")
-                
-                # Try HfApiModel for API-based models
-                try:
-                    model = HfApiModel(
-                        model_id=self.model_id,
-                        max_tokens=self.max_tokens,
-                        temperature=self.temperature
-                    )
-                    self.logger.info(f"Using HfApiModel for {self.model_id}")
-                except Exception as e:
-                    self.logger.warning(f"Failed to load model with HfApiModel: {str(e)}")
-                    
-                    # Fallback to OpenAI-compatible API
-                    try:
-                        model = OpenAIServerModel(
-                            model_id=self.model_id,
-                            max_tokens=self.max_tokens,
-                            temperature=self.temperature
-                        )
-                        self.logger.info(f"Using OpenAIServerModel for {self.model_id}")
-                    except Exception as e:
-                        self.logger.warning(f"Failed to load model with OpenAIServerModel: {str(e)}")
-                        
-                        # Final fallback to LiteLLM
-                        model = LiteLLMModel(
-                            model_id=self.model_id,
-                            max_tokens=self.max_tokens,
-                            temperature=self.temperature
-                        )
-                        self.logger.info(f"Using LiteLLMModel for {self.model_id}")
+            # Skip model initialization - we don't need it for direct media generation
+            self.logger.info("Initializing media generation tools (without language model)")
             
             # Initialize image and video generation tools
             self._initialize_tools_with_failsafe()
             
-            # Create the agent with both tools
-            tools = [tool for tool in [self.image_tool, self.video_tool] if tool is not None]
-            self.agent = CodeAgent(
-                tools=tools,
-                model=model,
-                additional_authorized_imports=["PIL", "gradio_client"] + self.authorized_imports,
-                verbosity_level=1
-            )
-            
+            # We don't need to create an agent for direct tool usage
             self.is_initialized = True
             self.logger.info(f"Media generation agent {self.agent_id} initialized successfully")
             
@@ -236,7 +185,7 @@ class MediaGenerationAgent(BaseAgent):
         self.video_tool = None
     
     def run(self, input_text: str, callback: Optional[Callable[[str], None]] = None) -> str:
-        """Run the agent with the given input
+        """Run the agent with the given input - directly calling tools without using a language model
         
         Args:
             input_text: Input text for the agent
@@ -288,7 +237,11 @@ class MediaGenerationAgent(BaseAgent):
             Result message with image information
         """
         try:
-            # Simplified direct tool usage to bypass CodeAgent complexities
+            # Update progress if callback is provided
+            if callback:
+                callback("Generating image, please wait...")
+            
+            # Directly use the image generation tool
             self.logger.info(f"Directly using image_generator tool with prompt: {prompt}")
             image_result = self.image_tool(prompt)
             
@@ -312,23 +265,23 @@ You can view the image in the display area above and save it using the 'Save Med
                     return result_message
             else:
                 # Handle other return types (like URLs or base64)
-                return f"Image generated successfully using {self.image_space_id}. Result: {str(image_result)}"
+                return f"Image generated successfully. Result: {str(image_result)}"
                 
         except Exception as direct_error:
-            self.logger.warning(f"Direct tool usage failed: {str(direct_error)}. Falling back to agent.")
+            self.logger.error(f"Error in image generation: {str(direct_error)}")
+            import traceback
+            self.logger.error(traceback.format_exc())
             
-            # Fall back to using the agent
-            result = self.agent.run(
-                f"""Generate an image based on this prompt: '{prompt}'
-                Use the image_generator tool to create the image.
-                When complete, combine the description and file location into a single string 
-                like "The image shows [description]. It has been saved to [location]." 
-                and pass that to final_answer()."""
-            )
-            
-            # Add to history
-            self.add_to_history(f"Generate an image: {prompt}", str(result))
-            return str(result)
+            return f"""
+Sorry, I encountered an error while generating the image: {str(direct_error)}
+
+This could be due to:
+- The image generation service being temporarily unavailable
+- An issue with the prompt
+- Connection problems with the Hugging Face space
+
+Please try again with a different prompt or try later when the service might be available.
+"""
     
     def _generate_video(self, prompt: str, callback: Optional[Callable[[str], None]] = None) -> str:
         """Generate a video based on the prompt
@@ -513,9 +466,8 @@ You can view the image in the display area above and save it using the 'Save Med
     
     def reset(self) -> None:
         """Reset the agent's state"""
-        if self.agent:
-            # Reset the agent's memory
-            self.agent.memory.reset()
+        # Clean up old media files
+        self._clean_old_media()
         
         self.clear_history()
     

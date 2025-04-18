@@ -16,12 +16,13 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QSize, QThread, pyqtSlot
 from PyQt6.QtGui import QIcon, QAction, QFont
-
+from PyQt6.QtWidgets import QTextBrowser
 from app.core.config_manager import ConfigManager
 from app.core.agent_manager import AgentManager
 from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
 from app.ui.components.conversation import ConversationWidget
 from app.ui.components.fine_tuning_tab import FineTuningTab
+import markdown 
 
 class AgentThread(QThread):
     """Thread for running agents to keep UI responsive"""
@@ -216,6 +217,54 @@ class MainWindow(QMainWindow):
         about_action = QAction("&About", self)
         about_action.triggered.connect(self.show_about)
         help_menu.addAction(about_action)
+    
+
+    def convert_markdown_to_html(self, markdown_text):
+        """Convert markdown text to HTML for display
+        
+        Args:
+            markdown_text: Markdown formatted text
+            
+        Returns:
+            HTML formatted text
+        """
+        try:
+            # Use the markdown library to convert to HTML
+            html = markdown.markdown(markdown_text, extensions=['tables', 'fenced_code'])
+            
+            # Add some basic styling
+            styled_html = f"""
+            <html>
+            <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; margin: 20px; }}
+                h1 {{ color: #2c3e50; font-size: 24px; margin-top: 20px; margin-bottom: 10px; }}
+                h2 {{ color: #3498db; font-size: 20px; margin-top: 15px; margin-bottom: 10px; }}
+                h3 {{ color: #2980b9; font-size: 16px; margin-top: 10px; margin-bottom: 5px; }}
+                a {{ color: #3498db; text-decoration: none; }}
+                a:hover {{ text-decoration: underline; }}
+                pre {{ background-color: #f8f8f8; padding: 10px; border-radius: 5px; overflow-x: auto; }}
+                code {{ font-family: Consolas, monospace; }}
+                blockquote {{ border-left: 4px solid #3498db; padding-left: 10px; color: #7f8c8d; margin-left: 20px; }}
+                ul, ol {{ padding-left: 30px; }}
+                li {{ margin-bottom: 5px; }}
+                p {{ margin-bottom: 10px; line-height: 1.5; }}
+                table {{ border-collapse: collapse; width: 100%; margin-bottom: 15px; }}
+                th, td {{ border: 1px solid #ddd; padding: 8px; }}
+                th {{ background-color: #f2f2f2; text-align: left; }}
+                tr:nth-child(even) {{ background-color: #f9f9f9; }}
+            </style>
+            </head>
+            <body>
+            {html}
+            </body>
+            </html>
+            """
+            return styled_html
+        except Exception as e:
+            # Fallback if markdown conversion fails
+            self.logger.error(f"Error converting markdown to HTML: {str(e)}")
+            return f"<pre>{markdown_text}</pre>"
     
     def create_chat_tab(self):
         """Create the chat tab with enhanced support for execution mode display"""
@@ -826,9 +875,10 @@ class MainWindow(QMainWindow):
         web_content_layout = QVBoxLayout(web_content_panel)
         
         # Create a read-only text area for showing web content
-        self.web_content_display = QTextEdit()
-        self.web_content_display.setReadOnly(True)
+        self.web_content_display = QTextBrowser()  # Changed to QTextBrowser
+        self.web_content_display.setOpenExternalLinks(True)  # Allow clicking on links
         self.web_content_display.setPlaceholderText("Web content will be displayed here")
+
         web_content_layout.addWidget(QLabel("Web Content:"))
         web_content_layout.addWidget(self.web_content_display)
         
@@ -905,7 +955,7 @@ class MainWindow(QMainWindow):
         )
 
     def handle_web_result(self, result: str):
-        """Handle web browsing agent result - display clean, properly formatted search results with clickable links
+        """Handle web browsing agent result - display markdown content with proper rendering
         
         Args:
             result: Agent result
@@ -914,45 +964,54 @@ class MainWindow(QMainWindow):
         self.web_conversation.add_message(result, is_user=False)
         
         try:
-            # Convert search results to HTML for better display in UI with clickable links
-            html_content = "<html><body style='font-family: Arial, sans-serif;'>"
-            lines = result.split("\n")
+            # Check if the result looks like it contains markdown
+            contains_markdown = any(marker in result for marker in ['#', '```', '*', '[', '|', '>'])
             
-            i = 0
-            while i < len(lines):
-                line = lines[i].strip()
+            if contains_markdown:
+                # Convert markdown to HTML
+                html_content = self.convert_markdown_to_html(result)
+                self.web_content_display.setHtml(html_content)
+            else:
+                # Fall back to the existing HTML conversion for simple search results
+                html_content = "<html><body style='font-family: Arial, sans-serif;'>"
+                lines = result.split("\n")
                 
-                # Handle title line
-                if "Search Results for:" in line:
-                    html_content += f"<h2>{line}</h2>"
-                    i += 1
-                    continue
+                i = 0
+                while i < len(lines):
+                    line = lines[i].strip()
                     
-                # Check if this line is a title and the next is a URL
-                if i < len(lines) - 1:
-                    next_line = lines[i+1].strip()
-                    # If current line is not a URL but the next line is
-                    if (not line.startswith("http")) and next_line.startswith("http"):
-                        # This is a title followed by URL
-                        html_content += f"<p><b>{line}</b><br>"
-                        html_content += f"<a href='{next_line}' style='color: #0066cc;'>{next_line}</a></p>"
-                        i += 2  # Skip both lines
+                    # Handle title line
+                    if "Search Results for:" in line:
+                        html_content += f"<h2>{line}</h2>"
+                        i += 1
                         continue
+                        
+                    # Check if this line is a title and the next is a URL
+                    if i < len(lines) - 1:
+                        next_line = lines[i+1].strip()
+                        # If current line is not a URL but the next line is
+                        if (not line.startswith("http")) and next_line.startswith("http"):
+                            # This is a title followed by URL
+                            html_content += f"<p><b>{line}</b><br>"
+                            html_content += f"<a href='{next_line}' style='color: #0066cc;'>{next_line}</a></p>"
+                            i += 2  # Skip both lines
+                            continue
+                    
+                    # Regular text line
+                    if line:
+                        # Check if this is a URL
+                        if line.startswith("http"):
+                            html_content += f"<p><a href='{line}' style='color: #0066cc;'>{line}</a></p>"
+                        else:
+                            html_content += f"<p>{line}</p>"
+                    
+                    i += 1
                 
-                # Regular text line
-                if line:
-                    # Check if this is a URL
-                    if line.startswith("http"):
-                        html_content += f"<p><a href='{line}' style='color: #0066cc;'>{line}</a></p>"
-                    else:
-                        html_content += f"<p>{line}</p>"
+                html_content += "</body></html>"
                 
-                i += 1
-            
-            html_content += "</body></html>"
-            
-            # Set content as HTML
-            self.web_content_display.setHtml(html_content)
+                # Set content as HTML
+                self.web_content_display.setHtml(html_content)
+        
         except Exception as e:
             # Fallback if HTML processing fails
             self.web_content_display.setText(result)
