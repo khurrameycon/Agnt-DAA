@@ -233,7 +233,6 @@ def _style_tab_widgets(window):
             "Code Generation": "code",
             "Media Generation": "media",
             "Fine-Tuning": "fine_tuning",
-            "RAG": "search",
             "Agents": "agents",
             "Settings": "settings"
         }

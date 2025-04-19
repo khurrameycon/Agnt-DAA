@@ -23,7 +23,6 @@ from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
 from app.ui.components.conversation import ConversationWidget
 from app.ui.components.fine_tuning_tab import FineTuningTab
 import markdown 
-from app.agents.rag_agent import RagAgent
 
 class AgentThread(QThread):
     """Thread for running agents to keep UI responsive"""
@@ -139,7 +138,6 @@ class MainWindow(QMainWindow):
         self.create_code_gen_tab()
         self.create_media_gen_tab()
         self.create_fine_tuning_tab()
-        self.create_rag_tab()
         self.create_agents_tab()
         self.create_settings_tab()
         
@@ -1406,72 +1404,6 @@ class MainWindow(QMainWindow):
                 # Switch to fine-tuning tab
                 self.tabs.setCurrentWidget(self.fine_tuning_tab)
 
-
-    def create_rag_tab(self):
-        """Create the RAG tab for document retrieval and question answering"""
-        from app.ui.components.rag_tab import RagTab
-        
-        # Create tab
-        self.rag_tab = RagTab(self.agent_manager, self)
-        
-        # Load agents
-        self.rag_tab.load_agents()
-        
-        # Add tab
-        self.tabs.addTab(self.rag_tab, "RAG")
-
-    def create_rag_agent(self):
-        """Create a new RAG agent"""
-        from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
-        
-        # Create dialog
-        dialog = CreateAgentDialog(self.agent_manager, self)
-        
-        # Set agent type to rag
-        index = dialog.agent_type_combo.findText("rag")
-        if index >= 0:
-            dialog.agent_type_combo.setCurrentIndex(index)
-        
-        # Show dialog
-        if dialog.exec():
-            # Get agent configuration
-            agent_config = dialog.get_agent_config()
-            
-            # Ensure we have the required configurations
-            if "additional_config" not in agent_config:
-                agent_config["additional_config"] = {}
-            
-            if "rag_space_id" not in agent_config["additional_config"]:
-                agent_config["additional_config"]["rag_space_id"] = "AdrienB134/rag_ColPali_Qwen2VL"
-            
-            if "fallback_space_id" not in agent_config["additional_config"]:
-                agent_config["additional_config"]["fallback_space_id"] = "openfree/PDF-RAG"
-            
-            # Create agent
-            agent_id = self.agent_manager.create_agent(
-                agent_id=agent_config["agent_id"],
-                agent_type=agent_config["agent_type"],
-                model_config=agent_config["model_config"],
-                tools=agent_config["tools"],
-                additional_config=agent_config["additional_config"]
-            )
-            
-            if agent_id:
-                # Show success message
-                self.status_bar.showMessage(f"RAG agent '{agent_id}' created", 3000)
-                
-                # Reload agents
-                self.rag_tab.load_agents()
-                
-                # Switch to RAG tab
-                self.tabs.setCurrentWidget(self.rag_tab)
-            else:
-                from PyQt6.QtWidgets import QMessageBox
-                QMessageBox.warning(
-                    self,
-                    "Agent Creation Failed",
-                    "Failed to create RAG agent. Check the logs for details."
-                )
 # Import and apply the main window enhancements
 try:
     from app.utils.main_window_enhancements import enhance_main_window
