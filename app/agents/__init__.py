@@ -7,6 +7,9 @@ from app.agents.local_model_agent import LocalModelAgent
 from app.agents.web_browsing_agent import WebBrowsingAgent
 from app.agents.visual_web_agent import VisualWebAgent
 from app.agents.code_gen_agent import CodeGenerationAgent
+from app.agents.media_generation_agent import MediaGenerationAgent
+from app.agents.fine_tuning_agent import FineTuningAgent
+from app.agents.rag_agent import RagAgent
 from app.agents.agent_registry import AgentRegistry
 
 __all__ = [
@@ -15,5 +18,8 @@ __all__ = [
     "WebBrowsingAgent", 
     "VisualWebAgent", 
     "CodeGenerationAgent", 
+    "MediaGenerationAgent",
+    "FineTuningAgent",
+    "RagAgent",
     "AgentRegistry"
 ]
