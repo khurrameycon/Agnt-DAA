@@ -6,10 +6,31 @@ from PyInstaller.utils.hooks import collect_data_files, collect_submodules, copy
 
 block_cipher = None
 
+# Add duckduckgo_search binaries explicitly
+binaries = []
+try:
+    import duckduckgo_search
+    duckduckgo_search_path = os.path.dirname(duckduckgo_search.__file__)
+    for f in os.listdir(duckduckgo_search_path):
+        if f.endswith('.so') or f.endswith('.pyd'):
+            full_path = os.path.join(duckduckgo_search_path, f)
+            binaries.append((full_path, 'duckduckgo_search'))
+    
+    # Add libs directory if it exists
+    libs_path = os.path.join(duckduckgo_search_path, 'libs')
+    if os.path.exists(libs_path):
+        for f in os.listdir(libs_path):
+            if f.endswith('.so') or f.endswith('.pyd'):
+                full_path = os.path.join(libs_path, f)
+                binaries.append((full_path, 'duckduckgo_search/libs'))
+except ImportError:
+    print("WARNING: duckduckgo_search not found")
+
 # Define all packages that need complete collection
 packages_to_collect = [
-    'PyQt6', 'torch', 'transformers', 'huggingface_hub', 'selenium', 
-    'webdriver_manager', 'smolagents', 'gradio_client', 'httpx', 'certifi', 'duckduckgo-search'
+    'PyQt6', 'transformers', 'huggingface_hub', 'selenium', 
+    'webdriver_manager', 'smolagents', 'gradio_client', 'httpx', 'certifi', 
+    'duckduckgo_search', 'markdown'
 ]
 
 # Add data files for packages that need them
@@ -22,7 +43,7 @@ for package in packages_to_collect:
         print(f"Warning: Could not collect data files for {package}: {e}")
 
 # Add metadata for certificate handling and other important packages
-metadata_packages = ['certifi', 'gradio_client', 'httpx']
+metadata_packages = ['certifi', 'gradio_client', 'httpx', 'requests', 'duckduckgo_search']
 for package in metadata_packages:
     try:
         metadata = copy_metadata(package)
@@ -34,38 +55,49 @@ for package in metadata_packages:
 datas.extend([
     ('app/', 'app/'),
     ('config/', 'config/'),
-    ('assets/', 'assets/') if os.path.exists('assets') else ('', '')
+    ('assets/', 'assets/') if os.path.exists('assets') else ('assets', 'assets')
 ])
 
-# Create necessary directories if they don't exist
-for dir_name in ['logs', 'fine_tuned_models', 'temp']:
-    os.makedirs(dir_name, exist_ok=True)
-    datas.append((dir_name, dir_name))
+# Add SSL certificates from certifi
+import certifi
+datas.append((certifi.where(), 'certifi'))
 
-# Collect hidden imports - add all gradio client related modules
+# Hidden imports
 hidden_imports = [
-    'torch', 'transformers', 'peft', 'huggingface_hub', 'datasets',
+    # Core packages
+    'transformers', 'peft', 'huggingface_hub', 'datasets',
     'smolagents', 'selenium', 'helium', 'PIL', 'pillow', 'bs4', 'pandas', 'numpy',
-    'matplotlib', 'webdriver_manager.chrome', 'webdriver_manager.core',
-    'dotenv', 'logging', 'json', 'requests', 'tqdm', 
-    'gradio_client', 'gradio_client.client', 'gradio_client.serializing',
-    'httpx', 'httpx._config', 'httpx._client', 'httpx._models', 
-    'certifi', 'ssl', 'websockets', 'websockets.client',
-    'huggingface_hub.file_download', 'huggingface_hub.utils',
-    'transformers.utils', 'transformers.models', 'app.agents.agent_registry',
-    'app.agents.web_browsing_agent', 'app.agents.visual_web_agent',
-    'app.agents.code_gen_agent', 'app.agents.local_model_agent',
-    'app.agents.media_generation_agent', 'app.agents.fine_tuning_agent',
-    'app.utils.style_system', 'app.utils.ui_assets', 'app.utils.logging_utils'
+    'matplotlib', 'dotenv', 'logging', 'json', 'requests', 'tqdm', 'markdown',
+    
+    # Web-related
+    'webdriver_manager.chrome', 'webdriver_manager.core',
+    'selenium.webdriver.chrome.service',
+    
+    # Network and SSL
+    'httpx', 'certifi', 'ssl', 'websockets', 'websockets.client',
+    'requests.packages.urllib3.util.ssl_',
+    
+    # App modules and important tools
+    'app.agents.agent_registry',
+    'app.agents.web_browsing_agent', 
+    'app.agents.visual_web_agent',
+    'app.agents.code_gen_agent', 
+    'app.agents.local_model_agent',
+    'app.agents.media_generation_agent', 
+    'app.agents.fine_tuning_agent',
+    'app.agents.base_agent',
+    'app.utils.style_system', 
+    'app.utils.ui_assets', 
+    'app.utils.logging_utils',
+    
+    # Explicitly include duckduckgo_search modules
+    'duckduckgo_search',
+    'duckduckgo_search.duckduckgo_search',
+    'smolagents.default_tools',
 ]
 
-# Add gradio client submodules
-hidden_imports.extend(collect_submodules('gradio_client'))
-hidden_imports.extend(collect_submodules('httpx'))
-
-# Create a runtime hook to set up certificates and temporary directory
-runtime_hooks = []
-with open('hook.py', 'w') as f:
+# Create a file for the runtime hook
+with open('runtime_hook.py', 'w') as f:
     f.write('''
 import os
 import sys
@@ -73,32 +105,50 @@ import tempfile
 import certifi
 import ssl
 
-def setup_app_environment():
-    # Set SSL certificate path
-    os.environ['SSL_CERT_FILE'] = certifi.where()
-    os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
-    
-    # Create and set a temp directory that definitely exists and is writable
-    temp_dir = os.path.join(os.path.dirname(sys.executable), 'temp')
-    os.makedirs(temp_dir, exist_ok=True)
-    os.environ['TMPDIR'] = temp_dir
-    os.environ['TEMP'] = temp_dir
-    os.environ['TMP'] = temp_dir
-    tempfile.tempdir = temp_dir
+# Set SSL certificate path
+os.environ['SSL_CERT_FILE'] = certifi.where()
+os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
 
-setup_app_environment()
+# Create and set a temp directory
+base_dir = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.getcwd()
+temp_dir = os.path.join(base_dir, 'temp')
+os.makedirs(temp_dir, exist_ok=True)
+os.environ['TMPDIR'] = temp_dir
+os.environ['TEMP'] = temp_dir
+os.environ['TMP'] = temp_dir
+tempfile.tempdir = temp_dir
+
+# Create necessary directories
+for dir_name in ['logs', 'fine_tuned_models', 'temp', 'assets/icons']:
+    os.makedirs(os.path.join(base_dir, dir_name), exist_ok=True)
+
+# Add a monkey patch for duckduckgo_search to avoid the compiled module issue
+try:
+    import sys
+    import types
+    
+    # Create an empty module to replace the compiled one
+    mock_module = types.ModuleType('duckduckgo_search.libs.utils_chat__mypyc')
+    sys.modules['duckduckgo_search.libs.utils_chat__mypyc'] = mock_module
+    
+    # Add the minimal functionality needed
+    def get_results_from_chat(chat, *args, **kwargs):
+        return {}
+    
+    mock_module.get_results_from_chat = get_results_from_chat
+except Exception as e:
+    print(f"Failed to monkey patch duckduckgo_search: {e}")
 ''')
-runtime_hooks.append('hook.py')
 
 a = Analysis(
     ['main.py'],
     pathex=[],
-    binaries=[],
+    binaries=binaries,
     datas=datas,
     hiddenimports=hidden_imports,
-    hookspath=[],
+    hookspath=['hooks'],
     hooksconfig={},
-    runtime_hooks=runtime_hooks,
+    runtime_hooks=['runtime_hook.py'],
     excludes=[],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
@@ -124,7 +174,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,
+    icon='assets/icons/sagax1-logo.ico' if os.path.exists('assets/icons/sagax1-logo.ico') else None,
 )
 
 coll = COLLECT(
@@ -135,5 +185,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='sagax1_app',  # Use a different name to avoid permission issues
+    name='sagax1',
 )
