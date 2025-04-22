@@ -138,6 +138,7 @@ class MainWindow(QMainWindow):
         self.create_code_gen_tab()
         self.create_media_gen_tab()
         self.create_fine_tuning_tab()
+        self.create_rag_tab()
         self.create_agents_tab()
         self.create_settings_tab()
         
@@ -154,7 +155,55 @@ class MainWindow(QMainWindow):
 
         # After creating the visual_web_tab
        
+    def create_rag_tab(self):
+        """Create the RAG tab"""
+        from app.ui.components.rag_tab import RagTab
         
+        # Create tab
+        self.rag_tab = RagTab(self.agent_manager, self)
+        
+        # Load agents
+        self.rag_tab.load_agents()
+        
+        # Add tab
+        self.tabs.addTab(self.rag_tab, "RAG")
+
+    def create_rag_agent(self):
+        """Create a new RAG agent"""
+        from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
+        
+        # Create dialog
+        dialog = CreateAgentDialog(self.agent_manager, self)
+        
+        # Set agent type to rag
+        index = dialog.agent_type_combo.findText("rag")
+        if index >= 0:
+            dialog.agent_type_combo.setCurrentIndex(index)
+        
+        # Show dialog
+        if dialog.exec():
+            # Get agent configuration
+            agent_config = dialog.get_agent_config()
+            
+            # Create agent
+            agent_id = self.agent_manager.create_agent(
+                agent_id=agent_config["agent_id"],
+                agent_type=agent_config["agent_type"],
+                model_config=agent_config["model_config"],
+                tools=agent_config["tools"],
+                additional_config=agent_config["additional_config"]
+            )
+            
+            if agent_id:
+                # Show success message
+                self.status_bar.showMessage(f"RAG agent '{agent_id}' created", 3000)
+                
+                # Reload agents
+                self.rag_tab.load_agents()
+                
+                # Switch to RAG tab
+                self.tabs.setCurrentWidget(self.rag_tab)
+
     def check_api_key(self):
         """Check if API key is set and prompt if not"""
         api_key = self.config_manager.get_hf_api_key()

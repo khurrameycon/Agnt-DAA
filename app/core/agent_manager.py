@@ -18,6 +18,7 @@ from app.agents.agent_registry import AgentRegistry
 from smolagents import Tool, DuckDuckGoSearchTool
 from app.agents.fine_tuning_agent import FineTuningAgent
 from app.core.agent_persistence import AgentPersistenceManager
+from app.agents.rag_agent import RAGAgent
 
 class AgentManager:
     """Manages agents and their execution"""
@@ -98,6 +99,7 @@ class AgentManager:
         AgentRegistry.register("code_generation", CodeGenerationAgent)
         AgentRegistry.register("media_generation", MediaGenerationAgent)
         AgentRegistry.register("fine_tuning", FineTuningAgent)
+        AgentRegistry.register("rag", RAGAgent)
         # AgentRegistry.register("chat", LocalModelAgent)
 
 
