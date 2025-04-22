@@ -41,6 +41,26 @@ class CreateAgentDialog(QDialog):
         self.setWindowTitle("Create New Agent")
         self.resize(600, 500)
         
+        self.setStyleSheet("""
+        QDialog {
+            color: black;
+            background-color: #F9FBFD;
+        }
+        
+        QRadioButton, QCheckBox, QLabel, QGroupBox, QComboBox {
+            color: black;
+        }
+        
+        QComboBox QAbstractItemView {
+            color: black;
+            background-color: white;
+        }
+        
+        QListWidget, QListWidget::item {
+            color: black;
+        }
+    """)
+
         # Track if we've loaded inference models
         self.inference_models_loaded = False
         self.inference_models = []
@@ -124,11 +144,13 @@ class CreateAgentDialog(QDialog):
         self.local_mode_radio.setToolTip("Download and run the model locally")
         self.local_mode_radio.setChecked(True)
         self.local_mode_radio.toggled.connect(self.on_execution_mode_changed)
+        self.local_mode_radio.setStyleSheet("color: black;")
         execution_mode_layout.addWidget(self.local_mode_radio)
         
         self.api_mode_radio = QRadioButton("HF API (Remote)")
         self.api_mode_radio.setToolTip("Use the Hugging Face Inference API")
         self.api_mode_radio.toggled.connect(self.on_execution_mode_changed)
+        self.api_mode_radio.setStyleSheet("color: black;")
         execution_mode_layout.addWidget(self.api_mode_radio)
         
         # Help button
@@ -144,7 +166,7 @@ class CreateAgentDialog(QDialog):
         layout.addLayout(execution_layout)
         
         # Add API key info
-        api_info = QLabel("Note: API mode requires a Hugging Face API key in Settings")
+        api_info = QLabel("Note: API mode is FAST but requires a HF API key set and not all models are supported by free tier HF API ")
         api_info.setStyleSheet("color: #666; font-style: italic;")
         layout.addWidget(api_info)
         
@@ -170,6 +192,37 @@ class CreateAgentDialog(QDialog):
         self.model_list.setMinimumHeight(180)  # Make model list taller
         layout.addWidget(self.model_list, 3)  # Give model list more weight in the layout
         
+        # Add this more comprehensive style to fix the transition states
+        self.model_list.setStyleSheet("""
+            QListWidget {
+                color: black;
+                background-color: white;
+                border: 1px solid #E0E0E0;
+            }
+            QListWidget::item {
+                color: black;
+                padding: 4px;
+            }
+            QListWidget::item:selected {
+                background-color: #4F8BC9;
+                color: black; /* Keep text black even when selected */
+            }
+            QListWidget::item:hover {
+                background-color: #E0E0E0;
+                color: black; /* Ensure text stays black on hover */
+            }
+            QListWidget::item:selected:active {
+                background-color: #4F8BC9;
+                color: black; /* Keep text black when actively selected */
+            }
+            QListWidget::item:selected:!active {
+                background-color: #E0E0E0;
+                color: black; /* Keep text black when selected but not active */
+            }
+            QListWidget::item:alternate {
+                background-color: #F9F9F9;
+            }
+        """)
         # Model parameters group - compact
         params_group = QGroupBox("Model Parameters")
         params_layout = QFormLayout(params_group)
@@ -216,6 +269,17 @@ class CreateAgentDialog(QDialog):
         # Update the Device selector availability based on mode
         is_local = self.local_mode_radio.isChecked()
         self.device_combo.setEnabled(is_local)
+        
+        # Enable/disable the search model text box based on mode
+        self.model_search_edit.setEnabled(is_local)
+        self.model_search_button.setEnabled(is_local)
+        
+        # Update visual cue for disabled state
+        if is_local:
+            self.model_search_edit.setPlaceholderText("Search for models")
+        else:
+            self.model_search_edit.setPlaceholderText("Model search disabled in API mode")
+            self.model_search_edit.clear()  # Optionally clear any existing text
         
         # Refresh the model list based on execution mode
         self.load_available_models()

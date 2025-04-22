@@ -201,8 +201,8 @@ class WebBrowsingAgent(BaseAgent):
         }
 
         # 3. Build the base URL for your model
-        base_url = f"https://router.huggingface.co/hf-inference/models/{self.model_id}/v1/chat/completions"
-
+        # base_url = f"https://router.huggingface.co/hf-inference/models/{self.model_id}/v1/chat/completions"
+        base_url = f"https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.3/v1/chat/completions"
         # 4. The wrapper function
         def generate_text(messages):
             try:
@@ -226,7 +226,7 @@ class WebBrowsingAgent(BaseAgent):
 
                 # 5. Build payload exactly as in your test
                 payload = {
-                    "model": self.model_id,
+                    "model": 'mistralai/Mistral-7B-Instruct-v0.3',
                     "messages": [{"role": "user", "content": prompt}],
                     "max_tokens": self.max_tokens,
                     "temperature": float(self.temperature),

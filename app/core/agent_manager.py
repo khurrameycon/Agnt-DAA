@@ -71,15 +71,22 @@ class AgentManager:
 
     def _initialize_available_tools(self) -> Dict[str, Tool]:
         """Initialize the available tools for agents
-        
         Returns:
             Dictionary of available tools
         """
         tools = {}
         
-        # Add web search tool
-        web_search_tool = DuckDuckGoSearchTool()
-        tools[web_search_tool.name] = web_search_tool
+        # Try to add web search tool with error handling
+        try:
+            from smolagents import DuckDuckGoSearchTool
+            web_search_tool = DuckDuckGoSearchTool()
+            tools[web_search_tool.name] = web_search_tool
+        except ImportError as e:
+            self.logger.warning(f"Could not initialize DuckDuckGoSearchTool: {e}")
+            self.logger.warning("Web search functionality will be unavailable")
+        except Exception as e:
+            self.logger.warning(f"Error initializing DuckDuckGoSearchTool: {e}")
+            self.logger.warning("Web search functionality will be unavailable")
         
         return tools
     
