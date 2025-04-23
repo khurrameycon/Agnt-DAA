@@ -75,15 +75,30 @@ class RAGAgent(BaseAgent):
         # Parallel processing
         self.use_parallel = config.get("use_parallel", True)
         self.max_workers = config.get("max_workers", min(8, os.cpu_count() or 1))
-        
+        self.api_key = os.environ.get("HUGGINGFACE_API_KEY") or os.environ.get("HF_API_KEY")
         # Get API key from environment or config
-        self.api_key = os.environ.get("HUGGINGFACE_API_KEY")
-        if not self.api_key and "config_manager" in config:
+        if not self.api_key:
             try:
-                self.api_key = config["config_manager"].get_hf_api_key()
-            except:
-                self.logger.warning("Could not get API key from config manager")
+                # Try to get from config_manager if it exists
+                if "config_manager" in config:
+                    self.api_key = config["config_manager"].get_hf_api_key()
+                    self.logger.info(f"API key from config_manager: {self.api_key is not None}")
+                
+                # If still no API key, try reading directly from config.json
+                if not self.api_key:
+                    config_path = os.path.join(os.path.expanduser("~"), ".sagax1", "config.json")
+                    if os.path.exists(config_path):
+                        try:
+                            with open(config_path, 'r') as f:
+                                config_data = json.load(f)
+                                self.api_key = config_data.get("hf_api_key")
+                                self.logger.info(f"API key from config.json: {self.api_key is not None}")
+                        except Exception as config_e:
+                            self.logger.warning(f"Error reading config.json: {str(config_e)}")
+            except Exception as e:
+                self.logger.warning(f"Could not get API key from config sources: {str(e)}")
         
+        # self.api_key = 'key'
         # Set base directory for storing FAISS indexes
         self.faiss_index_dir = config.get("faiss_index_dir", "./faiss_indexes")
         os.makedirs(self.faiss_index_dir, exist_ok=True)
@@ -685,14 +700,14 @@ Helpful Answer:
                             
                             # Generate response with LLM using retrieved documents as context
                             context = "\n\n".join([doc.page_content for doc in retrieved_docs])
-                            llm = self.qa_chain.combine_docs_chain.llm
+                            llm_chain = self.qa_chain.combine_docs_chain.llm_chain 
                             
                             prompt = self.SYSTEM_PROMPT.format(
                                 question=query,
                                 context=context
                             )
                             
-                            answer = llm.invoke(prompt)
+                            answer = llm_chain.run(context=context, question=query)
                             response["answer"] = answer
                         except Exception as e:
                             self.logger.error(f"Error in hybrid search: {str(e)}")
