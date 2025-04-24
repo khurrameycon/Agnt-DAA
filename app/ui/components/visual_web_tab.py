@@ -1,31 +1,30 @@
 """
-Visual Web Automation Tab Component for sagax1
-Tab for visual web automation agent interaction
-Enhanced with features from the web_browser.ipynb example
+Enhanced Visual Web Tab Component for sagax1
+Tab for visual web automation agent interaction with VLM capabilities
 """
 
 import os
 import logging
 from typing import Optional
+import json
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QTextEdit, 
     QPushButton, QComboBox, QSplitter, QScrollArea, 
-    QMessageBox, QGroupBox, QGridLayout
+    QMessageBox, QGroupBox, QGridLayout, QCheckBox, QFrame
 )
 from PyQt6.QtGui import QPixmap, QImage, QFont
 from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot
 
-from app.agents.visual_web_agent import VisualWebAgent
 from app.core.agent_manager import AgentManager
 from app.ui.components.conversation import ConversationWidget
 
 
 class VisualWebTab(QWidget):
-    """Tab for visual web automation"""
+    """Tab for enhanced visual web automation with VLM integration"""
     
     def __init__(self, agent_manager: AgentManager, parent=None):
-        """Initialize the visual web tab
+        """Initialize the enhanced visual web tab
         
         Args:
             agent_manager: Agent manager instance
@@ -79,18 +78,39 @@ class VisualWebTab(QWidget):
         self.start_stop_button.setEnabled(False)
         top_layout.addWidget(self.start_stop_button)
         
+        # Task selector combobox
+        self.task_selector = QComboBox()
+        self.task_selector.addItems([
+            "Suggest Actions",
+            "Explain Page Content",
+            "Find Elements",
+            "Guide Navigation",
+            "Custom Analysis"
+        ])
+        top_layout.addWidget(self.task_selector)
+        
+        # Analyze button
+        self.analyze_button = QPushButton("Analyze Page")
+        self.analyze_button.clicked.connect(self.analyze_current_page)
+        self.analyze_button.setEnabled(False)
+        top_layout.addWidget(self.analyze_button)
+        
         top_layout.addStretch()
         
         self.layout.addLayout(top_layout)
     
     def create_main_panel(self):
-        """Create main panel with browser view and conversation history"""
-        # Create splitter for browser view and conversation
+        """Create main panel with browser view, analysis results, and conversation history"""
+        # Create splitter for resizable sections
         splitter = QSplitter(Qt.Orientation.Vertical)
         
-        # Browser view
-        browser_widget = QWidget()
-        browser_layout = QVBoxLayout(browser_widget)
+        # Browser view and analysis panel
+        top_panel = QWidget()
+        top_layout = QHBoxLayout(top_panel)
+        
+        # Left side: Browser view
+        browser_panel = QWidget()
+        browser_layout = QVBoxLayout(browser_panel)
         
         # Create scroll area for browser view
         scroll_area = QScrollArea()
@@ -99,26 +119,46 @@ class VisualWebTab(QWidget):
         # Create label for browser screenshot
         self.screenshot_label = QLabel("No screenshot available")
         self.screenshot_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.screenshot_label.setMinimumHeight(600)  # Increased height for better visibility
+        self.screenshot_label.setMinimumHeight(400)
         
         # Add to scroll area
         scroll_area.setWidget(self.screenshot_label)
         browser_layout.addWidget(scroll_area)
         
-        # Add quick command buttons
+        # Add browser controls
         self.add_quick_commands(browser_layout)
         
-        # Add browser widget to splitter
-        splitter.addWidget(browser_widget)
+        top_layout.addWidget(browser_panel, 2)  # Give more space to browser
         
-        # Conversation widget
+        # Right side: Analysis results
+        analysis_panel = QWidget()
+        analysis_layout = QVBoxLayout(analysis_panel)
+        
+        # Analysis text area
+        analysis_layout.addWidget(QLabel("Analysis Results:"))
+        self.analysis_text = QTextEdit()
+        self.analysis_text.setReadOnly(True)
+        self.analysis_text.setPlaceholderText("Use the 'Analyze Page' button to get insights about the current page...")
+        analysis_layout.addWidget(self.analysis_text)
+        
+        # Suggestions area
+        suggestions_group = QGroupBox("Suggested Actions")
+        self.suggestions_layout = QVBoxLayout(suggestions_group)
+        analysis_layout.addWidget(suggestions_group)
+        
+        top_layout.addWidget(analysis_panel, 1)
+        
+        top_panel.setLayout(top_layout)
+        splitter.addWidget(top_panel)
+        
+        # Bottom panel: Conversation
         self.conversation = ConversationWidget()
         splitter.addWidget(self.conversation)
         
-        # Set initial sizes for the splitter sections
-        splitter.setSizes([600, 300])  # Browser view gets more space
+        # Set initial sizes
+        splitter.setSizes([600, 300])
         
-        # Add splitter to layout
+        # Add to main layout
         self.layout.addWidget(splitter, stretch=1)
     
     def add_quick_commands(self, parent_layout):
@@ -172,73 +212,6 @@ class VisualWebTab(QWidget):
         
         parent_layout.addWidget(commands_group)
     
-    def navigate_to_url(self):
-        """Navigate to the URL entered in the URL input field"""
-        if not self.ensure_browser_initialized():
-            return
-        
-        url = self.url_input.toPlainText().strip()
-        if not url:
-            return
-        
-        # Execute the go_to command
-        self.execute_quick_command("go_to", url)
-        
-        # Clear the URL input
-        self.url_input.clear()
-    
-    def execute_quick_command(self, command: str, parameters: str):
-        """Execute a quick command
-        
-        Args:
-            command: Command to execute
-            parameters: Parameters for the command
-        """
-        # Make sure we have a browser
-        if self.current_agent is None or not hasattr(self.current_agent, 'visual_tool') or self.current_agent.visual_tool.browser is None:
-            self.logger.info("Browser not active, attempting to start...")
-            # Use start_stop_browser instead of toggle_browser
-            self.start_stop_browser()
-            
-            # Wait for browser to start
-            import time
-            time.sleep(3)
-            
-            # Check again
-            if self.current_agent is None or not hasattr(self.current_agent, 'visual_tool') or self.current_agent.visual_tool.browser is None:
-                self.logger.error("Browser failed to start")
-                self.show_error_message("Browser Not Started", "Please start the browser first.")
-                return
-        
-        try:
-            # Get the visual tool from the agent
-            visual_tool = self.current_agent.visual_tool
-            
-            # Log what we're doing
-            self.logger.info(f"Executing command: {command} with parameters: {parameters}")
-            
-            # Execute the command
-            result = visual_tool.forward(command, parameters)
-            
-            # Add to conversation
-            self.conversation.add_message(f"Command: {command} {parameters}", is_user=True)
-            self.conversation.add_message(result, is_user=False)
-        except Exception as e:
-            self.logger.error(f"Error executing quick command: {str(e)}")
-            import traceback
-            self.logger.error(traceback.format_exc())
-            self.conversation.add_message(f"Error executing command: {str(e)}", is_user=False)
-    
-    def add_chrome_notice(self):
-        """Add a notice about Chrome being required"""
-        notice = QLabel(
-            "<b>Note:</b> Google Chrome is required for Visual Web Automation. "
-            "Please make sure Chrome is installed on your system."
-        )
-        notice.setStyleSheet("color: #FF6700; background-color: #FFEFDB; padding: 8px; border-radius: 4px;")
-        notice.setWordWrap(True)
-        self.layout.addWidget(notice)
-    
     def create_input_panel(self):
         """Create input panel for user commands"""
         input_layout = QVBoxLayout()
@@ -278,21 +251,15 @@ class VisualWebTab(QWidget):
         
         self.layout.addLayout(input_layout)
     
-    def ensure_browser_initialized(self):
-        """Ensure the browser is properly initialized"""
-        if self.current_agent is None or not hasattr(self.current_agent, 'visual_tool') or self.current_agent.visual_tool.browser is None:
-            # Try to start the browser
-            if self.start_stop_button.text() == "Start Browser":
-                self.start_stop_browser()
-                # Wait a moment for the browser to start
-                import time
-                time.sleep(2)
-                
-            # Check again
-            if self.current_agent is None or not hasattr(self.current_agent, 'visual_tool') or self.current_agent.visual_tool.browser is None:
-                self.show_error_message("Browser Not Started", "Please start the browser first.")
-                return False
-        return True
+    def add_chrome_notice(self):
+        """Add a notice about Chrome being required"""
+        notice = QLabel(
+            "<b>Note:</b> Google Chrome is required for Visual Web Automation. "
+            "The AI Vision features require a valid Hugging Face API key."
+        )
+        notice.setStyleSheet("color: #FF6700; background-color: #FFEFDB; padding: 8px; border-radius: 4px;")
+        notice.setWordWrap(True)
+        self.layout.addWidget(notice)
     
     def on_agent_selected(self, agent_id: str):
         """Handle agent selection
@@ -307,6 +274,7 @@ class VisualWebTab(QWidget):
             self.current_agent = None
             self.start_stop_button.setEnabled(False)
             self.send_button.setEnabled(False)
+            self.analyze_button.setEnabled(False)
             return
         
         try:
@@ -317,9 +285,9 @@ class VisualWebTab(QWidget):
             agent = self.agent_manager.active_agents.get(agent_id)
             
             # If agent exists, connect signals
-            if agent is not None and isinstance(agent, VisualWebAgent):
+            if agent is not None and hasattr(agent, 'screenshot_updated'):
                 # Disconnect from previous agent if any
-                if self.current_agent is not None:
+                if self.current_agent is not None and hasattr(self.current_agent, 'screenshot_updated'):
                     try:
                         self.current_agent.screenshot_updated.disconnect(self.update_screenshot)
                     except:
@@ -335,11 +303,12 @@ class VisualWebTab(QWidget):
                 self.start_stop_button.setEnabled(True)
                 
                 # Enable send button only if browser is started
-                self.send_button.setEnabled(hasattr(agent, 'visual_tool') and 
-                                         agent.visual_tool.browser is not None)
+                browser_started = hasattr(agent, 'browser') and agent.browser is not None
+                self.send_button.setEnabled(browser_started)
+                self.analyze_button.setEnabled(browser_started)
                 
                 # Update button text
-                if hasattr(agent, 'visual_tool') and agent.visual_tool.browser is not None:
+                if browser_started:
                     self.start_stop_button.setText("Stop Browser")
                 else:
                     self.start_stop_button.setText("Start Browser")
@@ -351,8 +320,9 @@ class VisualWebTab(QWidget):
                 self.start_stop_button.setEnabled(True)
                 self.start_stop_button.setText("Start Browser")
                 
-                # Disable send button until browser is started
+                # Disable other buttons until browser is started
                 self.send_button.setEnabled(False)
+                self.analyze_button.setEnabled(False)
                 
         except Exception as e:
             self.logger.error(f"Error selecting agent: {str(e)}")
@@ -361,106 +331,55 @@ class VisualWebTab(QWidget):
             self.current_agent = None
             self.start_stop_button.setEnabled(False)
             self.send_button.setEnabled(False)
+            self.analyze_button.setEnabled(False)
     
-    def clear_input(self):
-        """Clear the command input field"""
-        self.command_input.clear()
-    
-    def show_examples(self):
-        """Show examples of visual web automation commands"""
-        examples = [
-            "Go to wikipedia.org and search for artificial intelligence",
-            "Visit github.com/trending and tell me the top trending repository today",
-            "Go to amazon.com and find the best-selling book in science fiction",
-            "Navigate to news.ycombinator.com and summarize the top 3 stories",
-            "Browse to weather.com and tell me the forecast for New York City"
+    def refresh_agents(self):
+        """Load available agents"""
+        # Clear existing items
+        self.agent_selector.clear()
+        
+        # Get active agents
+        active_agents = self.agent_manager.get_active_agents()
+        
+        # Filter to visual web agents
+        visual_web_agents = [
+            agent for agent in active_agents
+            if agent["agent_type"] == "visual_web"
         ]
         
-        example_message = "Example tasks for the Visual Web Agent:\n\n"
-        for i, example in enumerate(examples, 1):
-            example_message += f"{i}. {example}\n"
-            
-        QMessageBox.information(
-            self,
-            "Visual Web Automation Examples",
-            example_message
-        )
-    
-    def show_error_message(self, title: str, message: str):
-        """Show an error message dialog
+        if not visual_web_agents:
+            self.agent_selector.addItem("No visual web agents available")
+            self.start_stop_button.setEnabled(False)
+            self.send_button.setEnabled(False)
+            self.analyze_button.setEnabled(False)
+            return
         
-        Args:
-            title: Dialog title
-            message: Error message
-        """
-        QMessageBox.warning(self, title, message)
+        # Add to combo box
+        for agent in visual_web_agents:
+            self.agent_selector.addItem(agent["agent_id"])
+        
+        # Select first agent
+        if self.agent_selector.count() > 0:
+            self.agent_selector.setCurrentIndex(0)
     
-
-    def init_browser_manually(self):
-        """Manually initialize the browser as a fallback method"""
-        if self.current_agent is None:
-            self.logger.error("No agent available for manual browser initialization")
-            return False
-            
-        try:
-            self.logger.info("Attempting manual browser initialization...")
-            
-            # Import required libraries
-            import helium
-            from selenium import webdriver
-            from selenium.webdriver.chrome.service import Service
-            from webdriver_manager.chrome import ChromeDriverManager
-            
-            # Configure browser options
-            options = webdriver.ChromeOptions()
-            options.add_argument("--force-device-scale-factor=1")
-            options.add_argument("--window-size=1000,800")
-            options.add_argument("--disable-pdf-viewer")
-            options.add_argument("--window-position=0,0")
-            options.add_argument("--no-sandbox")
-            options.add_argument("--disable-dev-shm-usage")
-            
-            # Start Chrome directly
-            self.logger.info("Starting Chrome directly...")
-            browser_driver = webdriver.Chrome(
-                service=Service(ChromeDriverManager().install()), 
-                options=options
+    def create_agent(self):
+        """Create a new visual web agent"""
+        # Find the main window by traversing up the parent hierarchy
+        main_window = self
+        while main_window and not hasattr(main_window, 'create_visual_web_agent'):
+            main_window = main_window.parent()
+        
+        if main_window and hasattr(main_window, 'create_visual_web_agent'):
+            main_window.create_visual_web_agent()
+        else:
+            # Fallback if we can't find the method
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.warning(
+                self,
+                "Not Implemented",
+                "Create visual web agent functionality not found in main window."
             )
-            
-            # Navigate to a page to verify it works
-            browser_driver.get("https://www.google.com")
-            self.logger.info(f"Browser navigated to: {browser_driver.current_url}")
-            
-            # Set the driver in helium
-            helium.set_driver(browser_driver)
-            
-            # Set the browser in visual_tool
-            if hasattr(self.current_agent, 'visual_tool'):
-                self.current_agent.visual_tool.browser = helium
-                self.current_agent.visual_tool.webdriver = browser_driver
-                
-                # Take a screenshot to verify
-                screenshot_bytes = browser_driver.get_screenshot_as_png()
-                from PIL import Image
-                from io import BytesIO
-                image = Image.open(BytesIO(screenshot_bytes))
-                self.update_screenshot(image)
-                
-                self.logger.info("Manual browser initialization successful")
-                self.start_stop_button.setText("Stop Browser")
-                self.send_button.setEnabled(True)
-                return True
-            else:
-                self.logger.error("Agent doesn't have visual_tool attribute")
-                return False
-                
-        except Exception as e:
-            self.logger.error(f"Manual browser initialization failed: {str(e)}")
-            import traceback
-            self.logger.error(traceback.format_exc())
-            return False
-
-
+    
     def start_stop_browser(self):
         """Toggle browser start/stop"""
         if self.current_agent_id is None:
@@ -476,6 +395,7 @@ class VisualWebTab(QWidget):
                 self.current_agent.cleanup()
                 self.start_stop_button.setText("Start Browser")
                 self.send_button.setEnabled(False)
+                self.analyze_button.setEnabled(False)
                 self.screenshot_label.setPixmap(QPixmap())  # Clear screenshot
                 self.screenshot_label.setText("Browser closed")
             return
@@ -515,34 +435,23 @@ class VisualWebTab(QWidget):
             # Update current agent
             self.current_agent = agent
             
-            # Try normal initialization first
-            try:
-                self.logger.info("Initializing agent with standard method...")
-                agent.initialize()
-                
-                # Wait for browser to potentially start
-                import time
-                time.sleep(2)
-            except Exception as e:
-                self.logger.error(f"Standard initialization failed: {str(e)}")
+            # Initialize the agent (starts the browser)
+            self.logger.info("Initializing agent with standard method...")
+            agent.initialize()
             
-            # Check if browser started
-            if hasattr(agent, 'visual_tool') and agent.visual_tool.browser is not None:
+            # Update UI based on browser status
+            if hasattr(agent, 'browser') and agent.browser is not None:
                 self.logger.info("Browser started with standard method")
                 self.start_stop_button.setText("Stop Browser")
                 self.send_button.setEnabled(True)
+                self.analyze_button.setEnabled(True)
                 self.conversation.add_message("Browser started successfully", is_user=False)
                 return
             
-            # If standard method failed, try manual initialization
-            self.logger.info("Standard browser initialization failed, trying manual method...")
-            if self.init_browser_manually():
-                self.logger.info("Manual browser initialization successful")
-                return
-            
-            # If both methods fail
+            # If we get here, there was a problem starting the browser
             self.start_stop_button.setText("Start Browser")
             self.send_button.setEnabled(False)
+            self.analyze_button.setEnabled(False)
             self.screenshot_label.setText("Failed to start browser")
             self.show_error_message("Browser Error", "Failed to start browser. Please check if Chrome is installed and try again.")
                 
@@ -552,126 +461,321 @@ class VisualWebTab(QWidget):
             self.logger.error(traceback.format_exc())
             self.start_stop_button.setText("Start Browser")
             self.send_button.setEnabled(False)
+            self.analyze_button.setEnabled(False)
             self.screenshot_label.setText(f"Error starting browser: {str(e)}")
             self.show_error_message("Browser Error", f"Could not start Chrome browser: {str(e)}\n\nPlease make sure Google Chrome is installed on your system.")
     
-    def send_command(self):
-        """Send command to agent"""
+    def navigate_to_url(self):
+        """Navigate to the URL entered in the URL input field"""
+        if not self.ensure_browser_initialized():
+            return
+        
+        url = self.url_input.toPlainText().strip()
+        if not url:
+            return
+        
+        # Execute the go_to command
+        self.execute_quick_command("go_to", url)
+        
+        # Clear the URL input
+        self.url_input.clear()
+    
+    def execute_quick_command(self, command: str, parameters: str):
+        """Execute a quick command
+        
+        Args:
+            command: Command to execute
+            parameters: Parameters for the command
+        """
+        if not self.ensure_browser_initialized():
+            return
+        
         try:
-            # Log that the function was called
-            self.logger.info("Send command method called")
+            # Get the visual tool from the agent
+            visual_tool = self.current_agent.visual_tool
             
-            # Check if browser is running
-            if self.current_agent is None or not hasattr(self.current_agent, 'visual_tool') or self.current_agent.visual_tool.browser is None:
-                self.logger.error("Browser not started")
-                self.show_error_message("Browser Not Started", "Please start the browser first.")
-                return
+            # Log what we're doing
+            self.logger.info(f"Executing command: {command} with parameters: {parameters}")
             
-            # Get command
-            command = self.command_input.toPlainText().strip()
-            if not command:
-                self.show_error_message("Empty Command", "Please enter a command for the agent.")
-                return
+            # Execute the command
+            result = visual_tool.forward(command, parameters)
             
             # Add to conversation
-            self.conversation.add_message(command, is_user=True)
-            
-            # Clear input
-            self.command_input.clear()
-            
-            # Disable UI while processing
-            self.command_input.setEnabled(False)
-            self.send_button.setEnabled(False)
-            self.start_stop_button.setEnabled(False)
-            
-            # Show processing message
-            self.conversation.add_message("Processing your request...", is_user=False)
-            
-            # Try simple direct execution first for certain patterns
-            if any(pattern in command.lower() for pattern in ["go to ", "navigate to "]):
-                try:
-                    # Extract URL
-                    url = None
-                    if "go to " in command.lower():
-                        url = command.lower().split("go to ")[1].split()[0].strip()
-                    elif "navigate to " in command.lower():
-                        url = command.lower().split("navigate to ")[1].split()[0].strip()
-                    
-                    if url:
-                        # Make sure URL has protocol
-                        if not url.startswith("http"):
-                            url = "https://" + url
-                            
-                        # Execute directly
-                        self.logger.info(f"Direct execution: Navigating to {url}")
-                        result = self.current_agent.visual_tool.forward("go_to", url)
-                        self.conversation.add_message(f"Navigated to {url}", is_user=False)
-                        
-                        # Re-enable UI
-                        self.command_input.setEnabled(True)
-                        self.send_button.setEnabled(True)
-                        self.start_stop_button.setEnabled(True)
-                        return
-                except Exception as e:
-                    self.logger.error(f"Error in direct execution: {str(e)}")
-                    # Continue to regular agent processing
-            
-            # Find the main window to run agent in thread
-            main_window = self.window()
-            if hasattr(main_window, 'run_agent_in_thread'):
-                self.logger.info(f"Running agent {self.current_agent_id} with command: {command}")
-                
-                # Execute the agent in a thread
-                main_window.run_agent_in_thread(
-                    self.current_agent_id, 
-                    command,
-                    self.handle_agent_result
-                )
-            else:
-                self.logger.error("Parent window not found or missing run_agent_in_thread method")
-                self.conversation.add_message("Error: Could not run agent. Please try again.", is_user=False)
-                
-                # Re-enable UI
-                self.command_input.setEnabled(True)
-                self.send_button.setEnabled(True)
-                self.start_stop_button.setEnabled(True)
-                
+            self.conversation.add_message(f"Command: {command} {parameters}", is_user=True)
+            self.conversation.add_message(result, is_user=False)
         except Exception as e:
-            self.logger.error(f"Error in send_command: {str(e)}")
+            self.logger.error(f"Error executing quick command: {str(e)}")
             import traceback
             self.logger.error(traceback.format_exc())
+            self.conversation.add_message(f"Error executing command: {str(e)}", is_user=False)
+    
+    def analyze_current_page(self):
+        """Analyze the current page with the selected task type"""
+        if not self.ensure_browser_initialized():
+            return
             
-            # Show error
-            self.conversation.add_message(f"Error: {str(e)}", is_user=False)
+        # Get selected task
+        task = self.task_selector.currentText().lower().replace(" ", "_")
+        
+        # Create a prompt for the selected task
+        custom_prompt = f"Analyze the current webpage and {task.replace('_', ' ')}"
+        
+        # Add to conversation
+        self.conversation.add_message(f"Analyzing page: {custom_prompt}", is_user=True)
+        
+        # Clear analysis area
+        self.analysis_text.clear()
+        self.clear_suggestions()
+        
+        # Find the main window to run agent in thread
+        main_window = self.window()
+        if hasattr(main_window, 'run_agent_in_thread'):
+            self.logger.info(f"Running agent {self.current_agent_id} with analysis: {custom_prompt}")
+            
+            # Execute the agent in a thread
+            main_window.run_agent_in_thread(
+                self.current_agent_id, 
+                custom_prompt,
+                self.handle_analysis_result
+            )
+        else:
+            self.logger.error("Parent window not found or missing run_agent_in_thread method")
+            self.conversation.add_message("Error: Could not run analysis. Please try again.", is_user=False)
+    
+    def handle_analysis_result(self, result: str):
+        """Handle analysis result from the agent
+        
+        Args:
+            result: Analysis result
+        """
+        # Add to conversation
+        self.conversation.add_message(result, is_user=False)
+        
+        # Set result in analysis text area
+        self.analysis_text.setText(result)
+        
+        # Try to parse suggestions from the result
+        self.parse_suggestions_from_result(result)
+    
+    def parse_suggestions_from_result(self, result: str):
+        """Parse suggestions from the analysis result
+        
+        Args:
+            result: Analysis result from the agent
+        """
+        try:
+            # Look for JSON array in the response
+            json_start = result.find('[')
+            json_end = result.rfind(']') + 1
+            
+            if json_start >= 0 and json_end > json_start:
+                json_str = result[json_start:json_end]
+                suggestions = json.loads(json_str)
+                
+                # Clear previous suggestions
+                self.clear_suggestions()
+                
+                if isinstance(suggestions, list):
+                    # Create suggestion items
+                    from app.agents.visual_web_agent import SuggestionItem
+                    
+                    for suggestion in suggestions:
+                        item = SuggestionItem(suggestion)
+                        item.clicked.connect(self.handle_suggestion_clicked)
+                        self.suggestions_layout.addWidget(item)
+        except:
+            # No parseable JSON or other error
+            pass
+    
+    def clear_suggestions(self):
+        """Clear all suggestions from the layout"""
+        # Remove all widgets from suggestions layout
+        while self.suggestions_layout.count():
+            item = self.suggestions_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+    
+    def handle_suggestion_clicked(self, suggestion_data):
+        """Handle when a suggestion is clicked
+        
+        Args:
+            suggestion_data: Suggestion data dictionary
+        """
+        action = suggestion_data.get("action", "").lower()
+        target = suggestion_data.get("target", "")
+        coordinates = suggestion_data.get("coordinates", {})
+        
+        try:
+            # Show overlay if the agent has one
+            if hasattr(self.current_agent, 'overlay'):
+                screen = QApplication.primaryScreen().size()
+                self.current_agent.overlay.setGeometry(0, 0, screen.width(), screen.height())
+                self.current_agent.overlay.clear_highlights()
+                
+                if coordinates and isinstance(coordinates, dict) and "x" in coordinates and "y" in coordinates:
+                    x, y = coordinates.get("x"), coordinates.get("y")
+                    highlight_size = 50
+                    self.current_agent.overlay.add_highlight(
+                        x - highlight_size//2, 
+                        y - highlight_size//2, 
+                        highlight_size, 
+                        highlight_size,
+                        (255, 0, 0, 80),  # Red with some transparency
+                        suggestion_data.get("action", "")
+                    )
+                    self.current_agent.overlay.show()
+            
+            # Log the selected action
+            self.logger.info(f"Selected action: {action} on {target}")
+            
+            # If coordinates are available, ask for confirmation
+            if coordinates and isinstance(coordinates, dict) and "x" in coordinates and "y" in coordinates:
+                x, y = coordinates.get("x"), coordinates.get("y")
+                
+                # Ask for confirmation
+                from PyQt6.QtWidgets import QMessageBox
+                msg_box = QMessageBox()
+                msg_box.setWindowTitle("Confirm Action")
+                msg_box.setText(f"Do you want to {action} on {target}?")
+                msg_box.setInformativeText(f"This will perform an action at position ({x}, {y}).")
+                msg_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+                msg_box.setDefaultButton(QMessageBox.StandardButton.No)
+                
+                if msg_box.exec() == QMessageBox.StandardButton.Yes:
+                    # Execute the action
+                    command = "click"
+                    if "type" in action:
+                        command = "type"
+                        # Get text to type
+                        from PyQt6.QtWidgets import QInputDialog
+                        text, ok = QInputDialog.getText(
+                            self, 
+                            "Enter Text", 
+                            f"What text should be typed into {target}?"
+                        )
+                        if ok and text:
+                            # Execute command through the agent
+                            if self.current_agent and hasattr(self.current_agent, 'visual_tool'):
+                                self.current_agent.visual_tool.forward(command, f"{target},{text}")
+                    elif "scroll" in action:
+                        command = "scroll" if "down" in action else "scroll_up"
+                        if self.current_agent and hasattr(self.current_agent, 'visual_tool'):
+                            self.current_agent.visual_tool.forward(command, "500")
+                    else:
+                        # Default to click
+                        if self.current_agent and hasattr(self.current_agent, 'visual_tool'):
+                            self.current_agent.visual_tool.forward(command, target)
+        except Exception as e:
+            self.logger.error(f"Error handling suggestion: {str(e)}")
+    
+    def send_command(self):
+        """Send a command to the agent"""
+        if not self.ensure_browser_initialized():
+            return
+        
+        # Get command text
+        command = self.command_input.toPlainText().strip()
+        if not command:
+            return
+        
+        # Add to conversation
+        self.conversation.add_message(command, is_user=True)
+        
+        # Clear input
+        self.command_input.clear()
+        
+        # Disable UI while processing
+        self.command_input.setEnabled(False)
+        self.send_button.setEnabled(False)
+        self.start_stop_button.setEnabled(False)
+        
+        # Find the main window to run agent in thread
+        main_window = self.window()
+        if hasattr(main_window, 'run_agent_in_thread'):
+            self.logger.info(f"Running agent {self.current_agent_id} with command: {command}")
+            
+            # Execute the agent in a thread
+            main_window.run_agent_in_thread(
+                self.current_agent_id, 
+                command,
+                self.handle_command_result
+            )
+        else:
+            self.logger.error("Parent window not found or missing run_agent_in_thread method")
+            self.conversation.add_message("Error: Could not run agent. Please try again.", is_user=False)
             
             # Re-enable UI
             self.command_input.setEnabled(True)
             self.send_button.setEnabled(True)
             self.start_stop_button.setEnabled(True)
     
-    def handle_agent_result(self, result: str):
-        """Handle agent result
+    def handle_command_result(self, result: str):
+        """Handle command result from the agent
         
         Args:
-            result: Agent result
+            result: Command result
         """
         # Add to conversation
         self.conversation.add_message(result, is_user=False)
         
-        # Enable input
+        # Re-enable UI
         self.command_input.setEnabled(True)
         self.send_button.setEnabled(True)
         self.start_stop_button.setEnabled(True)
     
-    @pyqtSlot(object)
-    def update_screenshot(self, screenshot):
-        """Update screenshot
+    def ensure_browser_initialized(self) -> bool:
+        """Ensure the browser is properly initialized
+        
+        Returns:
+            True if initialized, False otherwise
+        """
+        if self.current_agent is None or not hasattr(self.current_agent, 'browser') or self.current_agent.browser is None:
+            self.show_error_message("Browser Not Started", "Please start the browser first.")
+            return False
+        return True
+    
+    def show_error_message(self, title: str, message: str):
+        """Show an error message dialog
         
         Args:
-            screenshot: Screenshot image
+            title: Dialog title
+            message: Error message
+        """
+        QMessageBox.warning(self, title, message)
+    
+    def show_examples(self):
+        """Show example commands for the agent"""
+        examples = [
+            "Go to wikipedia.org and search for artificial intelligence",
+            "Visit github.com/trending and tell me the top trending repository today",
+            "Go to amazon.com and find the best-selling book in science fiction",
+            "Navigate to news.ycombinator.com and summarize the top 3 stories",
+            "Browse to weather.com and tell me the forecast for New York City"
+        ]
+        
+        example_message = "Example tasks for the Visual Web Agent:\n\n"
+        for i, example in enumerate(examples, 1):
+            example_message += f"{i}. {example}\n"
+            
+        QMessageBox.information(
+            self,
+            "Visual Web Automation Examples",
+            example_message
+        )
+    
+    def clear_input(self):
+        """Clear the command input field"""
+        self.command_input.clear()
+    
+    @pyqtSlot(object)
+    def update_screenshot(self, screenshot):
+        """Update the screenshot display
+        
+        Args:
+            screenshot: Screenshot image (PIL Image)
         """
         try:
-            # Convert PIL image to QImage
+            # Convert PIL Image to QImage and then to QPixmap
             if screenshot is not None:
                 # Convert PIL Image to QImage
                 img = screenshot.convert("RGB")
@@ -693,74 +797,16 @@ class VisualWebTab(QWidget):
                 # Set pixmap to label
                 self.screenshot_label.setPixmap(pixmap)
                 
-                # Update current URL in conversation if available
-                if self.current_agent and hasattr(self.current_agent, 'visual_tool') and self.current_agent.visual_tool.webdriver:
+                # Update browser URL in UI if available
+                if self.current_agent and hasattr(self.current_agent, 'webdriver'):
                     try:
-                        current_url = self.current_agent.visual_tool.webdriver.current_url
-                        title = self.current_agent.visual_tool.webdriver.title
+                        current_url = self.current_agent.webdriver.current_url
+                        title = self.current_agent.webdriver.title
                         status_text = f"Browser at: {title} ({current_url})"
-                        if hasattr(self.parent(), 'status_bar'):
-                            self.parent().status_bar.showMessage(status_text, 5000)
+                        main_window = self.window()
+                        if hasattr(main_window, 'status_bar'):
+                            main_window.status_bar.showMessage(status_text, 5000)
                     except:
                         pass
         except Exception as e:
             self.logger.error(f"Error updating screenshot: {str(e)}")
-            
-    def refresh_agents(self):
-        """Load available agents"""
-        # Clear existing items
-        self.agent_selector.clear()
-        
-        # Get active agents
-        active_agents = self.agent_manager.get_active_agents()
-        
-        # Filter to visual web agents
-        visual_web_agents = [
-            agent for agent in active_agents
-            if agent["agent_type"] == "visual_web"
-        ]
-        
-        if not visual_web_agents:
-            self.agent_selector.addItem("No visual web agents available")
-            self.start_stop_button.setEnabled(False)
-            self.send_button.setEnabled(False)
-            return
-        
-        # Add to combo box
-        for agent in visual_web_agents:
-            self.agent_selector.addItem(agent["agent_id"])
-        
-        # Select first agent
-        if self.agent_selector.count() > 0:
-            self.agent_selector.setCurrentIndex(0)
-    
-    def create_agent(self):
-        """Create a new visual web agent"""
-        # Find the main window by traversing up the parent hierarchy
-        main_window = self
-        while main_window and not hasattr(main_window, 'create_visual_web_agent'):
-            main_window = main_window.parent()
-        
-        if main_window and hasattr(main_window, 'create_visual_web_agent'):
-            # Suggest a more compatible model
-            from PyQt6.QtWidgets import QMessageBox
-            result = QMessageBox.question(
-                self,
-                "Model Recommendation",
-                "For best compatibility with visual web automation, we recommend using 'meta-llama/Llama-3.2-3B-Instruct'.\n\n"
-                "Would you like to use this model?",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                QMessageBox.StandardButton.Yes
-            )
-            
-            use_recommended = result == QMessageBox.StandardButton.Yes
-            
-            # Call the create method with the recommended model flag
-            main_window.create_visual_web_agent(use_recommended_model=use_recommended)
-        else:
-            # Fallback if we can't find the method
-            QMessageBox.warning(
-                self,
-                "Not Implemented",
-                "Create visual web agent functionality not found in main window."
-            )
