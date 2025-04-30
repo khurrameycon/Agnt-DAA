@@ -1076,26 +1076,14 @@ class MainWindow(QMainWindow):
     
 
     def create_visual_web_tab(self):
-        """Create the visual web automation tab"""
+        """Create the simplified visual web automation tab"""
         from app.ui.components.visual_web_tab import VisualWebTab
         
         # Create tab
         self.visual_web_tab = VisualWebTab(self.agent_manager, self)
         
-        # Load agents
-        self.visual_web_tab.refresh_agents()
-        
         # Add tab
         self.tabs.addTab(self.visual_web_tab, "Visual Web")
-        
-        # Add demo functionality if needed
-        try:
-            # Import the demo class - try/except prevents errors if file doesn't exist yet
-            from app.utils.visual_web_demo import VisualWebDemo
-            VisualWebDemo.add_demo_menu(self.visual_web_tab)
-        except ImportError:
-            # If the demo module isn't available, don't add the demo menu
-            self.logger.info("Visual Web Demo not available, skipping demo menu")
 
     def create_code_gen_tab(self):
         """Create the code generation tab"""
@@ -1187,81 +1175,20 @@ class MainWindow(QMainWindow):
 
     # In app/ui/main_window.py
     def create_visual_web_agent(self, use_recommended_model=False):
-        """Create a new visual web agent with enhanced functionality"""
-        from app.ui.dialogs.create_agent_dialog import CreateAgentDialog
-        
-        # Create dialog
-        dialog = CreateAgentDialog(self.agent_manager, self)
-        
-        # Set agent type to visual_web
-        index = dialog.agent_type_combo.findText("visual_web")
-        if index >= 0:
-            dialog.agent_type_combo.setCurrentIndex(index)
-        
-        # Use recommended model if specified
-        if use_recommended_model:
-            recommended_model = "meta-llama/Llama-3.2-3B-Instruct"
-            # Find the model in the list or add it
-            found = False
-            for i in range(dialog.model_list.count()):
-                item = dialog.model_list.item(i)
-                if item.text() == recommended_model:
-                    dialog.model_list.setCurrentItem(item)
-                    found = True
-                    break
-                    
-            if not found:
-                from PyQt6.QtWidgets import QListWidgetItem
-                from PyQt6.QtCore import Qt
-                item = QListWidgetItem(recommended_model)
-                item.setData(Qt.ItemDataRole.UserRole, {"id": recommended_model, "is_cached": False})
-                dialog.model_list.addItem(item)
-                dialog.model_list.setCurrentItem(item)
-        
+        """This method is simplified as it's no longer needed with the new Visual Web Tab"""
         # Show Chrome requirement message
         from PyQt6.QtWidgets import QMessageBox
         QMessageBox.information(
             self,
-            "Chrome Requirement",
-            "Visual Web Automation requires Google Chrome to be installed on your system. "
-            "Please make sure Chrome is installed before creating the agent.",
+            "Visual Web Agent",
+            "The Visual Web tab now provides a simplified interface.\n\n"
+            "Use the 'Install/Initialize Visual Agent' button to set up the environment,\n"
+            "and then 'Launch Visual Agent' to start the web UI.",
             QMessageBox.StandardButton.Ok
         )
         
-        # Show dialog
-        if dialog.exec():
-            # Get agent configuration
-            agent_config = dialog.get_agent_config()
-            
-            # Set flatten_messages_as_text to False for proper image handling
-            if "additional_config" not in agent_config:
-                agent_config["additional_config"] = {}
-            agent_config["additional_config"]["flatten_messages_as_text"] = False
-            
-            # Create agent
-            agent_id = self.agent_manager.create_agent(
-                agent_id=agent_config["agent_id"],
-                agent_type=agent_config["agent_type"],
-                model_config=agent_config["model_config"],
-                tools=agent_config["tools"],
-                additional_config=agent_config["additional_config"]
-            )
-            
-            if agent_id:
-                # Show success message
-                self.status_bar.showMessage(f"Visual web agent '{agent_id}' created", 3000)
-                
-                # Reload agents
-                self.visual_web_tab.refresh_agents()
-                
-                # Switch to visual web tab
-                self.tabs.setCurrentWidget(self.visual_web_tab)
-            else:
-                QMessageBox.warning(
-                    self,
-                    "Agent Creation Failed",
-                    "Failed to create visual web agent. Please check the logs for details."
-                )
+        # Switch to visual web tab
+        self.tabs.setCurrentWidget(self.visual_web_tab)
 
     def create_code_generation_agent(self):
         """Create a new code generation agent"""
