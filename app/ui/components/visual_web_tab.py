@@ -132,7 +132,7 @@ class VisualWebTab(QWidget):
         self.splitter.addWidget(self.output_panel)
         
         # Set initial sizes (more space for browser)
-        self.splitter.setSizes([600, 300])
+        self.splitter.setSizes([800, 400])
         
         # Add to main layout
         self.layout.addWidget(self.splitter, 1)  # stretch=1 to take all available space
@@ -382,7 +382,7 @@ class VisualWebTab(QWidget):
                 process = subprocess.Popen(
                     [venv_python_executable, webui_script],
                     cwd=WEBUI_DIRECTORY,
-                    creationflags=subprocess.CREATE_NEW_CONSOLE
+                    creationflags=subprocess.CREATE_NO_WINDOW
                 )
                 
                 self.log_output("Launch command sent. The WebUI should start in a new window.")

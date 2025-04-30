@@ -11,9 +11,9 @@ from app.core.config_manager import ConfigManager
 from app.core.model_manager import ModelManager
 from app.agents.local_model_agent import LocalModelAgent
 from app.agents.web_browsing_agent import WebBrowsingAgent
-from app.agents.visual_web_agent import VisualWebAgent
+# from app.agents.visual_web_agent import VisualWebAgent
 from app.agents.code_gen_agent import CodeGenerationAgent
-from app.agents.media_generation_agent import MediaGenerationAgent
+# from app.agents.media_generation_agent import MediaGenerationAgent
 from app.agents.agent_registry import AgentRegistry
 from smolagents import Tool, DuckDuckGoSearchTool
 from app.agents.fine_tuning_agent import FineTuningAgent
@@ -95,9 +95,9 @@ class AgentManager:
         """Register available agent types"""
         AgentRegistry.register("local_model", LocalModelAgent)
         AgentRegistry.register("web_browsing", WebBrowsingAgent)
-        AgentRegistry.register("visual_web", VisualWebAgent)
+        # AgentRegistry.register("visual_web", VisualWebAgent)
         AgentRegistry.register("code_generation", CodeGenerationAgent)
-        AgentRegistry.register("media_generation", MediaGenerationAgent)
+        # AgentRegistry.register("media_generation", MediaGenerationAgent)
         AgentRegistry.register("fine_tuning", FineTuningAgent)
         AgentRegistry.register("rag", RAGAgent)
         # AgentRegistry.register("chat", LocalModelAgent)

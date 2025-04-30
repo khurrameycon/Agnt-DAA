@@ -136,7 +136,7 @@ class MainWindow(QMainWindow):
         self.create_web_browsing_tab()
         self.create_visual_web_tab()
         self.create_code_gen_tab()
-        self.create_media_gen_tab()
+        # self.create_media_gen_tab()
         self.create_fine_tuning_tab()
         self.create_rag_tab()
         self.create_agents_tab()
