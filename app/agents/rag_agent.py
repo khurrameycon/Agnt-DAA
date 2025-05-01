@@ -34,7 +34,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
-
+from app.core.config_manager import ConfigManager
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 
@@ -75,30 +75,23 @@ class RAGAgent(BaseAgent):
         # Parallel processing
         self.use_parallel = config.get("use_parallel", True)
         self.max_workers = config.get("max_workers", min(8, os.cpu_count() or 1))
+        # Replacement logic:
         self.api_key = os.environ.get("HUGGINGFACE_API_KEY") or os.environ.get("HF_API_KEY")
-        # Get API key from environment or config
         if not self.api_key:
             try:
-                # Try to get from config_manager if it exists
-                if "config_manager" in config:
-                    self.api_key = config["config_manager"].get_hf_api_key()
-                    self.logger.info(f"API key from config_manager: {self.api_key is not None}")
-                
-                # If still no API key, try reading directly from config.json
-                if not self.api_key:
-                    config_path = os.path.join(os.path.expanduser("~"), ".sagax1", "config.json")
-                    if os.path.exists(config_path):
-                        try:
-                            with open(config_path, 'r') as f:
-                                config_data = json.load(f)
-                                self.api_key = config_data.get("hf_api_key")
-                                self.logger.info(f"API key from config.json: {self.api_key is not None}")
-                        except Exception as config_e:
-                            self.logger.warning(f"Error reading config.json: {str(config_e)}")
+                # Use ConfigManager to get the key
+                config_manager = ConfigManager() # Instantiate ConfigManager
+                self.api_key = config_manager.get_hf_api_key()
+                if self.api_key:
+                    self.logger.info("API key successfully retrieved from ConfigManager.")
+                else:
+                    self.logger.warning("API key not found in environment variables or config file.")
             except Exception as e:
-                self.logger.warning(f"Could not get API key from config sources: {str(e)}")
-        
-        # self.api_key = 'key'
+                self.logger.error(f"Error retrieving API key using ConfigManager: {str(e)}")
+                self.api_key = None # Ensure api_key is None if retrieval failed
+
+        # Make sure the HuggingFaceEndpoint uses this self.api_key
+        # (Check the initialize_llmchain method)
         # Set base directory for storing FAISS indexes
         self.faiss_index_dir = config.get("faiss_index_dir", "./faiss_indexes")
         os.makedirs(self.faiss_index_dir, exist_ok=True)

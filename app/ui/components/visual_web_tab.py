@@ -239,7 +239,7 @@ class VisualWebTab(QWidget):
                     "cmd.exe",              # Application to run
                     f'/c "{wrapper_batch}"',# Parameters - run our wrapper batch
                     None,                   # Directory - None means current directory
-                    1                       # Window state - normal (SW_SHOWNORMAL)
+                    0                       # Window state - normal (SW_SHOWNORMAL)
                 )
                 
                 # Check if UAC prompt was shown successfully (result > 32 means success)

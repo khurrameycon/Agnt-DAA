@@ -12,7 +12,8 @@ from dotenv import load_dotenv
 from app.utils.license_manager import LicenseManager
 from app.ui.license_dialog import LicenseDialog
 from PyQt6.QtWidgets import QApplication, QMessageBox, QDialog
-
+import certifi
+import httpx 
 
 # Fix for MultiplexedPath issue - MUST be before any imports that might use transformers
 if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):

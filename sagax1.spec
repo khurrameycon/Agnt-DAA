@@ -30,11 +30,23 @@ except ImportError:
 packages_to_collect = [
     'PyQt6', 'transformers', 'huggingface_hub', 'selenium', 
     'webdriver_manager', 'smolagents', 'gradio_client', 'httpx', 'certifi', 
-    'duckduckgo_search', 'markdown'
+    'duckduckgo_search', 'markdown',
+    # RAG-related packages
+    'langchain', 'langchain_community', 'langchain_huggingface', 'langchain_core',
+    'faiss', 'unidecode', 'sklearn', 'sentence_transformers'
 ]
 
 # Add data files for packages that need them
 datas = []
+models_path = 'models/sentence_transformers' 
+if os.path.exists(models_path):
+    for root, dirs, files in os.walk(models_path):
+        for file in files:
+            source_path = os.path.join(root, file)
+            target_path = os.path.join(os.path.relpath(root, os.getcwd()))
+            datas.append((source_path, target_path))
+    print(f"Added sentence transformer model files from {models_path}")
+
 for package in packages_to_collect:
     try:
         package_datas = collect_data_files(package)
@@ -43,7 +55,11 @@ for package in packages_to_collect:
         print(f"Warning: Could not collect data files for {package}: {e}")
 
 # Add metadata for certificate handling and other important packages
-metadata_packages = ['certifi', 'gradio_client', 'httpx', 'requests', 'duckduckgo_search']
+metadata_packages = [
+    'certifi', 'gradio_client', 'httpx', 'requests', 'duckduckgo_search',
+    # RAG-related packages metadata
+    'faiss', 'langchain', 'langchain_community', 'langchain_huggingface', 'sklearn'
+]
 for package in metadata_packages:
     try:
         metadata = copy_metadata(package)
@@ -86,6 +102,7 @@ hidden_imports = [
     'app.agents.media_generation_agent', 
     'app.agents.fine_tuning_agent',
     'app.agents.base_agent',
+    'app.agents.rag_agent',  # Add RAG agent
     'app.utils.style_system', 
     'app.utils.ui_assets', 
     'app.utils.logging_utils',
@@ -94,7 +111,41 @@ hidden_imports = [
     'duckduckgo_search',
     'duckduckgo_search.duckduckgo_search',
     'smolagents.default_tools',
+    
+    # RAG-related imports
+    'faiss',
+    'unidecode',
+    'langchain',
+    'langchain_community',
+    'langchain_huggingface',
+    'langchain_core',
+    'langchain.text_splitter',
+    'langchain.chains',
+    'langchain.chains.conversational_retrieval',
+    'langchain.memory',
+    'langchain_core.prompts',
+    'langchain_core.documents',
+    'langchain_community.document_loaders',
+    'langchain_community.document_loaders.pdf',
+    'langchain_community.document_loaders.text',
+    'langchain_community.vectorstores',
+    'langchain_community.vectorstores.faiss',
+    'langchain_huggingface.embeddings',
+    'langchain_huggingface.llms',
+    'sklearn.feature_extraction.text',
+    'sentence_transformers'
 ]
+
+# Add sentence transformers related imports
+hidden_imports.extend([
+    'sentence_transformers',
+    'sentence_transformers.models',
+    'sentence_transformers.util',
+    'torch',
+    'transformers.models.bert',
+    'transformers.models.roberta',
+    'transformers.models.xlm_roberta'
+])
 
 # Create a file for the runtime hook
 with open('runtime_hook.py', 'w') as f:
@@ -119,7 +170,7 @@ os.environ['TMP'] = temp_dir
 tempfile.tempdir = temp_dir
 
 # Create necessary directories
-for dir_name in ['logs', 'fine_tuned_models', 'temp', 'assets/icons']:
+for dir_name in ['logs', 'fine_tuned_models', 'temp', 'assets/icons', 'faiss_indexes']:
     os.makedirs(os.path.join(base_dir, dir_name), exist_ok=True)
 
 # Add a monkey patch for duckduckgo_search to avoid the compiled module issue
@@ -138,6 +189,51 @@ try:
     mock_module.get_results_from_chat = get_results_from_chat
 except Exception as e:
     print(f"Failed to monkey patch duckduckgo_search: {e}")
+''')
+
+# Add hook for RAG-related packages
+with open('hooks/hook-faiss.py', 'w') as f:
+    f.write('''
+# hooks/hook-faiss.py
+from PyInstaller.utils.hooks import collect_all
+
+# Collect all packages, data files, and binaries
+datas, binaries, hiddenimports = collect_all('faiss')
+''')
+
+with open('hooks/hook-langchain.py', 'w') as f:
+    f.write('''
+# hooks/hook-langchain.py
+from PyInstaller.utils.hooks import collect_all
+
+# Collect all packages, data files, and binaries
+datas, binaries, hiddenimports = collect_all('langchain')
+hiddenimports.extend(['langchain.text_splitter', 'langchain.chains', 'langchain.memory'])
+''')
+
+with open('hooks/hook-langchain_community.py', 'w') as f:
+    f.write('''
+# hooks/hook-langchain_community.py
+from PyInstaller.utils.hooks import collect_all
+
+# Collect all packages, data files, and binaries
+datas, binaries, hiddenimports = collect_all('langchain_community')
+hiddenimports.extend([
+    'langchain_community.document_loaders',
+    'langchain_community.document_loaders.pdf',
+    'langchain_community.vectorstores',
+    'langchain_community.vectorstores.faiss'
+])
+''')
+
+with open('hooks/hook-langchain_huggingface.py', 'w') as f:
+    f.write('''
+# hooks/hook-langchain_huggingface.py
+from PyInstaller.utils.hooks import collect_all
+
+# Collect all packages, data files, and binaries
+datas, binaries, hiddenimports = collect_all('langchain_huggingface')
+hiddenimports.extend(['langchain_huggingface.embeddings', 'langchain_huggingface.llms'])
 ''')
 
 a = Analysis(

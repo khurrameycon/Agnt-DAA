@@ -21,3 +21,11 @@ selenium
 webdriver-manager
 smolagents[transformers,tools]
 duckduckgo-search
+markdown
+certifi
+pyinstaller
+langchain-community
+langchain-huggingface
+chromadb
+unidecode
+langchain
