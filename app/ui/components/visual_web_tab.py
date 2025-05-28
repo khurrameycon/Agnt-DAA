@@ -181,7 +181,7 @@ class VisualWebTab(QWidget):
             
             self.install_button.setEnabled(False)
             # Keep launch button enabled regardless
-            self.update_status("Missing required files", is_error=True)
+            self.update_status("Please first Install then Click on Launch Button", is_error=True)
         else:
             # Both buttons should be enabled
             self.install_button.setEnabled(True)
@@ -196,11 +196,36 @@ class VisualWebTab(QWidget):
     def install_visual_agent(self):
         """Run the new.bat script with administrator privileges to install the Visual Agent"""
         self.log_output("\n--- Starting Installation Process ---")
+        
+        # Get the correct path to new.bat based on whether we're running from source or frozen app
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            # Running from frozen app (PyInstaller)
+            base_dir = os.path.dirname(sys.executable)
+            self.new_bat_path = os.path.join(base_dir, 'app', 'utils', 'new.bat')
+            
+            # If not found in the main directory, check _internal directory structure
+            if not os.path.exists(self.new_bat_path):
+                self.new_bat_path = os.path.join(base_dir, '_internal', 'app', 'utils', 'new.bat')
+                
+            # Log the paths we're checking
+            self.log_output(f"Checking for batch file at: {self.new_bat_path}")
+            
+            # If still not found, search for it
+            if not os.path.exists(self.new_bat_path):
+                # Try to find it by searching
+                for root, dirs, files in os.walk(base_dir):
+                    if 'new.bat' in files:
+                        self.new_bat_path = os.path.join(root, 'new.bat')
+                        self.log_output(f"Found batch file at: {self.new_bat_path}")
+                        break
+        else:
+            # Running from source
+            self.new_bat_path = r"app\utils\new.bat"
+        
         self.log_output(f"Running: {self.new_bat_path} (with administrator privileges)")
         
         # Disable buttons during installation
         self.install_button.setEnabled(False)
-        # self.launch_button.setEnabled(False)
         
         # Show progress
         self.progress_bar.setVisible(True)

@@ -7,92 +7,13 @@ REM ==================================================
 echo Checking for Administrator privileges...
 net session >nul 2>&1
 if %errorLevel% NEQ 0 (
-    echo ERROR: This script requires Administrator privileges to install Git and Python.
+    echo ERROR: This script requires Administrator privileges.
     echo Please right-click the script and select 'Run as administrator'.
     goto :error_no_endlocal
 ) else (
     echo Administrator privileges detected. Proceeding...
 )
 echo.
-
-@echo off
-setlocal enabledelayedexpansion
-
-echo Checking for Git and Python installations...
-echo.
-
-:: Check for Git
-where git >nul 2>nul
-if %ERRORLEVEL% EQU 0 (
-    for /f "tokens=3" %%a in ('git --version 2^>^&1') do set "GIT_VERSION=%%a"
-    echo Git is already installed. Version: !GIT_VERSION!
-) else (
-    echo Git is not installed. Downloading Git...
-    
-    :: Create temp directory for downloads
-    mkdir "%TEMP%\installer_downloads" 2>nul
-    
-    :: Download Git
-    powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri 'https://github.com/git-for-windows/git/releases/download/v2.41.0.windows.1/Git-2.41.0-64-bit.exe' -OutFile '%TEMP%\installer_downloads\git_installer.exe'}"
-    
-    if exist "%TEMP%\installer_downloads\git_installer.exe" (
-        echo Installing Git...
-        start /wait "" "%TEMP%\installer_downloads\git_installer.exe" /VERYSILENT /NORESTART
-        echo Git has been installed.
-    ) else (
-        echo Failed to download Git installer.
-    )
-)
-
-:: Check for Python
-where python >nul 2>nul
-if %ERRORLEVEL% EQU 0 (
-    for /f "tokens=2" %%a in ('python --version 2^>^&1') do set "PYTHON_VERSION=%%a"
-    echo Python is already installed. Version: !PYTHON_VERSION!
-) else (
-    echo Python is not installed. Downloading Python...
-    
-    :: Create temp directory for downloads if it doesn't exist
-    mkdir "%TEMP%\installer_downloads" 2>nul
-    
-    :: Download Python
-    powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.11.4/python-3.11.4-amd64.exe' -OutFile '%TEMP%\installer_downloads\python_installer.exe'}"
-    
-    if exist "%TEMP%\installer_downloads\python_installer.exe" (
-        echo Installing Python...
-        start /wait "" "%TEMP%\installer_downloads\python_installer.exe" /quiet InstallAllUsers=1 PrependPath=1
-        echo Python has been installed.
-    ) else (
-        echo Failed to download Python installer.
-    )
-)
-
-:: Check if PATH needs to be refreshed
-echo.
-echo Installation completed. You may need to restart your command prompt to use Git or Python commands.
-echo.
-
-:: Verify installations
-echo Verifying installations:
-echo.
-
-:: Verify Git
-where git >nul 2>nul
-if %ERRORLEVEL% EQU 0 (
-    echo Git: INSTALLED
-) else (
-    echo Git: NOT FOUND - You may need to restart your command prompt or rerun this script.
-)
-
-:: Verify Python
-where python >nul 2>nul
-if %ERRORLEVEL% EQU 0 (
-    echo Python: INSTALLED
-) else (
-    echo Python: NOT FOUND - You may need to restart your command prompt or rerun this script.
-)
-
-
 
 REM ==================================================
 REM == Main Installation Logic Starts Here ==
@@ -101,6 +22,9 @@ REM ==================================================
 REM Define the ABSOLUTE project directory path in user's home folder
 set USER_HOME=%USERPROFILE%
 set TARGET_INSTALL_DIR=%USER_HOME%\.sagax1\web-ui
+set TEMP_DIR=%TEMP%\sagax1_installer
+set PYTHON_EMBED_DIR=%TARGET_INSTALL_DIR%\python_embed
+set DOWNLOAD_DIR=%TEMP_DIR%\downloads
 
 echo Target installation directory set to: %TARGET_INSTALL_DIR%
 echo.
@@ -112,6 +36,11 @@ if exist "%TARGET_INSTALL_DIR%\" (
     choice /C YN /M "Do you want to continue?"
     if errorlevel 2 goto :error
 )
+
+REM Create temporary directory for downloads
+echo Creating temporary directory for downloads...
+mkdir "%TEMP_DIR%" 2>nul
+mkdir "%DOWNLOAD_DIR%" 2>nul
 
 REM Ensure the parent directory exists
 if not exist "%USER_HOME%\.sagax1\" (
@@ -134,34 +63,31 @@ if not exist "%TARGET_INSTALL_DIR%\" (
 )
 echo.
 
-
-REM == Step 1: Verify Prerequisites Again (Post Step 0) ==
-echo Verifying prerequisites again before proceeding...
-where git >nul 2>nul
+REM == Step 1: Download and Extract Repository ZIP ==
+echo Downloading repository ZIP file...
+powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri 'https://github.com/khurrameycon/update-webui/archive/refs/heads/main.zip' -OutFile '%DOWNLOAD_DIR%\repo.zip'}"
 if %errorlevel% neq 0 (
-    echo ERROR: Git not found even after Step 0. Please check installation or restart Command Prompt and retry.
+    echo ERROR: Failed to download repository ZIP.
+    echo Check your internet connection.
     goto :error
-) else (
-    echo Found Git.
 )
 
-where python >nul 2>nul
+echo Extracting repository...
+powershell -Command "& {Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('%DOWNLOAD_DIR%\repo.zip', '%TEMP_DIR%')}"
 if %errorlevel% neq 0 (
-    echo ERROR: Python not found even after Step 0. Please check installation or restart Command Prompt and retry.
+    echo ERROR: Failed to extract repository ZIP.
     goto :error
-) else (
-    echo Found Python.
-    python --version
 )
+
+echo Copying repository files to target directory...
+xcopy /E /I /Y "%TEMP_DIR%\update-webui-main\*" "%TARGET_INSTALL_DIR%\"
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to copy repository files.
+    goto :error
+)
+
+echo Repository files copied successfully.
 echo.
-
-REM == Step 2: Clone the Repository ==
-echo Cloning the web-ui repository into %TARGET_INSTALL_DIR%...
-git clone https://github.com/khurrameycon/web-ui.git "%TARGET_INSTALL_DIR%"
-if %errorlevel% neq 0 (
-    echo ERROR: Failed to clone repository. Check your internet connection and Git setup.
-    goto :error
-)
 
 REM Change directory AND drive to the target installation directory
 cd /d "%TARGET_INSTALL_DIR%"
@@ -169,14 +95,97 @@ if %errorlevel% neq 0 (
     echo ERROR: Failed to change directory to "%TARGET_INSTALL_DIR%".
     goto :error
 )
-echo Successfully cloned repository and changed directory to "%CD%".
+echo Current directory is now: "%CD%"
+echo.
+
+REM == Step 2: Download and Setup Python Embedded ==
+echo Downloading Python embedded...
+mkdir "%PYTHON_EMBED_DIR%" 2>nul
+powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.13.3/python-3.13.3-embed-amd64.zip' -OutFile '%DOWNLOAD_DIR%\python_embed.zip'}"
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to download Python embedded.
+    echo Check your internet connection.
+    goto :error
+)
+
+echo Extracting Python embedded...
+REM Clear the directory before extraction to avoid conflicts
+if exist "%PYTHON_EMBED_DIR%" (
+    echo Cleaning existing Python embedded directory...
+    rd /s /q "%PYTHON_EMBED_DIR%"
+    mkdir "%PYTHON_EMBED_DIR%"
+)
+powershell -Command "& {Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('%DOWNLOAD_DIR%\python_embed.zip', '%PYTHON_EMBED_DIR%')}"
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to extract Python embedded.
+    goto :error
+)
+
+echo Python embedded extracted successfully.
+echo.
+
+REM Ensure pip is available in embedded Python
+echo Setting up pip for embedded Python...
+powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri 'https://bootstrap.pypa.io/get-pip.py' -OutFile '%DOWNLOAD_DIR%\get-pip.py'}"
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to download get-pip.py.
+    goto :error
+)
+
+REM Fix python**._pth file to allow importing site packages
+echo Modifying Python path configuration...
+set PTH_FILE=
+for %%f in ("%PYTHON_EMBED_DIR%\python*._pth") do set PTH_FILE=%%f
+if "%PTH_FILE%"=="" (
+    echo ERROR: Could not find python._pth file.
+    goto :error
+)
+
+REM Backup original file
+copy /Y "%PTH_FILE%" "%PTH_FILE%.bak" >nul
+
+REM Modify the file to uncomment import site
+type "%PTH_FILE%" | findstr /v /c:"import site" > "%TEMP%\pth.tmp"
+echo import site >> "%TEMP%\pth.tmp"
+copy /Y "%TEMP%\pth.tmp" "%PTH_FILE%" >nul
+del "%TEMP%\pth.tmp"
+
+REM Download and install pip using get-pip.py
+echo Downloading get-pip.py...
+powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri 'https://bootstrap.pypa.io/get-pip.py' -OutFile '%DOWNLOAD_DIR%\get-pip.py'}"
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to download get-pip.py.
+    goto :error
+)
+
+echo Configuring Python libraries path...
+mkdir "%PYTHON_EMBED_DIR%\Lib" 2>nul
+mkdir "%PYTHON_EMBED_DIR%\Lib\site-packages" 2>nul
+
+echo Running get-pip.py with embedded Python...
+"%PYTHON_EMBED_DIR%\python.exe" "%DOWNLOAD_DIR%\get-pip.py" --no-warn-script-location
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to install pip.
+    goto :error
+)
+
+echo Installing necessary Python packages...
+echo Adding Scripts directory to PATH temporarily...
+set PATH=%PYTHON_EMBED_DIR%;%PYTHON_EMBED_DIR%\Scripts;%PATH%
+
+echo Installing virtualenv with embedded Python...
+"%PYTHON_EMBED_DIR%\python.exe" -m pip install virtualenv --no-warn-script-location
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to install virtualenv.
+    goto :error
+)
 echo.
 
 REM == Step 3: Create Python Virtual Environment ==
 echo Creating Python virtual environment (.venv) in "%CD%"...
-python -m venv .venv
+"%PYTHON_EMBED_DIR%\Scripts\virtualenv.exe" .venv
 if %errorlevel% neq 0 (
-    echo ERROR: Failed to create virtual environment. Check your Python installation.
+    echo ERROR: Failed to create virtual environment.
     goto :error
 )
 echo Virtual environment created.
@@ -191,24 +200,56 @@ if %errorlevel% neq 0 (
 )
 
 echo Installing packages from requirements.txt (using --no-cache-dir)...
-python -m pip install --no-cache-dir -r requirements.txt
-if %errorlevel% neq 0 (
-    echo ERROR: Failed to install Python packages. Check requirements.txt and pip setup.
-    goto :error
+
+REM Create a modified requirements file without the problematic dependency
+echo Creating a modified requirements file...
+type NUL > requirements_modified.txt
+for /F "tokens=*" %%a in (requirements.txt) do (
+    echo %%a | findstr /i "langchain-ibm" > nul
+    if errorlevel 1 (
+        echo %%a >> requirements_modified.txt
+    ) else (
+        echo Skipping incompatible package: %%a
+        echo # %%a >> requirements_modified.txt
+    )
 )
-echo Python packages installed.
+
+echo Installing compatible packages...
+python -m pip install --no-cache-dir -r requirements_modified.txt
+set PIP_RESULT=%errorlevel%
+
+REM Process the error but don't exit
+if %PIP_RESULT% neq 0 (
+    echo WARNING: Some packages failed to install.
+    echo Attempting to install essential packages individually...
+    
+    REM Try to install essential packages one by one
+    python -m pip install --no-cache-dir gradio
+    python -m pip install --no-cache-dir langchain
+    python -m pip install --no-cache-dir playwright
+    
+    echo Installation of core packages completed with best effort.
+    echo Some features may not be available due to missing dependencies.
+) else (
+    echo Python packages installed successfully.
+)
 echo.
 
 REM == Step 5: Install Playwright Browsers ==
 echo Installing Playwright browsers (this might take a while)...
-playwright install --with-deps chromium
-REM You can change 'chromium' to install others or remove '--with-deps chromium' to install all default browsers
+echo Attempting to install Playwright with Chromium...
+python -m pip install playwright
 if %errorlevel% neq 0 (
-    echo WARNING: Playwright browser installation reported an error. The UI might still work,
-    echo but browser automation could fail. Try running 'playwright install' manually later.
-    REM Don't exit on playwright error, maybe user wants to retry manually
+    echo WARNING: Failed to install Playwright package.
+    echo Browser automation features may not work properly.
 ) else (
-    echo Playwright browsers installed/updated.
+    playwright install --with-deps chromium
+    if %errorlevel% neq 0 (
+        echo WARNING: Playwright browser installation reported an error.
+        echo Browser automation features may not work properly.
+    ) else (
+        echo Playwright browsers installed/updated successfully.
+    )
 )
 echo.
 
@@ -236,12 +277,23 @@ echo 1. IMPORTANT: Manually edit the '.env' file in the '%TARGET_INSTALL_DIR%' d
 echo    You MUST add your API keys (OpenAI, Google, Anthropic, etc.) for the AI features to work.
 echo.
 echo 2. To run the WebUI:
-echo    - Open a new Command Prompt or PowerShell window (important if Git/Python were just installed).
 echo    - Navigate to this directory: cd /d "%TARGET_INSTALL_DIR%"
-echo    - Activate the virtual environment: .venv\Scripts\activate.bat
-echo    - Run the application: python webui.py
+echo    - Double-click on the 'start_app.bat' file we'll create for you
 echo.
-echo 3. Access the WebUI in your browser, usually at: http://127.0.0.1:7788
+echo 3. Access the Web UI in your browser, usually at: http://127.0.0.1:7788
+echo.
+
+REM Create a simple startup script for the user
+echo Creating startup script...
+(
+    echo @echo off
+    echo cd /d "%TARGET_INSTALL_DIR%"
+    echo call .venv\Scripts\activate.bat
+    echo echo Starting Web UI...
+    echo python webui.py
+    echo pause
+) > "%TARGET_INSTALL_DIR%\start_app.bat"
+echo Please Launch the Visual Web Agent by Clicking Launch Button
 echo.
 goto :cleanup_and_end
 
@@ -260,7 +312,7 @@ exit /b 1
 
 :cleanup_and_end
 echo Cleaning up temporary downloads...
-rmdir /s /q "%DOWNLOAD_DIR%" 2>nul
+rmdir /s /q "%TEMP_DIR%" 2>nul
 echo Script finished successfully.
 pause
 endlocal
@@ -268,6 +320,6 @@ exit /b 0
 
 :cleanup_and_exit
 echo Cleaning up temporary downloads...
-rmdir /s /q "%DOWNLOAD_DIR%" 2>nul
+rmdir /s /q "%TEMP_DIR%" 2>nul
 endlocal
 exit /b 1
