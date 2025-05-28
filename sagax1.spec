@@ -33,7 +33,9 @@ packages_to_collect = [
     'duckduckgo_search', 'markdown',
     # RAG-related packages
     'langchain', 'langchain_community', 'langchain_huggingface', 'langchain_core',
-    'faiss', 'unidecode', 'sklearn', 'sentence_transformers'
+    'faiss', 'unidecode', 'sklearn', 'sentence_transformers',
+    # New additions for PyQt6-WebEngine
+    'PyQt6.QtWebEngineWidgets', 'PyQt6.QtWebEngineCore'
 ]
 
 # Add data files for packages that need them
@@ -72,6 +74,11 @@ datas.extend([
     ('app/', 'app/'),
     ('config/', 'config/'),
     ('assets/', 'assets/') if os.path.exists('assets') else ('assets', 'assets')
+])
+
+# Add new.bat file which is used for installation
+datas.extend([
+    ('app/utils/new.bat', 'app/utils/')
 ])
 
 # Add SSL certificates from certifi
@@ -133,7 +140,12 @@ hidden_imports = [
     'langchain_huggingface.embeddings',
     'langchain_huggingface.llms',
     'sklearn.feature_extraction.text',
-    'sentence_transformers'
+    'sentence_transformers',
+    
+    # New PyQt6-WebEngine imports
+    'PyQt6.QtWebEngineWidgets',
+    'PyQt6.QtWebEngineCore',
+    'PyQt6.QtWebEngineWidgets.QWebEngineView'
 ]
 
 # Add sentence transformers related imports
@@ -189,9 +201,19 @@ try:
     mock_module.get_results_from_chat = get_results_from_chat
 except Exception as e:
     print(f"Failed to monkey patch duckduckgo_search: {e}")
+
+# Set up WebEngine environment variables
+if getattr(sys, 'frozen', False):
+    try:
+        from PyQt6.QtWebEngineCore import QWebEngineSettings
+        print("Successfully imported QWebEngineCore")
+    except ImportError as e:
+        print(f"Warning: Could not import QWebEngineCore: {e}")
 ''')
 
 # Add hook for RAG-related packages
+os.makedirs('hooks', exist_ok=True)
+
 with open('hooks/hook-faiss.py', 'w') as f:
     f.write('''
 # hooks/hook-faiss.py
@@ -234,6 +256,16 @@ from PyInstaller.utils.hooks import collect_all
 # Collect all packages, data files, and binaries
 datas, binaries, hiddenimports = collect_all('langchain_huggingface')
 hiddenimports.extend(['langchain_huggingface.embeddings', 'langchain_huggingface.llms'])
+''')
+
+# Add hook for PyQt6-WebEngine
+with open('hooks/hook-PyQt6.QtWebEngineWidgets.py', 'w') as f:
+    f.write('''
+# hooks/hook-PyQt6.QtWebEngineWidgets.py
+from PyInstaller.utils.hooks import collect_all
+
+# Collect all packages, data files, and binaries
+datas, binaries, hiddenimports = collect_all('PyQt6.QtWebEngineWidgets')
 ''')
 
 a = Analysis(

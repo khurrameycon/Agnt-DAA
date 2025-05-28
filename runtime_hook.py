@@ -38,3 +38,11 @@ try:
     mock_module.get_results_from_chat = get_results_from_chat
 except Exception as e:
     print(f"Failed to monkey patch duckduckgo_search: {e}")
+
+# Set up WebEngine environment variables
+if getattr(sys, 'frozen', False):
+    try:
+        from PyQt6.QtWebEngineCore import QWebEngineSettings
+        print("Successfully imported QWebEngineCore")
+    except ImportError as e:
+        print(f"Warning: Could not import QWebEngineCore: {e}")
