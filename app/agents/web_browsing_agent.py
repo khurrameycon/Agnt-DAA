@@ -1,183 +1,265 @@
 """
-Web Browsing Agent for sagax1
-Agent for browsing the web, searching for information, and visiting webpages
-Updated to remove HF dependency and use only external API providers
+Improved Web Browsing Agent for sagax1
+Enhanced with rate limiting handling and multiple search backends
 """
 
 import os
 import logging
 import json
-from typing import Dict, Any, List, Optional, Callable, Union
+import time
+import requests
+from typing import Dict, Any, List, Optional, Callable
+import random
+from urllib.parse import quote_plus
+import re
 
 from app.agents.base_agent import BaseAgent
-from smolagents import (
-    Tool, 
-    DuckDuckGoSearchTool, 
-    VisitWebpageTool, 
-    CodeAgent,
-    ToolCallingAgent
-)
 
-class FormattedSearchResults(Tool):
-    """Tool for formatting search results into a more UI-friendly format"""
+
+class MultiSearchTool:
+    """Multi-backend search tool with rate limiting and fallbacks"""
     
-    name = "format_results"
-    description = "Format search and webpage results for better display in the UI"
-    inputs = {
-        "content": {
-            "type": "string", 
-            "description": "Raw search results or webpage content to format"
-        }
-    }
-    output_type = "string"
-    
-    def forward(self, content: str) -> str:
-        """Format content for better display
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.last_request_time = 0
+        self.min_delay = 1.0  # Minimum delay between requests
         
-        Args:
-            content: Raw content to format
-            
-        Returns:
-            Formatted content
-        """
+        # User agents for rotation
+        self.user_agents = [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/91.0.864.59",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15"
+        ]
+    
+    def _rate_limit_delay(self):
+        """Implement rate limiting delay"""
+        current_time = time.time()
+        time_since_last = current_time - self.last_request_time
+        
+        if time_since_last < self.min_delay:
+            delay = self.min_delay - time_since_last + random.uniform(0.1, 0.5)
+            self.logger.info(f"Rate limiting: waiting {delay:.2f} seconds")
+            time.sleep(delay)
+        
+        self.last_request_time = time.time()
+    
+    def _get_headers(self):
+        """Get randomized headers"""
+        return {
+            'User-Agent': random.choice(self.user_agents),
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+        }
+    
+    def search_duckduckgo_html(self, query: str, max_results: int = 5) -> List[Dict[str, str]]:
+        """Search using DuckDuckGo HTML interface"""
         try:
-            # Check if the content is from a web search
-            if "Web search results:" in content:
-                # Format search results more attractively
-                lines = content.split("\n")
-                formatted = "# Search Results\n\n"
-                
-                current_result = None
-                results = []
-                
-                for line in lines:
-                    if line.startswith("[") and "]" in line:
-                        # New result title
-                        if current_result:
-                            results.append(current_result)
-                        current_result = {"title": line, "content": []}
-                    elif current_result and line.strip():
-                        current_result["content"].append(line)
-                
-                # Add the last result
-                if current_result:
-                    results.append(current_result)
-                
-                # Format results in a more structured way
-                for i, result in enumerate(results):
-                    title = result["title"]
-                    content = "\n".join(result["content"])
-                    formatted += f"## Result {i+1}\n{title}\n\n{content}\n\n"
-                
-                return formatted
+            self._rate_limit_delay()
             
-            # Check if it's webpage content
-            elif "Error fetching the webpage:" not in content and len(content) > 500:
-                # Simplify lengthy webpage content
-                # Extract what seems to be the main content
-                paragraphs = [p for p in content.split("\n\n") if len(p) > 100]
-                
-                if paragraphs:
-                    formatted = "# Webpage Content\n\n"
-                    formatted += "\n\n".join(paragraphs[:5])  # First 5 substantial paragraphs
-                    if len(paragraphs) > 5:
-                        formatted += "\n\n... (content continues) ..."
-                    return formatted
+            # Use the regular DuckDuckGo search instead of lite
+            search_url = f"https://duckduckgo.com/html/?q={quote_plus(query)}"
             
-            # Default: return content as is
-            return content
+            headers = self._get_headers()
+            
+            response = requests.get(search_url, headers=headers, timeout=10)
+            
+            if response.status_code == 202:
+                self.logger.warning("DuckDuckGo rate limit hit, trying alternative approach")
+                return []
+            
+            response.raise_for_status()
+            html = response.text
+            
+            # Parse results using regex (simple but effective)
+            results = []
+            
+            # Look for result links and titles
+            link_pattern = r'<a[^>]+class="result__a"[^>]+href="([^"]+)"[^>]*>([^<]+)</a>'
+            snippet_pattern = r'<a[^>]+class="result__snippet"[^>]*>([^<]+)</a>'
+            
+            links = re.findall(link_pattern, html)
+            snippets = re.findall(snippet_pattern, html)
+            
+            for i, (url, title) in enumerate(links[:max_results]):
+                snippet = snippets[i] if i < len(snippets) else ""
+                
+                # Clean up the data
+                title = re.sub(r'<[^>]+>', '', title).strip()
+                snippet = re.sub(r'<[^>]+>', '', snippet).strip()
+                url = url.replace('/l/?uddg=', '').replace('&rut=', '').split('&')[0]
+                
+                results.append({
+                    'title': title,
+                    'url': url,
+                    'snippet': snippet
+                })
+            
+            return results
             
         except Exception as e:
-            return f"Error formatting content: {str(e)}"
+            self.logger.error(f"DuckDuckGo HTML search failed: {e}")
+            return []
+    
+    def search_searx(self, query: str, max_results: int = 5) -> List[Dict[str, str]]:
+        """Search using SearX public instances"""
+        searx_instances = [
+            "https://searx.tiekoetter.com",
+            "https://searx.be",
+            "https://search.sapti.me",
+            "https://searx.prvcy.eu",
+        ]
+        
+        for instance in searx_instances:
+            try:
+                self._rate_limit_delay()
+                
+                search_url = f"{instance}/search"
+                params = {
+                    'q': query,
+                    'format': 'json',
+                    'categories': 'general'
+                }
+                
+                headers = self._get_headers()
+                
+                response = requests.get(search_url, params=params, headers=headers, timeout=10)
+                response.raise_for_status()
+                
+                data = response.json()
+                results = []
+                
+                for item in data.get('results', [])[:max_results]:
+                    results.append({
+                        'title': item.get('title', ''),
+                        'url': item.get('url', ''),
+                        'snippet': item.get('content', '')
+                    })
+                
+                if results:
+                    self.logger.info(f"Successfully used SearX instance: {instance}")
+                    return results
+                    
+            except Exception as e:
+                self.logger.warning(f"SearX instance {instance} failed: {e}")
+                continue
+        
+        return []
+    
+    def search_bing_scrape(self, query: str, max_results: int = 5) -> List[Dict[str, str]]:
+        """Scrape Bing search results"""
+        try:
+            self._rate_limit_delay()
+            
+            search_url = f"https://www.bing.com/search?q={quote_plus(query)}"
+            headers = self._get_headers()
+            
+            response = requests.get(search_url, headers=headers, timeout=10)
+            response.raise_for_status()
+            
+            html = response.text
+            results = []
+            
+            # Parse Bing results
+            # This is a simplified parser - you might need to adjust the regex
+            title_pattern = r'<h2><a href="([^"]+)"[^>]*>([^<]+)</a></h2>'
+            snippet_pattern = r'<p class="b_lineclamp[^"]*">([^<]+)</p>'
+            
+            titles = re.findall(title_pattern, html)
+            snippets = re.findall(snippet_pattern, html)
+            
+            for i, (url, title) in enumerate(titles[:max_results]):
+                snippet = snippets[i] if i < len(snippets) else ""
+                
+                # Clean up the data
+                title = re.sub(r'<[^>]+>', '', title).strip()
+                snippet = re.sub(r'<[^>]+>', '', snippet).strip()
+                
+                results.append({
+                    'title': title,
+                    'url': url,
+                    'snippet': snippet
+                })
+            
+            return results
+            
+        except Exception as e:
+            self.logger.error(f"Bing scraping failed: {e}")
+            return []
+    
+    def search(self, query: str, max_results: int = 5) -> List[Dict[str, str]]:
+        """Search with multiple backends and fallbacks"""
+        self.logger.info(f"Searching for: {query}")
+        
+        # Try different search backends in order of preference
+        search_methods = [
+            ("DuckDuckGo HTML", self.search_duckduckgo_html),
+            ("SearX", self.search_searx),
+            ("Bing Scrape", self.search_bing_scrape),
+        ]
+        
+        for method_name, search_method in search_methods:
+            try:
+                self.logger.info(f"Trying {method_name}...")
+                results = search_method(query, max_results)
+                
+                if results:
+                    self.logger.info(f"Successfully got {len(results)} results from {method_name}")
+                    return results
+                else:
+                    self.logger.warning(f"{method_name} returned no results")
+                    
+            except Exception as e:
+                self.logger.error(f"{method_name} failed: {e}")
+                continue
+        
+        # If all methods fail, return a helpful message
+        self.logger.error("All search methods failed")
+        return [{
+            'title': 'Search Temporarily Unavailable',
+            'url': '',
+            'snippet': 'All search services are currently unavailable due to rate limiting or connectivity issues. Please try again in a few minutes.'
+        }]
 
-class WebBrowsingAgent(BaseAgent):
-    """Agent for browsing the web, searching for information, and visiting webpages
-    Updated to use only external API providers (OpenAI, Gemini, Groq)
-    """
+
+class ImprovedWebBrowsingAgent(BaseAgent):
+    """Improved web browsing agent with rate limiting and fallbacks"""
     
     def __init__(self, agent_id: str, config: Dict[str, Any]):
-        """Initialize the web browsing agent
-        
-        Args:
-            agent_id: Unique identifier for this agent
-            config: Agent configuration dictionary
-                model_id: Model ID for the API provider
-                api_provider: API provider (openai, gemini, groq)
-                max_tokens: Maximum number of tokens to generate
-                temperature: Temperature for generation
-                multi_agent: Whether to use multi-agent architecture
-        """
+        """Initialize the improved web browsing agent"""
         super().__init__(agent_id, config)
         
         # Get API provider and model configuration
-        self.api_provider = config.get("api_provider", "groq")  # Default to Groq
+        self.api_provider = config.get("api_provider", "groq")
         self.model_id = config.get("model_id", self._get_default_model())
         self.max_tokens = config.get("max_tokens", 2048)
         self.temperature = config.get("temperature", 0.1)
-        self.authorized_imports = config.get("authorized_imports", [])
-        
-        # Add required imports for web tools
-        for import_name in ["requests", "bs4", "json", "re", "os"]:
-            if import_name not in self.authorized_imports:
-                self.authorized_imports.append(import_name)
-        
-        # Multi-agent architecture setting
-        self.use_multi_agent = config.get("multi_agent", False)
         
         # Initialize components
-        self.main_agent = None
-        self.web_agent = None
-        self.manager_agent = None
-        self.model = None
-        self.is_initialized = False
+        self.search_tool = MultiSearchTool()
+        self.api_provider_instance = None
         
-        # Store the last raw search results for UI display
-        self.last_search_results = ""
+        self.logger.info(f"Improved Web Browsing Agent initialized with {self.api_provider}")
     
     def _get_default_model(self):
         """Get default model based on API provider"""
         default_models = {
             "openai": "gpt-4o-mini",
             "gemini": "gemini-2.0-flash-exp",
-            "groq": "llama-3.3-70b-versatile"
+            "groq": "llama-3.3-70b-versatile",
+            "anthropic": "claude-sonnet-4-20250514"
         }
         return default_models.get(self.api_provider, "llama-3.3-70b-versatile")
     
-    def initialize(self) -> None:
-        """Initialize the model and agent(s) using external API providers"""
-        if self.is_initialized:
+    def _initialize_api(self):
+        """Initialize the API provider"""
+        if self.api_provider_instance is not None:
             return
         
-        try:
-            self.logger.info(f"Initializing web browsing agent with {self.api_provider} API")
-            
-            # Initialize the LLM model using API providers
-            self._initialize_api_model()
-            
-            # Initialize tools
-            tools = self._initialize_tools()
-
-            # If multi-agent mode is enabled, initialize multi-agent system
-            if self.use_multi_agent:
-                self._initialize_multi_agent(self.model, tools)
-            else:
-                # Create a single agent for direct search
-                self.main_agent = ToolCallingAgent(
-                    tools=tools,
-                    model=self.model,
-                    max_steps=5,  # Allow several steps for search and optional page visits
-                    verbosity_level=2  # Provide detailed output logs
-                )
-            
-            self.is_initialized = True
-            self.logger.info(f"Web browsing agent {self.agent_id} initialized successfully")
-            
-        except Exception as e:
-            self.logger.error(f"Error initializing web browsing agent: {str(e)}")
-            raise
-    
-    def _initialize_api_model(self):
-        """Initialize the model using external API providers (OpenAI, Gemini, Groq)"""
         from app.utils.api_providers import APIProviderFactory
         from app.core.config_manager import ConfigManager
         
@@ -187,213 +269,154 @@ class WebBrowsingAgent(BaseAgent):
         api_keys = {
             "openai": config_manager.get_openai_api_key(),
             "gemini": config_manager.get_gemini_api_key(),
-            "groq": config_manager.get_groq_api_key()
+            "groq": config_manager.get_groq_api_key(),
+            "anthropic": config_manager.get_anthropic_api_key()
         }
         
         api_key = api_keys.get(self.api_provider)
         if not api_key:
-            raise ValueError(f"{self.api_provider.upper()} API key is required for web browsing agent")
+            raise ValueError(f"{self.api_provider.upper()} API key is required")
         
-        # Create API provider instance
         self.api_provider_instance = APIProviderFactory.create_provider(
             self.api_provider, api_key, self.model_id
         )
-        
-        # Create wrapper function for smolagents compatibility
-        def generate_text(messages):
-            return self.api_provider_instance.generate(
-                messages, 
-                temperature=self.temperature,
-                max_tokens=self.max_tokens
-            )
-        
-        self.model = generate_text
-        self.logger.info(f"Initialized {self.api_provider.upper()} API with model {self.model_id}")
+        self.logger.info(f"Initialized {self.api_provider.upper()} API")
     
-    def _initialize_tools(self) -> List[Tool]:
-        """Initialize tools for the agent"""
-        return [
-            DuckDuckGoSearchTool(),
-            VisitWebpageTool(),
-            FormattedSearchResults()
-        ]
-    
-    def _initialize_multi_agent(self, model, tools: List[Tool]) -> None:
-        """Initialize the multi-agent setup following the notebook approach
-        
-        Args:
-            model: Language model to use
-            tools: List of tools to use
-        """
-        # Create a web agent that handles search and browsing (using ToolCallingAgent)
-        self.web_agent = ToolCallingAgent(
-            tools=tools,
-            model=model,
-            max_steps=10,  # Allow for more steps as web search may require several iterations
-            name="web_search_agent",
-            description="Runs web searches and visits webpages for you.",
-            verbosity_level=2  # Provide detailed output logs
-        )
-        
-        # Create a manager agent that handles the overall task (using CodeAgent)
-        self.manager_agent = CodeAgent(
-            tools=[],  # No direct tools, will use the web_agent
-            model=model,
-            managed_agents=[self.web_agent],  # This is how we connect the agents
-            additional_authorized_imports=self.authorized_imports,
-            verbosity_level=2  # Provide detailed output logs
-        )
-    
-    def generate_summary_with_llm(self, formatted_results: str, query: str) -> str:
-        """Generate an intelligent summary of search results using the LLM
-        
-        Args:
-            formatted_results: Formatted search results
-            query: Original search query
+    def search_and_summarize(self, query: str) -> str:
+        """Search for information and create a summary"""
+        try:
+            self._initialize_api()
             
-        Returns:
-            LLM-generated summary with relevant URLs
-        """
-        self.logger.info(f"Generating summary for query: {query}")
-        
-        # Create a prompt for the LLM
-        prompt = f"""You are an intelligent web search assistant that provides helpful, accurate, and concise summaries.
+            # Perform search
+            results = self.search_tool.search(query, max_results=5)
+            
+            if not results or not results[0].get('title'):
+                return "I couldn't find any search results at the moment. Please try again later."
+            
+            # Format search results in a more compact way
+            formatted_results = ""
+            for i, result in enumerate(results, 1):
+                title = result.get('title', 'No title')
+                url = result.get('url', '')
+                snippet = result.get('snippet', 'No description available')
+                
+                # Truncate snippets to keep prompt manageable
+                if len(snippet) > 150:
+                    snippet = snippet[:150] + "..."
+                
+                formatted_results += f"{i}. {title}\n"
+                formatted_results += f"   {snippet}\n"
+                if url:
+                    formatted_results += f"   Source: {url}\n"
+                formatted_results += "\n"
+            
+            # Create a more concise prompt for Groq
+            prompt = f"""Search Query: "{query}"
 
-I searched for: "{query}"
-
-Here are the search results:
-
+Search Results:
 {formatted_results}
 
-Please provide a comprehensive summary of these results that directly answers my query. 
-Include the most relevant information and mention 2-3 specific sources with their URLs.
-Format your response in a clear, easy-to-read way with sections and bullet points where appropriate.
-"""
+Please provide a clear and informative summary based on these search results. Include key points and mention relevant sources."""
+            
+            # Check prompt length and truncate if needed for Groq
+            if len(prompt) > 2000:  # Conservative limit for Groq
+                # Truncate the search results part
+                truncated_results = formatted_results[:1000] + "\n[Results truncated...]"
+                prompt = f"""Search Query: "{query}"
 
-        # Format the input in the format expected by the model
-        messages = [
-            {
-                "role": "user", 
-                "content": [
-                    {
-                        "type": "text", 
-                        "text": prompt
-                    }
-                ]
-            }
-        ]
-        
-        # Call the model (API-based)
-        try:
-            response = self.model(messages)
+Search Results:
+{truncated_results}
+
+Please provide a clear and informative summary based on these search results."""
             
-            # Convert the response to a string based on its type
-            if hasattr(response, 'content'):
-                # If it's a ChatMessage object with a content attribute
-                result_text = response.content
-            elif hasattr(response, 'text'):
-                # If it has a text attribute
-                result_text = response.text
-            elif hasattr(response, '__str__'):
-                # Fall back to string representation
-                result_text = str(response)
-            else:
-                # Last resort fallback
-                result_text = "Response received but could not be converted to text"
-            
-            return result_text
+            # Generate summary with retry logic for Groq
+            max_retries = 2
+            for attempt in range(max_retries):
+                try:
+                    messages = [{"content": prompt}]
+                    summary = self.api_provider_instance.generate(
+                        messages,
+                        temperature=self.temperature,
+                        max_tokens=min(self.max_tokens, 1024)  # Reduce max tokens for Groq
+                    )
+                    return summary
+                    
+                except Exception as api_error:
+                    error_str = str(api_error).lower()
+                    if "503" in error_str or "service unavailable" in error_str:
+                        if attempt < max_retries - 1:
+                            self.logger.warning(f"Groq API 503 error, retrying in 2 seconds... (attempt {attempt + 1})")
+                            time.sleep(2)  # Wait before retry
+                            continue
+                        else:
+                            # If all retries failed, return formatted results without AI summary
+                            self.logger.error("Groq API consistently unavailable, returning raw search results")
+                            return self._format_raw_results(query, results)
+                    else:
+                        # For other errors, don't retry
+                        raise api_error
             
         except Exception as e:
-            error_msg = f"Error generating summary: {str(e)}"
-            self.logger.error(error_msg)
-            return f"""Failed to generate a summary with the LLM. Here are the raw search results:
-
-{formatted_results}
-
-Error: {error_msg}"""
+            self.logger.error(f"Error in search and summarize: {e}")
+            # Return formatted search results as fallback
+            if 'results' in locals() and results:
+                return self._format_raw_results(query, results)
+            else:
+                return f"I encountered an error while searching: {str(e)}. Please try again."
+    
+    def _format_raw_results(self, query: str, results: List[Dict[str, str]]) -> str:
+        """Format raw search results when AI summary fails"""
+        formatted = f"# Search Results for: {query}\n\n"
+        formatted += "*Note: AI summary temporarily unavailable, showing raw search results*\n\n"
+        
+        for i, result in enumerate(results, 1):
+            title = result.get('title', 'No title')
+            url = result.get('url', '')
+            snippet = result.get('snippet', 'No description available')
+            
+            formatted += f"## {i}. {title}\n"
+            if url:
+                formatted += f"**URL:** {url}\n"
+            formatted += f"**Description:** {snippet}\n\n"
+        
+        return formatted
     
     def run(self, input_text: str, callback: Optional[Callable[[str], None]] = None) -> str:
-        """Run the agent with the given input
-        
-        Args:
-            input_text: Input text for the agent
-            callback: Optional callback for streaming responses
-            
-        Returns:
-            Agent output text
-        """
-        if not self.is_initialized:
-            self.initialize()
-        
+        """Run the agent with the given input"""
         try:
-            # Update progress if callback is provided
             if callback:
-                callback("Searching the web for information...")
+                callback("Searching the web...")
             
-            # Use the DuckDuckGoSearchTool to get search results
-            search_tool = DuckDuckGoSearchTool()
+            # Clean up the input query
+            query = input_text.strip()
             
-            # Perform the search
-            search_results = search_tool(query=input_text)
+            # Perform search and summarization
+            result = self.search_and_summarize(query)
             
-            # Store the raw search results
-            self.last_search_results = search_results
-            
-            # Format the search results
-            formatter = FormattedSearchResults()
-            formatted_results = formatter(search_results)
-            
-            # Update progress if callback is provided
             if callback:
-                callback("Processing search results and generating summary...")
-            
-            # Generate intelligent summary with the LLM
-            summary = self.generate_summary_with_llm(formatted_results, input_text)
+                callback("Search completed")
             
             # Add to history
-            self.add_to_history(input_text, summary)
+            self.add_to_history(input_text, result)
             
-            # Return the summary
-            return summary
+            return result
             
         except Exception as e:
-            error_msg = f"Error running web browsing agent: {str(e)}"
+            error_msg = f"Error in web browsing agent: {str(e)}"
             self.logger.error(error_msg)
             return f"Sorry, I encountered an error while browsing the web: {error_msg}"
     
     def reset(self) -> None:
         """Reset the agent's state"""
-        if self.use_multi_agent:
-            if self.web_agent:
-                self.web_agent.memory.reset()
-            if self.manager_agent:
-                self.manager_agent.memory.reset()
-        elif self.main_agent:
-            self.main_agent.memory.reset()
-        
         self.clear_history()
-        self.last_search_results = ""
     
     def get_capabilities(self) -> List[str]:
-        """Get the list of capabilities this agent has
-        
-        Returns:
-            List of capability names
-        """
-        capabilities = [
-            "web_search", 
-            "web_browsing", 
-            "information_retrieval",
-            "content_extraction",
-            "result_formatting",
-            "intelligent_summarization"
+        """Get the list of capabilities this agent has"""
+        return [
+            "web_search",
+            "information_retrieval", 
+            "content_summarization",
+            "multi_backend_search",
+            "rate_limit_handling",
+            f"{self.api_provider}_api"
         ]
-        
-        if self.use_multi_agent:
-            capabilities.append("multi_agent_collaboration")
-            capabilities.append("task_planning")
-        
-        # Add API provider capability
-        capabilities.append(f"{self.api_provider}_api")
-        
-        return capabilities

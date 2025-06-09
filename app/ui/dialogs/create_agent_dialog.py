@@ -882,6 +882,17 @@ class CreateAgentDialog(QDialog):
         # Add agent-specific configuration
         agent_type = self.agent_type_combo.currentText()
         
+        if agent_type == "rag":
+            # Set embedding provider based on chat provider
+            if api_provider == "openai":
+                # Use OpenAI for both chat and embeddings if available
+                config["additional_config"]["embedding_provider"] = "openai"
+                config["additional_config"]["embedding_model"] = "text-embedding-3-small"
+            else:
+                # Use sentence-transformers for embeddings with other chat providers
+                config["additional_config"]["embedding_provider"] = "sentence-transformers"
+                config["additional_config"]["embedding_model"] = "all-MiniLM-L6-v2"
+
         if agent_type == "web_browsing":
             config["additional_config"]["multi_agent"] = self.multi_agent_check.isChecked()
         elif agent_type == "visual_web":
