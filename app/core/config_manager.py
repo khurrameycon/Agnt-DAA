@@ -1,6 +1,6 @@
 """
 Configuration manager for sagax1
-Handles loading, saving, and managing application configuration
+Updated to include Anthropic API key support
 """
 
 import os
@@ -13,7 +13,8 @@ DEFAULT_CONFIG = {
         "huggingface": "",
         "openai": "",
         "gemini": "",
-        "groq": ""
+        "groq": "",
+        "anthropic": ""  # Add Anthropic API key
     },
     "api_providers": {
         "openai": {
@@ -27,6 +28,10 @@ DEFAULT_CONFIG = {
         "groq": {
             "default_model": "llama-3.3-70b-versatile",
             "base_url": "https://api.groq.com/openai/v1"
+        },
+        "anthropic": {  # Add Anthropic configuration
+            "default_model": "claude-sonnet-4-20250514",
+            "base_url": "https://api.anthropic.com"
         }
     },
     "models": {
@@ -160,10 +165,6 @@ class ConfigManager:
         """
         self.set("api_keys.huggingface", api_key)
     
-    def save(self) -> None:
-        """Save the current configuration to file"""
-        self._save_config(self.config)
-
     def get_openai_api_key(self) -> Optional[str]:
         return os.environ.get("OPENAI_API_KEY") or self.get("api_keys.openai")
 
@@ -173,6 +174,14 @@ class ConfigManager:
     def get_groq_api_key(self) -> Optional[str]:
         return os.environ.get("GROQ_API_KEY") or self.get("api_keys.groq")
 
+    def get_anthropic_api_key(self) -> Optional[str]:
+        """Get the Anthropic API key
+        
+        Returns:
+            The API key or None if not set
+        """
+        return os.environ.get("ANTHROPIC_API_KEY") or self.get("api_keys.anthropic")
+
     def set_openai_api_key(self, api_key: str) -> None:
         self.set("api_keys.openai", api_key)
 
@@ -181,3 +190,15 @@ class ConfigManager:
 
     def set_groq_api_key(self, api_key: str) -> None:
         self.set("api_keys.groq", api_key)
+
+    def set_anthropic_api_key(self, api_key: str) -> None:
+        """Set the Anthropic API key
+        
+        Args:
+            api_key: The API key to set
+        """
+        self.set("api_keys.anthropic", api_key)
+    
+    def save(self) -> None:
+        """Save the current configuration to file"""
+        self._save_config(self.config)

@@ -428,6 +428,13 @@ class MainWindow(QMainWindow):
         layout.addWidget(QLabel("API Settings:"))
         api_layout = QFormLayout()
 
+        # Anthropic API Key (put first since it's preferred for Code Generation)
+        self.anthropic_key_field = QLineEdit()
+        self.anthropic_key_field.setEchoMode(QLineEdit.EchoMode.Password)
+        anthropic_key = self.config_manager.get_anthropic_api_key() or ""
+        self.anthropic_key_field.setText(anthropic_key)
+        api_layout.addRow("Anthropic API Key:", self.anthropic_key_field)
+
         # OpenAI API Key
         self.openai_key_field = QLineEdit()
         self.openai_key_field.setEchoMode(QLineEdit.EchoMode.Password)
@@ -461,20 +468,6 @@ class MainWindow(QMainWindow):
         save_keys_button.clicked.connect(self.save_api_keys)
         api_layout.addRow("", save_keys_button)
         
-        # API key field (masked)
-        self.api_key_field = QLineEdit()
-        self.api_key_field.setEchoMode(QLineEdit.EchoMode.Password)
-        api_key = self.config_manager.get_hf_api_key() or ""
-        self.api_key_field.setText(api_key)
-        self.api_key_field.setReadOnly(True)
-        
-        api_layout.addRow("API Key:", self.api_key_field)
-        
-        # API key change button
-        change_key_button = QPushButton("Change")
-        change_key_button.clicked.connect(self.set_api_key)
-        api_layout.addRow("", change_key_button)
-        
         layout.addLayout(api_layout)
         
         # Model cache settings
@@ -503,9 +496,10 @@ class MainWindow(QMainWindow):
         
         # Start a thread to calculate cache size
         self.update_cache_size()
-    
+
     def save_api_keys(self):
         """Save all API keys"""
+        self.config_manager.set_anthropic_api_key(self.anthropic_key_field.text())
         self.config_manager.set_openai_api_key(self.openai_key_field.text())
         self.config_manager.set_gemini_api_key(self.gemini_key_field.text())
         self.config_manager.set_groq_api_key(self.groq_key_field.text())

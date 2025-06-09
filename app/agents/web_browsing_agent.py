@@ -1,7 +1,7 @@
 """
 Web Browsing Agent for sagax1
 Agent for browsing the web, searching for information, and visiting webpages
-Enhanced with direct LLM summarization capability (both local and API modes)
+Updated to remove HF dependency and use only external API providers
 """
 
 import os
@@ -92,7 +92,7 @@ class FormattedSearchResults(Tool):
 
 class WebBrowsingAgent(BaseAgent):
     """Agent for browsing the web, searching for information, and visiting webpages
-    Enhanced with direct LLM summarization capability (both local and API modes)
+    Updated to use only external API providers (OpenAI, Gemini, Groq)
     """
     
     def __init__(self, agent_id: str, config: Dict[str, Any]):
@@ -101,18 +101,17 @@ class WebBrowsingAgent(BaseAgent):
         Args:
             agent_id: Unique identifier for this agent
             config: Agent configuration dictionary
-                model_id: Hugging Face model ID
-                device: Device to use (e.g., 'cpu', 'cuda', 'mps')
+                model_id: Model ID for the API provider
+                api_provider: API provider (openai, gemini, groq)
                 max_tokens: Maximum number of tokens to generate
                 temperature: Temperature for generation
                 multi_agent: Whether to use multi-agent architecture
-                use_api: Whether to use the Hugging Face Inference API (remote execution)
-                use_local_execution: Whether to use local execution (download model)
         """
         super().__init__(agent_id, config)
         
-        self.model_id = config.get("model_id", "meta-llama/Llama-3.2-3B-Instruct")
-        self.device = config.get("device", "auto")
+        # Get API provider and model configuration
+        self.api_provider = config.get("api_provider", "groq")  # Default to Groq
+        self.model_id = config.get("model_id", self._get_default_model())
         self.max_tokens = config.get("max_tokens", 2048)
         self.temperature = config.get("temperature", 0.1)
         self.authorized_imports = config.get("authorized_imports", [])
@@ -121,18 +120,11 @@ class WebBrowsingAgent(BaseAgent):
         for import_name in ["requests", "bs4", "json", "re", "os"]:
             if import_name not in self.authorized_imports:
                 self.authorized_imports.append(import_name)
-                
-        # Get execution mode - prioritize explicit flags
-        self.use_api = config.get("use_api", False)
-        self.use_local_execution = config.get("use_local_execution", not self.use_api)
         
-        # If both flags are somehow set (shouldn't happen), prioritize API mode
-        if self.use_api and self.use_local_execution:
-            self.logger.warning("Both use_api and use_local_execution are set to True. Prioritizing API mode.")
-            self.use_local_execution = False
-        
+        # Multi-agent architecture setting
         self.use_multi_agent = config.get("multi_agent", False)
         
+        # Initialize components
         self.main_agent = None
         self.web_agent = None
         self.manager_agent = None
@@ -142,22 +134,25 @@ class WebBrowsingAgent(BaseAgent):
         # Store the last raw search results for UI display
         self.last_search_results = ""
     
+    def _get_default_model(self):
+        """Get default model based on API provider"""
+        default_models = {
+            "openai": "gpt-4o-mini",
+            "gemini": "gemini-2.0-flash-exp",
+            "groq": "llama-3.3-70b-versatile"
+        }
+        return default_models.get(self.api_provider, "llama-3.3-70b-versatile")
+    
     def initialize(self) -> None:
-        """Initialize the model and agent(s)"""
+        """Initialize the model and agent(s) using external API providers"""
         if self.is_initialized:
             return
         
         try:
-            from smolagents import TransformersModel, HfApiModel, OpenAIServerModel, LiteLLMModel
+            self.logger.info(f"Initializing web browsing agent with {self.api_provider} API")
             
-            self.logger.info(f"Initializing web browsing agent with model {self.model_id}")
-            
-            # Initialize the LLM model (local or API-based)
-            if self.use_api:
-                self._initialize_api_model()
-            else:
-                # Local execution mode - download model and use locally
-                self._initialize_local_model()
+            # Initialize the LLM model using API providers
+            self._initialize_api_model()
             
             # Initialize tools
             tools = self._initialize_tools()
@@ -182,139 +177,38 @@ class WebBrowsingAgent(BaseAgent):
             raise
     
     def _initialize_api_model(self):
-        """Initialize the model by wrapping a direct HTTP call to the HF Inference API."""
+        """Initialize the model using external API providers (OpenAI, Gemini, Groq)"""
+        from app.utils.api_providers import APIProviderFactory
         from app.core.config_manager import ConfigManager
-        import requests
-
-        self.logger.info("Initializing model via Hugging Face Inference API")
-
-        # 1. Retrieve API key
-        api_key = ConfigManager().get_hf_api_key()
-        self.logger.info(f"Loaded HF API key: {api_key!r}")
-        if not api_key:
-            self.logger.error("No API key found. Cannot use Inference API.")
-            raise ValueError("HuggingFace API key is required for Inference API mode")
         
-        # 2. Prepare headers once
-        headers = {
-            "Authorization": f"Bearer {api_key}"
+        config_manager = ConfigManager()
+        
+        # Get API key based on provider
+        api_keys = {
+            "openai": config_manager.get_openai_api_key(),
+            "gemini": config_manager.get_gemini_api_key(),
+            "groq": config_manager.get_groq_api_key()
         }
-
-        # 3. Build the base URL for your model
-        # base_url = f"https://router.huggingface.co/hf-inference/models/{self.model_id}/v1/chat/completions"
-        base_url = f"https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.3/v1/chat/completions"
-        # 4. The wrapper function
-        def generate_text(messages):
-            try:
-                # --- extract prompt from messages (your existing logic) ---
-                prompt = ""
-                if isinstance(messages, list) and messages:
-                    last = messages[-1]
-                    if isinstance(last, dict) and "content" in last:
-                        content = last["content"]
-                        if isinstance(content, list):
-                            prompt = " ".join(
-                                item.get("text", "")
-                                for item in content
-                                if item.get("type") == "text"
-                            )
-                        else:
-                            prompt = content
-                    else:
-                        prompt = str(last)
-                # ----------------------------------------------------------
-
-                # 5. Build payload exactly as in your test
-                payload = {
-                    "model": 'mistralai/Mistral-7B-Instruct-v0.3',
-                    "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": self.max_tokens,
-                    "temperature": float(self.temperature),
-                }
-
-                # 6. POST to the inference endpoint
-                resp = requests.post(base_url, headers=headers, json=payload)
-
-                # 7. Error handling
-                if resp.status_code != 200:
-                    self.logger.error(f"Inference API HTTP {resp.status_code}: {resp.text}")
-                    return f"Error calling Inference API: {resp.status_code} {resp.text}"
-
-                data = resp.json()
-                return data["choices"][0]["message"]["content"]
-
-            except Exception as e:
-                self.logger.error(f"Inference API exception: {e}")
-                return f"Error calling Inference API: {e}"
-
-        # 8. Bind it and log
-        self.model = generate_text
-        self.logger.info(f"Initialized {self.model_id} via direct HTTP inference")
-
-    def _initialize_local_model(self):
-        """Initialize the model locally"""
-        try:
-            from smolagents import TransformersModel
-            
-            self.logger.info(f"Initializing local model {self.model_id}")
-            
-            self.model = TransformersModel(
-                model_id=self.model_id,
-                device_map=self.device,
-                max_new_tokens=self.max_tokens,
-                temperature=self.temperature,
-                trust_remote_code=True,
-                do_sample=True  # Add this to fix the temperature warning
-            )
-            
-            self.logger.info(f"Initialized {self.model_id} for local execution")
-            
-        except Exception as e:
-            self.logger.error(f"Error initializing local model: {str(e)}")
-            # Try fallbacks like in LocalModelAgent
-            self._initialize_with_fallbacks()
-    
-    def _initialize_with_fallbacks(self):
-        """Try alternative model implementations if TransformersModel fails"""
-        from smolagents import HfApiModel, OpenAIServerModel, LiteLLMModel
         
-        try:
-            # Try HfApiModel
-            try:
-                self.logger.info("Trying HfApiModel...")
-                self.model = HfApiModel(
-                    model_id=self.model_id,
-                    temperature=self.temperature,
-                    max_tokens=self.max_tokens
-                )
-            except Exception as e:
-                self.logger.warning(f"Failed to initialize with HfApiModel: {str(e)}")
-                
-                # Try OpenAIServerModel
-                try:
-                    self.logger.info("Trying OpenAIServerModel...")
-                    self.model = OpenAIServerModel(
-                        model_id=self.model_id,
-                        temperature=self.temperature,
-                        max_tokens=self.max_tokens
-                    )
-                except Exception as e:
-                    self.logger.warning(f"Failed to initialize with OpenAIServerModel: {str(e)}")
-                    
-                    # Try LiteLLMModel as last resort
-                    self.logger.info("Trying LiteLLMModel...")
-                    self.model = LiteLLMModel(
-                        model_id=self.model_id,
-                        temperature=self.temperature,
-                        max_tokens=self.max_tokens
-                    )
-            
-            self.is_initialized = True
-            self.logger.info(f"Model {self.model_id} initialized successfully with fallback")
-            
-        except Exception as e:
-            self.logger.error(f"All fallback initialization attempts failed: {str(e)}")
-            raise
+        api_key = api_keys.get(self.api_provider)
+        if not api_key:
+            raise ValueError(f"{self.api_provider.upper()} API key is required for web browsing agent")
+        
+        # Create API provider instance
+        self.api_provider_instance = APIProviderFactory.create_provider(
+            self.api_provider, api_key, self.model_id
+        )
+        
+        # Create wrapper function for smolagents compatibility
+        def generate_text(messages):
+            return self.api_provider_instance.generate(
+                messages, 
+                temperature=self.temperature,
+                max_tokens=self.max_tokens
+            )
+        
+        self.model = generate_text
+        self.logger.info(f"Initialized {self.api_provider.upper()} API with model {self.model_id}")
     
     def _initialize_tools(self) -> List[Tool]:
         """Initialize tools for the agent"""
@@ -389,7 +283,7 @@ Format your response in a clear, easy-to-read way with sections and bullet point
             }
         ]
         
-        # Call the model (which could be local or API-based)
+        # Call the model (API-based)
         try:
             response = self.model(messages)
             
@@ -499,9 +393,7 @@ Error: {error_msg}"""
             capabilities.append("multi_agent_collaboration")
             capabilities.append("task_planning")
         
-        if self.use_api:
-            capabilities.append("api_inference")
-        else:
-            capabilities.append("local_model_inference")
+        # Add API provider capability
+        capabilities.append(f"{self.api_provider}_api")
         
         return capabilities

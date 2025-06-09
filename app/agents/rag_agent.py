@@ -1,7 +1,7 @@
 """
 RAG Agent for sagax1
 Agent for document retrieval and question answering using FAISS vector store
-Optimized for performance with dynamic chunking, caching, and hybrid search
+Updated to use API providers (Groq, OpenAI, Gemini) instead of HuggingFace
 """
 import sys
 import os
@@ -34,10 +34,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-# Import necessary libraries for LLM
-from langchain.chains.conversational_retrieval.base import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
-from langchain_huggingface import HuggingFaceEndpoint
+# Import necessary libraries for LLM - Remove HF dependencies
 from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
 from app.core.config_manager import ConfigManager
@@ -138,10 +135,13 @@ class RAGAgent(BaseAgent):
         super().__init__(agent_id, config)
         
         # Get config parameters or use defaults
-        self.model_id = config.get("model_id", "mistralai/Mistral-7B-Instruct-v0.3")
+        self.model_id = config.get("model_id", "llama-3.3-70b-versatile")  # Default to Groq model
         self.temperature = config.get("temperature", 0.7)
         self.max_tokens = config.get("max_tokens", 1024)
         self.top_k = config.get("top_k", 3)
+        
+        # API provider configuration
+        self.api_provider = config.get("api_provider", "groq")
         
         # Advanced chunking parameters
         self.chunk_size = config.get("chunk_size", 600)
@@ -160,10 +160,9 @@ class RAGAgent(BaseAgent):
         self.mmr_lambda = config.get("mmr_lambda", 0.7)
         
         # Parallel processing - using threads instead of processes to prevent window spawning
-        # Also leave some cores for system use
         self.use_parallel = config.get("use_parallel", False)
         cpu_count = os.cpu_count() or 1
-        self.max_workers = config.get("max_workers", max(1, min(cpu_count - 2, 6)))  # Leave at least 2 cores free
+        self.max_workers = config.get("max_workers", max(1, min(cpu_count - 2, 6)))
         
         # Resource monitoring and limitations
         self.max_memory_percent = config.get("max_memory_percent", MAX_MEMORY_PERCENT)
@@ -172,27 +171,11 @@ class RAGAgent(BaseAgent):
         # Cancellation support
         self.cancellation_token = threading.Event()
         
-        # API key management
-        self.api_key = os.environ.get("HUGGINGFACE_API_KEY") or os.environ.get("HF_API_KEY")
-        self.api_key = "hf_TH"
-        if not self.api_key:
-            try:
-                config_manager = ConfigManager()
-                self.api_key = config_manager.get_hf_api_key()
-                if self.api_key:
-                    self.logger.info("API key successfully retrieved from ConfigManager.")
-                else:
-                    self.logger.warning("API key not found in environment variables or config file.")
-            except Exception as e:
-                self.logger.error(f"Error retrieving API key using ConfigManager: {str(e)}")
-                self.api_key = None
-        
         # Set base directory for storing FAISS indexes
         self.faiss_index_dir = config.get("faiss_index_dir", "./faiss_indexes")
         os.makedirs(self.faiss_index_dir, exist_ok=True)
         
         # Status and components
-        self.qa_chain = None
         self.llm = None
         self.documents = {}  # Track document metadata (not full content)
         self.current_document_id = None
@@ -228,10 +211,7 @@ Question: {question}
 Context: {context} 
 Helpful Answer:
 """
-        self.logger.info(f"RAG Agent initialized with API key present: {self.api_key is not None}")
-        self.logger.info(f"Environment variables:")
-        for key in ['HUGGINGFACE_TOKEN', 'HF_TOKEN', 'HUGGINGFACE_API_KEY', 'HF_API_KEY']:
-            self.logger.info(f"  {key}: {'SET' if os.environ.get(key) else 'NOT SET'}")
+        self.logger.info(f"RAG Agent initialized with API provider: {self.api_provider}")
     
     def __del__(self):
         """Clean up resources when the object is destroyed"""
@@ -243,10 +223,6 @@ Helpful Answer:
             # Clean up LLM resources
             if hasattr(self, 'llm') and self.llm is not None:
                 del self.llm
-            
-            # Clean up QA chain
-            if hasattr(self, 'qa_chain') and self.qa_chain is not None:
-                del self.qa_chain
             
             # Clear caches
             if hasattr(self, 'embedding_cache'):
@@ -267,10 +243,6 @@ Helpful Answer:
         import sys
         
         self.logger.info(f"==== RAG AGENT INITIALIZATION START ====")
-        # Debug information about the environment
-        self.logger.info(f"Current working directory: {os.getcwd()}")
-        self.logger.info(f"Python executable: {sys.executable}")
-        self.logger.info(f"Is packaged app: {getattr(sys, 'frozen', False)}")
         
         # Fix SSL/HTTPS issues which are common in packaged applications
         try:
@@ -290,23 +262,10 @@ Helpful Answer:
             os.environ['CURL_CA_BUNDLE'] = cert_path
             
             # For packaged apps, consider creating an unverified context
-            # This is a security risk, but can be necessary for troubleshooting
             if getattr(sys, 'frozen', False):
                 self.logger.warning("Using unverified SSL context in packaged app")
                 ssl._create_default_https_context = ssl._create_unverified_context
                 
-            # Test HTTPS connection
-            self.logger.info("Testing HTTPS connection to huggingface.co")
-            try:
-                response = requests.get("https://huggingface.co/api/models?limit=1", timeout=10)
-                self.logger.info(f"HTTPS test response status: {response.status_code}")
-                if response.status_code == 200:
-                    self.logger.info("HTTPS connection successful")
-                else:
-                    self.logger.warning(f"HTTPS connection returned status {response.status_code}")
-            except Exception as https_e:
-                self.logger.error(f"HTTPS connection test failed: {https_e}")
-        
         except Exception as ssl_e:
             self.logger.error(f"Error setting up SSL certificates: {ssl_e}")
         
@@ -331,12 +290,8 @@ Helpful Answer:
             except Exception as bundle_e:
                 self.logger.error(f"Error trying to use bundled model: {bundle_e}")
         
-        # If we get here, try online model with Hugging Face Hub authentication
+        # If we get here, try online model
         try:
-            # Explicit authentication with huggingface_hub
-            import huggingface_hub
-            self.logger.info(f"HuggingFace Hub version: {huggingface_hub.__version__}")
-            
             # Set up the cache directory
             cache_dir = os.path.join(os.getcwd(), "models", "cache")
             if getattr(sys, 'frozen', False):
@@ -346,31 +301,12 @@ Helpful Answer:
             self.logger.info(f"Using cache directory: {cache_dir}")
             os.environ["TRANSFORMERS_CACHE"] = cache_dir
             
-            # Try explicit login with API key
-            if self.api_key:
-                self.logger.info("Attempting explicit HuggingFace login")
-                try:
-                    huggingface_hub.login(token=self.api_key)
-                    self.logger.info("Explicit HuggingFace login successful")
-                    
-                    # Set environment variables as well
-                    os.environ["HUGGINGFACE_TOKEN"] = self.api_key
-                    os.environ["HF_TOKEN"] = self.api_key
-                    os.environ["HUGGINGFACE_HUB_TOKEN"] = self.api_key
-                    
-                    self.logger.info("Environment variables set for API access")
-                except Exception as login_e:
-                    self.logger.error(f"Error during explicit login: {login_e}")
-            else:
-                self.logger.warning("No API key available for HuggingFace login")
-            
             # Now try to initialize the embedding model
             try:
                 self.logger.info("Initializing embedding model with all-MiniLM-L6-v2")
                 self.embedding_model = HuggingFaceEmbeddings(
                     model_name="sentence-transformers/all-MiniLM-L6-v2",
                     cache_folder=cache_dir,
-                    huggingface_token=self.api_key,  # Pass token directly to the embeddings class
                 )
                 
                 self.is_initialized = True
@@ -385,7 +321,6 @@ Helpful Answer:
                     self.embedding_model = HuggingFaceEmbeddings(
                         model_name="distilbert-base-nli-mean-tokens",
                         cache_folder=cache_dir,
-                        huggingface_token=self.api_key,
                     )
                     
                     self.is_initialized = True
@@ -526,7 +461,6 @@ Helpful Answer:
                 callback("Starting document processing...", 0.0)
 
             # --- Step 1: Load and Split Document ---
-            # Use the (already modified) sequential load_doc function
             doc_splits = self.load_doc(file_path, callback)
             
             # Check for cancellation
@@ -537,7 +471,6 @@ Helpful Answer:
                 }
 
             # --- Step 2: Validate Extracted Content ---
-            # Check if splitting resulted in meaningful content
             if not doc_splits or not any(chunk.page_content.strip() for chunk in doc_splits):
                 error_message = (
                     "Could not extract meaningful text from the PDF. "
@@ -556,12 +489,10 @@ Helpful Answer:
                 callback(f"Successfully extracted {len(doc_splits)} text chunks", 30.0)
 
             # --- Step 3: Create Collection Name ---
-            # Generate a unique and valid name for the vector store collection
             collection_name = self.create_collection_name(file_path)
             self.logger.info(f"Generated collection name: {collection_name}")
 
             # --- Step 4: Create Vector Database ---
-            # Now that we know we have content, proceed to create the DB
             try:
                 self.logger.info(f"Creating FAISS vector database for {collection_name}...")
                 if callback:
@@ -590,9 +521,8 @@ Helpful Answer:
                         self.tfidf_vectorizers[collection_name] = tfidf_vectorizer
                         self.logger.info(f"TF-IDF vectorizer created for {collection_name}.")
                     except Exception as tfidf_error:
-                        # Log the error but don't fail the whole process, hybrid search will just not work
                         self.logger.warning(f"Could not create TF-IDF vectorizer for {collection_name}: {tfidf_error}. Hybrid search may be affected.")
-                        self.tfidf_vectorizers.pop(collection_name, None) # Ensure it's not partially stored
+                        self.tfidf_vectorizers.pop(collection_name, None)
 
             except Exception as db_error:
                 self.logger.error(f"Error creating vector database for {collection_name}: {db_error}")
@@ -604,7 +534,6 @@ Helpful Answer:
                 }
 
             # --- Step 5: Store Document Info and Return Success ---
-            # Store metadata only - not the full chunks to save memory
             chunk_metadata = [{
                 "page": doc.metadata.get("page", 0),
                 "source": doc.metadata.get("source", file_path),
@@ -615,7 +544,7 @@ Helpful Answer:
                 "id": collection_name,
                 "path": file_path,
                 "name": os.path.basename(file_path),
-                "chunk_metadata": chunk_metadata,  # Store just metadata, not full content
+                "chunk_metadata": chunk_metadata,
                 "vector_db": vector_db,
                 "total_chunks": len(doc_splits)
             }
@@ -836,6 +765,7 @@ Helpful Answer:
                     gc.collect()
             
             # Convert to numpy array
+            # Convert to numpy array
             embeddings_np = np.array(all_embeddings).astype('float32')
             
             # Create optimized FAISS index with IVF for faster search
@@ -993,18 +923,9 @@ Helpful Answer:
                 self.logger.info("Successfully cleaned up previous LLM resources")
             except Exception as e:
                 self.logger.error(f"Error cleaning up LLM resources: {str(e)}")
-        
-        # Clean up previous QA chain if it exists
-        if hasattr(self, 'qa_chain') and self.qa_chain is not None:
-            try:
-                del self.qa_chain
-                self.qa_chain = None
-                gc.collect()
-            except Exception as e:
-                self.logger.error(f"Error cleaning up QA chain: {str(e)}")
     
     def initialize_llmchain(self, document_id: str) -> bool:
-        """Initialize the LLM chain for a specific document
+        """Initialize the LLM chain for a specific document using API providers
         
         Args:
             document_id: Document ID to use
@@ -1025,121 +946,57 @@ Helpful Answer:
             vector_db = self.documents[document_id]["vector_db"]
             
             # Clean up previous resources if model is changing
-            if self.llm is not None or self.qa_chain is not None:
+            if self.llm is not None:
                 self.cleanup_llm_resources()
             
-            self.logger.info(f"Initializing LLM chain with model: {self.model_id}")
+            self.logger.info(f"Initializing LLM chain with API provider: {self.api_provider}")
             
-            # Get API provider from config
-            api_provider = self.config.get("api_provider", "huggingface")
+            # Use API providers instead of HuggingFace
+            from app.utils.api_providers import APIProviderFactory
+            from app.core.config_manager import ConfigManager
+            from langchain.llms.base import LLM
             
-            if api_provider in ["openai", "gemini", "groq"]:
-                # Use new API providers
-                from app.utils.api_providers import APIProviderFactory
-                from app.core.config_manager import ConfigManager
-                from langchain.llms.base import LLM
-                
-                config_manager = ConfigManager()
-                api_keys = {
-                    "openai": config_manager.get_openai_api_key(),
-                    "gemini": config_manager.get_gemini_api_key(),
-                    "groq": config_manager.get_groq_api_key()
-                }
-                
-                api_key = api_keys.get(api_provider)
-                if not api_key:
-                    self.logger.error(f"{api_provider.upper()} API key required")
-                    return False
-                
-                # Create custom LLM wrapper for langchain
-                class CustomAPILLM(LLM):
-                    def __init__(self, provider, api_key, model_id, temperature, max_tokens):
-                        super().__init__()
-                        self.provider_instance = APIProviderFactory.create_provider(provider, api_key, model_id)
-                        self.temperature = temperature
-                        self.max_tokens = max_tokens
-                    
-                    def _call(self, prompt, stop=None):
-                        messages = [{"content": prompt}]
-                        return self.provider_instance.generate(
-                            messages, 
-                            temperature=self.temperature, 
-                            max_tokens=self.max_tokens
-                        )
-                    
-                    @property
-                    def _llm_type(self):
-                        return f"custom_{provider}"
-                
-                self.llm = CustomAPILLM(api_provider, api_key, self.model_id, self.temperature, self.max_tokens)
-                self.logger.info(f"Initialized {api_provider.upper()} LLM successfully")
-                
-            else:
-                # Use existing HuggingFace implementation
-                try:
-                    self.llm = HuggingFaceEndpoint(
-                        repo_id=self.model_id,
-                        task="text-generation",
-                        temperature=self.temperature,
-                        max_new_tokens=self.max_tokens,
-                        top_k=self.top_k,
-                        huggingfacehub_api_token=self.api_key,
-                    )
-                except Exception as llm_error:
-                    self.logger.error(f"Error initializing LLM with model {self.model_id}: {str(llm_error)}")
-                    # Try falling back to default model
-                    try:
-                        default_model = "mistralai/Mistral-7B-Instruct-v0.3"
-                        self.logger.info(f"Falling back to default model: {default_model}")
-                        self.llm = HuggingFaceEndpoint(
-                            repo_id=default_model,
-                            task="text-generation",
-                            temperature=self.temperature,
-                            max_new_tokens=self.max_tokens,
-                            top_k=self.top_k,
-                            huggingfacehub_api_token=self.api_key,
-                        )
-                        # Update model_id to reflect the fallback
-                        self.model_id = default_model
-                    except Exception as fallback_error:
-                        self.logger.error(f"Error initializing fallback LLM: {str(fallback_error)}")
-                        return False
-
-            self.logger.info("Setting up conversation memory...")
-            memory = ConversationBufferMemory(
-                memory_key="chat_history", 
-                output_key="answer", 
-                return_messages=True
-            )
+            config_manager = ConfigManager()
+            api_keys = {
+                "openai": config_manager.get_openai_api_key(),
+                "gemini": config_manager.get_gemini_api_key(),
+                "groq": config_manager.get_groq_api_key(),
+                "anthropic": config_manager.get_anthropic_api_key()
+            }
             
-            # Configure the retriever
-            retriever = self.setup_retriever(vector_db)
-
-            self.logger.info("Creating RAG chain...")
-            rag_prompt = PromptTemplate(
-                template=self.SYSTEM_PROMPT, 
-                input_variables=["context", "question"]
-            )
-            
-            # Create QA chain with error handling
-            try:
-                self.qa_chain = ConversationalRetrievalChain.from_llm(
-                    self.llm,
-                    retriever=retriever,
-                    chain_type="stuff",
-                    memory=memory,
-                    combine_docs_chain_kwargs={"prompt": rag_prompt},
-                    return_source_documents=True,
-                    verbose=False,
-                )
-                
-                self.logger.info("LLM chain initialized successfully!")
-                return True
-            except Exception as chain_error:
-                self.logger.error(f"Error creating QA chain: {str(chain_error)}")
-                # Clean up any partial resources
-                self.cleanup_llm_resources()
+            api_key = api_keys.get(self.api_provider)
+            if not api_key:
+                self.logger.error(f"{self.api_provider.upper()} API key required")
                 return False
+            
+            # Create custom LLM wrapper for langchain
+            class CustomAPILLM(LLM):
+                def __init__(self, provider, api_key, model_id, temperature, max_tokens):
+                    super().__init__()
+                    self.provider_instance = APIProviderFactory.create_provider(provider, api_key, model_id)
+                    self.temperature = temperature
+                    self.max_tokens = max_tokens
+                
+                def _call(self, prompt, stop=None):
+                    messages = [{"content": prompt}]
+                    return self.provider_instance.generate(
+                        messages, 
+                        temperature=self.temperature, 
+                        max_tokens=self.max_tokens
+                    )
+                
+                @property
+                def _llm_type(self):
+                    return f"custom_{self.api_provider}"
+            
+            self.llm = CustomAPILLM(self.api_provider, api_key, self.model_id, self.temperature, self.max_tokens)
+            self.logger.info(f"Initialized {self.api_provider.upper()} LLM successfully")
+            
+            # For RAG, we'll implement a simpler approach without conversational memory
+            # since we're not using HuggingFace endpoints anymore
+            
+            self.logger.info("LLM chain initialized successfully!")
+            return True
             
         except Exception as e:
             self.logger.error(f"Error initializing LLM chain: {str(e)}")
@@ -1241,8 +1098,8 @@ Helpful Answer:
                     if callback:
                         callback("Processing query...")
                     
-                    # Initialize QA chain if needed
-                    if self.qa_chain is None or document_id != self.current_document_id:
+                    # Initialize LLM if needed
+                    if self.llm is None or document_id != self.current_document_id:
                         if callback:
                             callback("Initializing language model...")
                         
@@ -1254,13 +1111,6 @@ Helpful Answer:
                                 "success": False,
                                 "error": f"Failed to initialize LLM chain for document {document_id}"
                             })
-                    
-                    # Format history for the chain
-                    chat_history = []
-                    for entry in self.history:
-                        chat_history.append((entry["user_input"], entry["agent_output"]))
-                    
-                    formatted_chat_history = self.format_chat_history(chat_history)
                     
                     # Use hybrid search if enabled
                     if self.use_hybrid_search and query:
@@ -1276,12 +1126,6 @@ Helpful Answer:
                             if callback:
                                 callback("Generating response...")
                             
-                            # Create a custom response with the retrieved documents
-                            response = {
-                                "answer": "I'm searching through the document to find relevant information...",
-                                "source_documents": retrieved_docs
-                            }
-                            
                             # Check for cancellation
                             if self.cancellation_token.is_set():
                                 return json.dumps({
@@ -1291,7 +1135,6 @@ Helpful Answer:
                             
                             # Generate response with LLM using retrieved documents as context
                             context = "\n\n".join([doc.page_content for doc in retrieved_docs])
-                            llm_chain = self.qa_chain.combine_docs_chain.llm_chain 
                             
                             prompt = self.SYSTEM_PROMPT.format(
                                 question=query,
@@ -1307,8 +1150,14 @@ Helpful Answer:
                                         "error": "Operation was cancelled by the user"
                                     })
                             
-                            answer = llm_chain.run(context=context, question=query)
-                            response["answer"] = answer
+                            # Use the API provider directly
+                            messages = [{"content": prompt}]
+                            answer = self.llm.generate(
+                                messages, 
+                                temperature=self.temperature, 
+                                max_tokens=self.max_tokens
+                            )
+                            
                         except Exception as e:
                             self.logger.error(f"Error in hybrid search: {str(e)}")
                             # Fall back to standard retrieval
@@ -1324,12 +1173,24 @@ Helpful Answer:
                                         "error": "Operation was cancelled by the user"
                                     })
                             
-                            response = self.qa_chain.invoke({
-                                "question": query, 
-                                "chat_history": formatted_chat_history
-                            })
+                            # Use basic similarity search
+                            vector_db = self.documents[document_id]["vector_db"]
+                            retrieved_docs = vector_db.similarity_search(query, k=self.top_k)
+                            context = "\n\n".join([doc.page_content for doc in retrieved_docs])
+                            
+                            prompt = self.SYSTEM_PROMPT.format(
+                                question=query,
+                                context=context
+                            )
+                            
+                            messages = [{"content": prompt}]
+                            answer = self.llm.generate(
+                                messages, 
+                                temperature=self.temperature, 
+                                max_tokens=self.max_tokens
+                            )
                     else:
-                        # Invoke QA chain with standard retrieval
+                        # Standard retrieval
                         if callback:
                             callback("Retrieving information...")
                         
@@ -1342,21 +1203,30 @@ Helpful Answer:
                                     "error": "Operation was cancelled by the user"
                                 })
                         
-                        response = self.qa_chain.invoke({
-                            "question": query, 
-                            "chat_history": formatted_chat_history
-                        })
+                        # Use basic similarity search
+                        vector_db = self.documents[document_id]["vector_db"]
+                        retrieved_docs = vector_db.similarity_search(query, k=self.top_k)
+                        context = "\n\n".join([doc.page_content for doc in retrieved_docs])
+                        
+                        prompt = self.SYSTEM_PROMPT.format(
+                            question=query,
+                            context=context
+                        )
+                        
+                        messages = [{"content": prompt}]
+                        answer = self.llm.generate(
+                            messages, 
+                            temperature=self.temperature, 
+                            max_tokens=self.max_tokens
+                        )
                     
-                    # Extract answer and sources
-                    response_answer = response["answer"]
-                    response_sources = response["source_documents"]
-                    
-                    if response_answer.find("Helpful Answer:") != -1:
-                        response_answer = response_answer.split("Helpful Answer:")[-1]
+                    # Clean up the answer
+                    if answer.find("Helpful Answer:") != -1:
+                        answer = answer.split("Helpful Answer:")[-1]
                     
                     # Format sources
                     sources = []
-                    for i, doc in enumerate(response_sources[:self.top_k]):
+                    for i, doc in enumerate(retrieved_docs[:self.top_k]):
                         page_num = doc.metadata.get("page", 0) + 1
                         content = doc.page_content.strip()
                         sources.append({
@@ -1365,7 +1235,7 @@ Helpful Answer:
                         })
                     
                     # Add to history
-                    self.add_to_history(query, response_answer)
+                    self.add_to_history(query, answer)
                     
                     if callback:
                         callback("Query processing complete")
@@ -1373,7 +1243,7 @@ Helpful Answer:
                     # Return JSON result
                     return json.dumps({
                         "success": True,
-                        "answer": response_answer,
+                        "answer": answer,
                         "sources": sources
                     })
                 
@@ -1382,18 +1252,8 @@ Helpful Answer:
                     config_updates = command.get("config", {})
                     
                     # Validate configuration updates
-                    # This prevents crashes when switching to invalid models
                     if "model_id" in config_updates:
                         new_model = config_updates["model_id"]
-                        # List of known working models (can be expanded)
-                        valid_models = [
-                            "mistralai/Mistral-7B-Instruct-v0.3",
-                            "google/flan-t5-xxl",
-                            "tiiuae/falcon-7b-instruct",
-                            "meta-llama/Llama-2-7b-chat-hf",
-                            # Add more known working models here
-                        ]
-                        
                         self.logger.info(f"Updating model to: {new_model}")
                         
                         # Clean up previous resources before changing model
@@ -1405,8 +1265,8 @@ Helpful Answer:
                             setattr(self, key, value)
                             self.logger.info(f"Updated config parameter: {key} = {value}")
                     
-                    # Reset the QA chain to apply new configuration
-                    self.qa_chain = None
+                    # Reset the LLM to apply new configuration
+                    self.llm = None
                     self.current_document_id = None
                     
                     # Force garbage collection
@@ -1468,7 +1328,8 @@ Helpful Answer:
         capabilities = [
             "document_retrieval",
             "question_answering", 
-            "pdf_processing"
+            "pdf_processing",
+            "api_based_llm"
         ]
         
         if self.use_hybrid_search:

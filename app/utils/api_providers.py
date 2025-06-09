@@ -1,5 +1,6 @@
 """
 API Providers for different LLM services
+Updated to include Anthropic Claude API support
 """
 import os
 import logging
@@ -107,13 +108,50 @@ class GroqProvider(BaseAPIProvider):
             self.logger.error(f"Groq API error: {str(e)}")
             return f"Error: {str(e)}"
 
+class AnthropicProvider(BaseAPIProvider):
+    def generate(self, messages: List[Dict], **kwargs) -> str:
+        try:
+            import anthropic
+            client = anthropic.Anthropic(api_key=self.api_key)
+            
+            # Extract prompt from messages
+            prompt = ""
+            for msg in messages:
+                if isinstance(msg, dict) and "content" in msg:
+                    content = msg["content"]
+                    if isinstance(content, list):
+                        prompt = " ".join(item.get("text", "") for item in content if item.get("type") == "text")
+                    else:
+                        prompt = str(content)
+            
+            # Anthropic uses a different message format
+            response = client.messages.create(
+                model=self.model,
+                max_tokens=kwargs.get("max_tokens", 2048),
+                temperature=kwargs.get("temperature", 0.7),
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            
+            # Extract text from response
+            if response.content and len(response.content) > 0:
+                return response.content[0].text
+            else:
+                return "No response content received"
+                
+        except Exception as e:
+            self.logger.error(f"Anthropic API error: {str(e)}")
+            return f"Error: {str(e)}"
+
 class APIProviderFactory:
     @staticmethod
     def create_provider(provider: str, api_key: str, model: str) -> BaseAPIProvider:
         providers = {
             "openai": OpenAIProvider,
             "gemini": GeminiProvider,
-            "groq": GroqProvider
+            "groq": GroqProvider,
+            "anthropic": AnthropicProvider
         }
         
         if provider not in providers:
