@@ -64,11 +64,13 @@ class StyleSystem:
             border: 1px solid {colors["light_gray"]};
             border-radius: 4px;
             padding: 4px;
+            color: black;
         }}
         
         QMenu::item {{
             padding: 6px 24px 6px 12px;
             border-radius: 3px;
+            color: black;
         }}
         
         QMenu::item:selected {{
@@ -220,16 +222,19 @@ class StyleSystem:
             border-radius: 4px;
             background-color: {colors["white"]};
             alternate-background-color: {colors["light"]};
+            color: black; 
         }}
         
         QListWidget::item, QTreeWidget::item {{
             padding: 4px;
             border-radius: 2px;
+            color: black; 
         }}
         
         QListWidget::item:selected, QTreeWidget::item:selected {{
             background-color: {colors["primary_light"]};
             color: {colors["white"]};
+            color: black; 
         }}
         
         /* Status bar */

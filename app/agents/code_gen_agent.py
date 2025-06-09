@@ -52,7 +52,15 @@ class CodeGenerationAgent(BaseAgent):
         # --- End Get API Key ---
 
         # --- Hardcoded Model ---
-        self.target_model = "Qwen/Qwen2.5-Coder-32B-Instruct"
+        api_provider = self.config.get("api_provider", "huggingface")
+        if api_provider == "openai":
+            self.target_model = "gpt-4o-mini"
+        elif api_provider == "gemini":
+            self.target_model = "gemini-2.0-flash-exp"
+        elif api_provider == "groq":
+            self.target_model = "llama-3.3-70b-versatile"
+        else:
+            self.target_model = "Qwen/Qwen2.5-Coder-32B-Instruct"
         self.logger.info(f"Code Generation Agent configured")
         # --- End Hardcoded Model ---
 
@@ -93,75 +101,138 @@ class CodeGenerationAgent(BaseAgent):
 
 
     def run(self, input_text: str, callback: Optional[Callable[[str], None]] = None) -> str:
-        """Run the agent with the given input using direct Inference API call
-
+        """Run the agent with the given input using API providers or HF Inference API
+        
         Args:
             input_text: Input text (prompt) for the agent
-            callback: Optional callback for streaming responses (Note: basic chat.completions doesn't stream easily)
-
+            callback: Optional callback for streaming responses
+            
         Returns:
             Generated code or error message
         """
-        if not self.is_initialized or not self.inference_client:
-            # Try to initialize if not already done (e.g., if API key was added after initial attempt)
-            self.initialize()
-            if not self.is_initialized or not self.inference_client:
-                error_msg = "Code Generation Agent not initialized (possibly missing API key)."
-                self.logger.error(error_msg)
-                return f"Error: {error_msg}"
-
-        prompt = input_text.strip()
-        self.logger.info(f"Generating code for Prompt: '{prompt[:50]}...'")
-
-        if callback:
-            callback(f"Generating code ...")
-
-        try:
-            # Prepare messages for the chat completions endpoint
-            messages = [{"role": "user", "content": prompt}]
-
-            # Make the API Call
-            completion = self.inference_client.chat.completions.create(
-                model=self.target_model,
-                messages=messages,
-                max_tokens=self.max_tokens,
-                temperature=self.temperature if self.temperature > 0 else None, # Temp must be > 0 for API
-                # top_p=0.95, # Optional: Add top_p if desired
-                stop=None, # Optional: Add stop sequences if needed, e.g., ["```"]
-                stream=False # Keep stream False for this implementation
-            )
-
-            # Extract the response content
-            if completion.choices and completion.choices[0].message and completion.choices[0].message.content:
-                generated_text = completion.choices[0].message.content
-                self.logger.info(f"Code generation successful. Response length: {len(generated_text)}")
-
+        # Get API provider from config
+        api_provider = self.config.get("api_provider", "huggingface")
+        
+        if api_provider in ["openai", "gemini", "groq"]:
+            # Use new API providers
+            from app.utils.api_providers import APIProviderFactory
+            from app.core.config_manager import ConfigManager
+            
+            config_manager = ConfigManager()
+            api_keys = {
+                "openai": config_manager.get_openai_api_key(),
+                "gemini": config_manager.get_gemini_api_key(),
+                "groq": config_manager.get_groq_api_key()
+            }
+            
+            api_key = api_keys.get(api_provider)
+            if not api_key:
+                error_msg = f"{api_provider.upper()} API key is required for {api_provider} mode"
+                self.add_to_history(input_text, error_msg)
+                return error_msg
+            
+            prompt = input_text.strip()
+            self.logger.info(f"Generating code using {api_provider.upper()} for prompt: '{prompt[:50]}...'")
+            
+            if callback:
+                callback(f"Generating code with {api_provider.upper()}...")
+            
+            try:
+                provider_instance = APIProviderFactory.create_provider(api_provider, api_key, self.target_model)
+                
+                # Create a code-focused prompt
+                code_prompt = f"Generate clean, well-commented code for the following request:\n\n{prompt}\n\nProvide only the code with appropriate comments:"
+                
+                messages = [{"content": code_prompt}]
+                response = provider_instance.generate(
+                    messages, 
+                    temperature=self.temperature, 
+                    max_tokens=self.max_tokens
+                )
+                
+                self.logger.info(f"Code generation successful with {api_provider.upper()}. Response length: {len(response)}")
+                
                 # Extract code snippet using the helper
-                code_snippet = self._extract_code_from_result(generated_text)
+                code_snippet = self._extract_code_from_result(response)
                 if code_snippet:
-                     self.generated_code.append(code_snippet)
-                     # Use the formatted response with the extracted code
-                     result_message = self._format_code_response(prompt, code_snippet)
+                    self.generated_code.append(code_snippet)
+                    # Use the formatted response with the extracted code
+                    result_message = self._format_code_response(prompt, code_snippet)
                 else:
                     # If no specific code block found, use the whole text but format it
-                    result_message = self._format_code_response(prompt, generated_text)
-
-
+                    result_message = self._format_code_response(prompt, response)
+                
                 # Add to history
                 self.add_to_history(input_text, result_message)
                 return result_message
-            else:
-                self.logger.error("Received an unexpected or empty response structure from the API.")
-                self.add_to_history(input_text, "Error: No valid response from API.")
-                return "Error: Received no valid choices from the API."
+                
+            except Exception as e:
+                error_msg = f"Error with {api_provider.upper()}: {str(e)}"
+                self.logger.error(error_msg)
+                self.add_to_history(input_text, error_msg)
+                return error_msg
+        
+        else:
+            # Use existing HuggingFace Inference API implementation
+            if not self.is_initialized or not self.inference_client:
+                # Try to initialize if not already done (e.g., if API key was added after initial attempt)
+                self.initialize()
+                if not self.is_initialized or not self.inference_client:
+                    error_msg = "Code Generation Agent not initialized (possibly missing API key)."
+                    self.logger.error(error_msg)
+                    return f"Error: {error_msg}"
 
-        except Exception as e:
-            error_msg = f"Error during API call model: {str(e)}"
-            self.logger.error(error_msg)
-            traceback.print_exc()
-            # Add to history with error
-            self.add_to_history(input_text, f"Error: {error_msg}")
-            return f"Sorry, I encountered an error while generating code: {error_msg}"
+            prompt = input_text.strip()
+            self.logger.info(f"Generating code for Prompt: '{prompt[:50]}...'")
+
+            if callback:
+                callback(f"Generating code with Hugging Face API...")
+
+            try:
+                # Prepare messages for the chat completions endpoint
+                messages = [{"role": "user", "content": prompt}]
+
+                # Make the API Call
+                completion = self.inference_client.chat.completions.create(
+                    model=self.target_model,
+                    messages=messages,
+                    max_tokens=self.max_tokens,
+                    temperature=self.temperature if self.temperature > 0 else None, # Temp must be > 0 for API
+                    # top_p=0.95, # Optional: Add top_p if desired
+                    stop=None, # Optional: Add stop sequences if needed, e.g., ["```"]
+                    stream=False # Keep stream False for this implementation
+                )
+
+                # Extract the response content
+                if completion.choices and completion.choices[0].message and completion.choices[0].message.content:
+                    generated_text = completion.choices[0].message.content
+                    self.logger.info(f"Code generation successful. Response length: {len(generated_text)}")
+
+                    # Extract code snippet using the helper
+                    code_snippet = self._extract_code_from_result(generated_text)
+                    if code_snippet:
+                        self.generated_code.append(code_snippet)
+                        # Use the formatted response with the extracted code
+                        result_message = self._format_code_response(prompt, code_snippet)
+                    else:
+                        # If no specific code block found, use the whole text but format it
+                        result_message = self._format_code_response(prompt, generated_text)
+
+                    # Add to history
+                    self.add_to_history(input_text, result_message)
+                    return result_message
+                else:
+                    self.logger.error("Received an unexpected or empty response structure from the API.")
+                    self.add_to_history(input_text, "Error: No valid response from API.")
+                    return "Error: Received no valid choices from the API."
+
+            except Exception as e:
+                error_msg = f"Error during API call model: {str(e)}"
+                self.logger.error(error_msg)
+                traceback.print_exc()
+                # Add to history with error
+                self.add_to_history(input_text, f"Error: {error_msg}")
+                return f"Sorry, I encountered an error while generating code: {error_msg}"
 
 
     def _extract_code_from_result(self, result: str) -> Optional[str]:

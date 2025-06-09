@@ -134,34 +134,46 @@ class CreateAgentDialog(QDialog):
         
         # Add execution mode selection at the top
         execution_layout = QHBoxLayout()
-        execution_layout.addWidget(QLabel("Select Execution Mode:"))
+        execution_layout.setSpacing(10)
+        execution_layout.addWidget(QLabel("Select API Provider:"))
+        
+        self.provider_combo = QComboBox()
+        self.provider_combo.addItems([
+            "Local Execution",
+            "HF API (Remote)", 
+            "OpenAI API",
+            "Gemini API", 
+            "Groq API"
+        ])
+        self.provider_combo.currentTextChanged.connect(self.on_provider_changed)
+        execution_layout.addWidget(self.provider_combo)                            
         
         # Radio button group for execution mode
         self.execution_mode_group = QGroupBox()
         execution_mode_layout = QHBoxLayout(self.execution_mode_group)
         
-        self.local_mode_radio = QRadioButton("Local Execution")
-        self.local_mode_radio.setToolTip("Download and run the model locally")
-        self.local_mode_radio.setChecked(True)
-        self.local_mode_radio.toggled.connect(self.on_execution_mode_changed)
-        self.local_mode_radio.setStyleSheet("color: black;")
-        execution_mode_layout.addWidget(self.local_mode_radio)
+        # self.local_mode_radio = QRadioButton("Local Execution")
+        # self.local_mode_radio.setToolTip("Download and run the model locally")
+        # self.local_mode_radio.setChecked(True)
+        # self.local_mode_radio.toggled.connect(self.on_execution_mode_changed)
+        # self.local_mode_radio.setStyleSheet("color: black;")
+        # execution_mode_layout.addWidget(self.local_mode_radio)
         
-        self.api_mode_radio = QRadioButton("HF API (Remote)")
-        self.api_mode_radio.setToolTip("Use the Hugging Face Inference API")
-        self.api_mode_radio.toggled.connect(self.on_execution_mode_changed)
-        self.api_mode_radio.setStyleSheet("color: black;")
-        execution_mode_layout.addWidget(self.api_mode_radio)
+        # self.api_mode_radio = QRadioButton("HF API (Remote)")
+        # self.api_mode_radio.setToolTip("Use the Hugging Face Inference API")
+        # self.api_mode_radio.toggled.connect(self.on_execution_mode_changed)
+        # self.api_mode_radio.setStyleSheet("color: black;")
+        # execution_mode_layout.addWidget(self.api_mode_radio)
         
         # Help button
-        help_button = QPushButton("?")
-        help_button.setToolTip("Learn about execution modes")
-        help_button.setFixedSize(25, 25)
-        help_button.clicked.connect(self.show_execution_mode_guide)
-        execution_mode_layout.addWidget(help_button)
+        # help_button = QPushButton("?")
+        # help_button.setToolTip("Learn about execution modes")
+        # help_button.setFixedSize(25, 25)
+        # help_button.clicked.connect(self.show_execution_mode_guide)
+        # execution_mode_layout.addWidget(help_button)
         
-        execution_layout.addWidget(self.execution_mode_group)
-        execution_layout.addStretch()
+        # execution_layout.addWidget(self.execution_mode_group)
+        # execution_layout.addStretch()
         
         layout.addLayout(execution_layout)
         
@@ -189,7 +201,7 @@ class CreateAgentDialog(QDialog):
         
         self.model_list = QListWidget()
         self.model_list.setSelectionMode(QListWidget.SelectionMode.SingleSelection)
-        self.model_list.setMinimumHeight(180)  # Make model list taller
+        self.model_list.setMinimumHeight(200)  # Make model list taller
         layout.addWidget(self.model_list, 3)  # Give model list more weight in the layout
         
         # Add this more comprehensive style to fix the transition states
@@ -226,8 +238,8 @@ class CreateAgentDialog(QDialog):
         # Model parameters group - compact
         params_group = QGroupBox("Model Parameters")
         params_layout = QFormLayout(params_group)
-        params_layout.setVerticalSpacing(5)  # Reduce vertical spacing
-        params_layout.setHorizontalSpacing(10)  # Keep reasonable horizontal spacing
+        params_layout.setVerticalSpacing(8)  # Reduce vertical spacing
+        params_layout.setHorizontalSpacing(15)  # Keep reasonable horizontal spacing
         
         # Temperature
         self.temperature_spin = QDoubleSpinBox()
@@ -252,37 +264,76 @@ class CreateAgentDialog(QDialog):
         
         self.tabs.addTab(model_tab, "Model")
     
+
+    def on_provider_changed(self, provider):
+        """Handle provider change"""
+        is_local = provider == "Local Execution"
+        
+        # Enable/disable controls based on selection
+        self.device_combo.setEnabled(is_local)
+        self.model_search_edit.setEnabled(is_local)
+        self.model_search_button.setEnabled(is_local)
+        
+        if not is_local:
+            self.model_search_edit.setPlaceholderText(f"Model search disabled for {provider}")
+            self.model_search_edit.clear()
+            # Load models for the selected provider
+            if provider == "HF API (Remote)":
+                self.load_available_models()  # This will handle HF API models
+            else:
+                self._load_provider_models(provider)  # This will handle other API providers
+        else:
+            self.model_search_edit.setPlaceholderText("Search for models")
+            self.load_available_models()
+
+    def _load_provider_models(self, provider):
+        """Load default models for API providers"""
+        self.model_list.clear()
+        
+        provider_models = {
+            "OpenAI API": ["gpt-4.1", "gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-3.5-turbo"],
+            "Gemini API": ["gemini-2.5-pro-preview-05-06", "gemini-2.0-flash-exp", "gemini-1.5-pro", "gemini-1.5-flash"],
+            "Groq API": ["deepseek-r1-distill-llama-70b", "qwen-qwq-32b", "meta-llama/llama-4-maverick-17b-128e-instruct", "meta-llama/llama-4-scout-17b-16e-instruct", "llama-3.3-70b-versatile", "llama-3.1-8b-instant", "gemma2-9b-it"],
+            "Hugging Face API": []  # Keep existing HF models loading
+        }
+        
+        models = provider_models.get(provider, [])
+        for model_id in models:
+            item = QListWidgetItem(model_id)
+            item.setData(Qt.ItemDataRole.UserRole, {"id": model_id, "is_cached": False})
+            self.model_list.addItem(item)
+
     def show_execution_mode_guide(self):
         """Show the execution mode guide dialog"""
         guide_dialog = ExecutionModeGuideDialog(self)
         guide_dialog.exec()
     
-    def on_execution_mode_changed(self, checked):
-        """Handle execution mode change
+    # def on_execution_mode_changed(self, checked):
+    #     """Handle execution mode change
         
-        Args:
-            checked: Whether the radio button is checked
-        """
-        if not checked:
-            return
+    #     Args:
+    #         checked: Whether the radio button is checked
+    #     """
+    #     if not checked:
+    #         return
         
-        # Update the Device selector availability based on mode
-        is_local = self.local_mode_radio.isChecked()
-        self.device_combo.setEnabled(is_local)
+    #     # Update the Device selector availability based on mode
+    #     is_local = self.local_mode_radio.isChecked()
+    #     self.device_combo.setEnabled(is_local)
         
-        # Enable/disable the search model text box based on mode
-        self.model_search_edit.setEnabled(is_local)
-        self.model_search_button.setEnabled(is_local)
+    #     # Enable/disable the search model text box based on mode
+    #     self.model_search_edit.setEnabled(is_local)
+    #     self.model_search_button.setEnabled(is_local)
         
-        # Update visual cue for disabled state
-        if is_local:
-            self.model_search_edit.setPlaceholderText("Search for models")
-        else:
-            self.model_search_edit.setPlaceholderText("Model search disabled in API mode")
-            self.model_search_edit.clear()  # Optionally clear any existing text
+    #     # Update visual cue for disabled state
+    #     if is_local:
+    #         self.model_search_edit.setPlaceholderText("Search for models")
+    #     else:
+    #         self.model_search_edit.setPlaceholderText("Model search disabled in API mode")
+    #         self.model_search_edit.clear()  # Optionally clear any existing text
         
-        # Refresh the model list based on execution mode
-        self.load_available_models()
+    #     # Refresh the model list based on execution mode
+    #     self.load_available_models()
         
     def create_tools_tab(self):
         """Create tools configuration tab"""
@@ -422,12 +473,18 @@ class CreateAgentDialog(QDialog):
         self.tabs.addTab(agent_specific_tab, "Agent Options")
     
     def load_available_models(self):
-        """Load available models based on the selected execution mode"""
+        """Load available models based on the selected provider"""
         # Clear the list
         self.model_list.clear()
         
-        # Show different models based on execution mode
-        if self.api_mode_radio.isChecked():
+        # Get current provider selection
+        provider_text = self.provider_combo.currentText()
+        
+        # Show different models based on provider selection
+        if provider_text in ["OpenAI API", "Gemini API", "Groq API"]:
+            # Load API provider models
+            self._load_provider_models(provider_text)
+        elif provider_text == "HF API (Remote)":
             # Show "Loading..." while fetching inference models
             loading_item = QListWidgetItem("Loading inference models...")
             loading_item.setFlags(loading_item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
@@ -439,7 +496,6 @@ class CreateAgentDialog(QDialog):
             else:
                 # If we already loaded them, just populate the list
                 self.populate_inference_models()
-                
         else:
             # Local execution mode - load cached and popular models
             self._load_local_models()
@@ -758,8 +814,17 @@ class CreateAgentDialog(QDialog):
         agent_name = self.agent_name_edit.text().strip()
         agent_id = agent_name if agent_name else f"agent_{uuid.uuid4().hex[:8]}"
         
-        # Determine execution mode
-        use_local_execution = self.local_mode_radio.isChecked()
+        # Determine provider and execution mode
+        provider_text = self.provider_combo.currentText()
+        provider_map = {
+            "Local Execution": ("local", True, False),
+            "HF API (Remote)": ("huggingface", False, True),
+            "OpenAI API": ("openai", False, True),
+            "Gemini API": ("gemini", False, True),
+            "Groq API": ("groq", False, True)
+        }
+        
+        api_provider, use_local, use_api = provider_map.get(provider_text, ("local", True, False))
         
         # Base configuration
         config = {
@@ -770,8 +835,9 @@ class CreateAgentDialog(QDialog):
                 "temperature": self.temperature_spin.value(),
                 "max_tokens": self.max_tokens_spin.value(),
                 "device": self.device_combo.currentText(),
-                "use_local_execution": use_local_execution,
-                "use_api": not use_local_execution  # Added this flag
+                "use_local_execution": use_local,
+                "use_api": use_api,
+                "api_provider": api_provider  # This is the key addition
             },
             "tools": selected_tools,
             "additional_config": {
@@ -779,8 +845,9 @@ class CreateAgentDialog(QDialog):
                 "max_history": self.max_history_spin.value(),
                 "authorized_imports": authorized_imports,
                 "is_default": self.default_agent_check.isChecked(),
-                "use_local_execution": use_local_execution,  # Add to additional config too
-                "use_api": not use_local_execution  # Add to additional config too
+                "use_local_execution": use_local,
+                "use_api": use_api,
+                "api_provider": api_provider  # Also add here for backward compatibility
             }
         }
         

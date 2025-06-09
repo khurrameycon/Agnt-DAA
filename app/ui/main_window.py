@@ -425,8 +425,41 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(settings_tab)
         
         # API settings
-        layout.addWidget(QLabel("Hugging Face API Settings:"))
+        layout.addWidget(QLabel("API Settings:"))
         api_layout = QFormLayout()
+
+        # OpenAI API Key
+        self.openai_key_field = QLineEdit()
+        self.openai_key_field.setEchoMode(QLineEdit.EchoMode.Password)
+        openai_key = self.config_manager.get_openai_api_key() or ""
+        self.openai_key_field.setText(openai_key)
+        api_layout.addRow("OpenAI API Key:", self.openai_key_field)
+
+        # Gemini API Key
+        self.gemini_key_field = QLineEdit()
+        self.gemini_key_field.setEchoMode(QLineEdit.EchoMode.Password)
+        gemini_key = self.config_manager.get_gemini_api_key() or ""
+        self.gemini_key_field.setText(gemini_key)
+        api_layout.addRow("Gemini API Key:", self.gemini_key_field)
+
+        # Groq API Key
+        self.groq_key_field = QLineEdit()
+        self.groq_key_field.setEchoMode(QLineEdit.EchoMode.Password)
+        groq_key = self.config_manager.get_groq_api_key() or ""
+        self.groq_key_field.setText(groq_key)
+        api_layout.addRow("Groq API Key:", self.groq_key_field)
+
+        # Hugging Face API Key (keep existing)
+        self.api_key_field = QLineEdit()
+        self.api_key_field.setEchoMode(QLineEdit.EchoMode.Password)
+        api_key = self.config_manager.get_hf_api_key() or ""
+        self.api_key_field.setText(api_key)
+        api_layout.addRow("Hugging Face API Key:", self.api_key_field)
+
+        # Save button
+        save_keys_button = QPushButton("Save API Keys")
+        save_keys_button.clicked.connect(self.save_api_keys)
+        api_layout.addRow("", save_keys_button)
         
         # API key field (masked)
         self.api_key_field = QLineEdit()
@@ -471,6 +504,15 @@ class MainWindow(QMainWindow):
         # Start a thread to calculate cache size
         self.update_cache_size()
     
+    def save_api_keys(self):
+        """Save all API keys"""
+        self.config_manager.set_openai_api_key(self.openai_key_field.text())
+        self.config_manager.set_gemini_api_key(self.gemini_key_field.text())
+        self.config_manager.set_groq_api_key(self.groq_key_field.text())
+        self.config_manager.set_hf_api_key(self.api_key_field.text())
+        self.status_bar.showMessage("API keys saved", 3000)
+
+
     def load_agents(self):
         """Load available agents"""
         # Clear existing items
@@ -517,14 +559,32 @@ class MainWindow(QMainWindow):
             info_text = f"Agent: {agent_id}\nType: {agent_type}\nModel: {model_id}\nTools: {tools}"
             self.agent_info.setText(info_text)
             
-            # Update execution mode label
-            use_api = agent_config["model_config"].get("use_api", False)
-            if use_api:
-                self.execution_mode_label.setText("Mode: Inference API")
-                self.execution_mode_label.setStyleSheet("color: #2E86C1; font-weight: bold;")
-            else:
-                self.execution_mode_label.setText("Mode: Local Model")
-                self.execution_mode_label.setStyleSheet("color: #27AE60; font-weight: bold;")
+            # Update execution mode label with API provider support
+            api_provider = agent_config["model_config"].get("api_provider", "local")
+            
+            # Map provider names to display names
+            provider_names = {
+                "local": "Local Model",
+                "huggingface": "Hugging Face API",
+                "openai": "OpenAI API", 
+                "gemini": "Gemini API",
+                "groq": "Groq API"
+            }
+            
+            mode_name = provider_names.get(api_provider, "Unknown")
+            self.execution_mode_label.setText(f"Mode: {mode_name}")
+            
+            # Set color based on provider
+            colors = {
+                "local": "#27AE60",        # Green for local
+                "huggingface": "#2E86C1",  # Blue for HF
+                "openai": "#00A86B",       # Teal for OpenAI
+                "gemini": "#4285F4",       # Google Blue for Gemini
+                "groq": "#FF6B35"          # Orange for Groq
+            }
+            
+            color = colors.get(api_provider, "#E74C3C")  # Red for unknown
+            self.execution_mode_label.setStyleSheet(f"color: {color}; font-weight: bold;")
             
         except Exception as e:
             self.logger.error(f"Error getting agent config: {str(e)}")

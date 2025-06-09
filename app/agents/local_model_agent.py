@@ -79,6 +79,47 @@ class LocalModelAgent(BaseAgent):
                 raise
 
     def _initialize_api_model(self):
+        """Initialize the model using various API providers"""
+        from app.core.config_manager import ConfigManager
+        from app.utils.api_providers import APIProviderFactory
+        
+        config_manager = ConfigManager()
+        
+        # Get provider from config (default to huggingface for backward compatibility)
+        provider = self.config.get("api_provider", "huggingface")
+        
+        if provider == "huggingface":
+            # Keep existing HF implementation
+            self._initialize_hf_api_model()
+            return
+        
+        # Get API key based on provider
+        api_keys = {
+            "openai": config_manager.get_openai_api_key(),
+            "gemini": config_manager.get_gemini_api_key(),
+            "groq": config_manager.get_groq_api_key()
+        }
+        
+        api_key = api_keys.get(provider)
+        if not api_key:
+            raise ValueError(f"{provider.upper()} API key is required for {provider} mode")
+        
+        # Create provider instance
+        self.api_provider = APIProviderFactory.create_provider(provider, api_key, self.model_id)
+        
+        # Create wrapper function
+        def generate_text(messages):
+            return self.api_provider.generate(
+                messages, 
+                temperature=self.temperature,
+                max_tokens=self.max_new_tokens
+            )
+        
+        self.model = generate_text
+        self.logger.info(f"Initialized {provider} API with model {self.model_id}")
+
+
+    def _initialize_hf_api_model(self):
         """Initialize the model by wrapping a direct HTTP call to the HF Inference API."""
         from app.core.config_manager import ConfigManager
         import requests

@@ -1030,35 +1030,80 @@ Helpful Answer:
             
             self.logger.info(f"Initializing LLM chain with model: {self.model_id}")
             
-            # Initialize the LLM with error handling
-            try:
-                self.llm = HuggingFaceEndpoint(
-                    repo_id=self.model_id,
-                    task="text-generation",
-                    temperature=self.temperature,
-                    max_new_tokens=self.max_tokens,
-                    top_k=self.top_k,
-                    huggingfacehub_api_token=self.api_key,
-                )
-            except Exception as llm_error:
-                self.logger.error(f"Error initializing LLM with model {self.model_id}: {str(llm_error)}")
-                # Try falling back to default model
+            # Get API provider from config
+            api_provider = self.config.get("api_provider", "huggingface")
+            
+            if api_provider in ["openai", "gemini", "groq"]:
+                # Use new API providers
+                from app.utils.api_providers import APIProviderFactory
+                from app.core.config_manager import ConfigManager
+                from langchain.llms.base import LLM
+                
+                config_manager = ConfigManager()
+                api_keys = {
+                    "openai": config_manager.get_openai_api_key(),
+                    "gemini": config_manager.get_gemini_api_key(),
+                    "groq": config_manager.get_groq_api_key()
+                }
+                
+                api_key = api_keys.get(api_provider)
+                if not api_key:
+                    self.logger.error(f"{api_provider.upper()} API key required")
+                    return False
+                
+                # Create custom LLM wrapper for langchain
+                class CustomAPILLM(LLM):
+                    def __init__(self, provider, api_key, model_id, temperature, max_tokens):
+                        super().__init__()
+                        self.provider_instance = APIProviderFactory.create_provider(provider, api_key, model_id)
+                        self.temperature = temperature
+                        self.max_tokens = max_tokens
+                    
+                    def _call(self, prompt, stop=None):
+                        messages = [{"content": prompt}]
+                        return self.provider_instance.generate(
+                            messages, 
+                            temperature=self.temperature, 
+                            max_tokens=self.max_tokens
+                        )
+                    
+                    @property
+                    def _llm_type(self):
+                        return f"custom_{provider}"
+                
+                self.llm = CustomAPILLM(api_provider, api_key, self.model_id, self.temperature, self.max_tokens)
+                self.logger.info(f"Initialized {api_provider.upper()} LLM successfully")
+                
+            else:
+                # Use existing HuggingFace implementation
                 try:
-                    default_model = "mistralai/Mistral-7B-Instruct-v0.3"
-                    self.logger.info(f"Falling back to default model: {default_model}")
                     self.llm = HuggingFaceEndpoint(
-                        repo_id=default_model,
+                        repo_id=self.model_id,
                         task="text-generation",
                         temperature=self.temperature,
                         max_new_tokens=self.max_tokens,
                         top_k=self.top_k,
                         huggingfacehub_api_token=self.api_key,
                     )
-                    # Update model_id to reflect the fallback
-                    self.model_id = default_model
-                except Exception as fallback_error:
-                    self.logger.error(f"Error initializing fallback LLM: {str(fallback_error)}")
-                    return False
+                except Exception as llm_error:
+                    self.logger.error(f"Error initializing LLM with model {self.model_id}: {str(llm_error)}")
+                    # Try falling back to default model
+                    try:
+                        default_model = "mistralai/Mistral-7B-Instruct-v0.3"
+                        self.logger.info(f"Falling back to default model: {default_model}")
+                        self.llm = HuggingFaceEndpoint(
+                            repo_id=default_model,
+                            task="text-generation",
+                            temperature=self.temperature,
+                            max_new_tokens=self.max_tokens,
+                            top_k=self.top_k,
+                            huggingfacehub_api_token=self.api_key,
+                        )
+                        # Update model_id to reflect the fallback
+                        self.model_id = default_model
+                    except Exception as fallback_error:
+                        self.logger.error(f"Error initializing fallback LLM: {str(fallback_error)}")
+                        return False
 
             self.logger.info("Setting up conversation memory...")
             memory = ConversationBufferMemory(

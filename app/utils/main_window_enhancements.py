@@ -66,7 +66,7 @@ def _apply_enhancements(window):
     """
     try:
         # Set window properties for better appearance
-        window.setWindowTitle("sagax1 - AI Agent Platform")
+        window.setWindowTitle("My1ai - My1 Agnostic Intelligence")
         window.setMinimumSize(1100, 800)
         
         # Apply the application icon
@@ -105,23 +105,23 @@ def _create_toolbar(window):
         
         # Set toolbar properties
         window.toolbar.setMovable(False)
-        window.toolbar.setIconSize(QSize(24, 24))
+        window.toolbar.setIconSize(QSize(0, 0))
         window.toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         
         # Add actions with professional icons
-        create_new_action = QAction(UIAssets.get_icon("create"), "New Agent", window)
-        create_new_action.triggered.connect(window.create_new_agent)
-        window.toolbar.addAction(create_new_action)
+        # create_new_action = QAction(UIAssets.get_icon("create"), "New Agent", window)
+        # create_new_action.triggered.connect(window.create_new_agent)
+        # window.toolbar.addAction(create_new_action)
         
         # Add spacer
-        spacer = QWidget()
-        spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        window.toolbar.addWidget(spacer)
+        # spacer = QWidget()
+        # spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        # window.toolbar.addWidget(spacer)
         
         # Add settings action on the right
-        settings_action = QAction(UIAssets.get_icon("settings"), "Settings", window)
-        settings_action.triggered.connect(lambda: window.tabs.setCurrentIndex(window.tabs.count() - 1))  # Go to settings tab
-        window.toolbar.addAction(settings_action)
+        # settings_action = QAction(UIAssets.get_icon("settings"), "Settings", window)
+        # settings_action.triggered.connect(lambda: window.tabs.setCurrentIndex(window.tabs.count() - 1))  # Go to settings tab
+        # window.toolbar.addAction(settings_action)
     except Exception as e:
         print(f"Error in _create_toolbar: {str(e)}")
 
@@ -150,18 +150,18 @@ def _create_header(window):
                 logo_label.setPixmap(logo_pixmap)
             else:
                 # Use text as fallback
-                logo_label.setText("S1")
+                logo_label.setText("My1ai")
                 logo_label.setStyleSheet("font-size: 24px; font-weight: bold; color: white;")
             
             header_layout.addWidget(logo_label)
             
             # Add title to header
-            title_label = QLabel("sagax1")
+            title_label = QLabel("My1ai")
             title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: white;")
             header_layout.addWidget(title_label)
             
             # Add tagline
-            tagline_label = QLabel("Opensource AI-powered agent platform for everyday tasks")
+            tagline_label = QLabel("My1 Agnostic Intelligence")
             tagline_label.setStyleSheet("color: rgba(255, 255, 255, 0.7); font-size: 14px;")
             header_layout.addSpacing(20)
             header_layout.addWidget(tagline_label)
@@ -254,7 +254,7 @@ def _show_enhanced_about(window):
     """
     try:
         about_dialog = QDialog(window)
-        about_dialog.setWindowTitle("About sagax1")
+        about_dialog.setWindowTitle("About My1ai")
         about_dialog.setMinimumWidth(480)
         about_dialog.setStyleSheet("""
             QDialog {
@@ -292,7 +292,7 @@ def _show_enhanced_about(window):
             layout.addWidget(logo_label)
         
         # Title
-        title_label = QLabel("sagax1")
+        title_label = QLabel("My1ai")
         title_label.setObjectName("title")
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title_label)
@@ -304,7 +304,7 @@ def _show_enhanced_about(window):
         layout.addWidget(version_label)
         
         # Description
-        description_label = QLabel("An Opensource AI-powered agent platform for everyday tasks")
+        description_label = QLabel("My1 Agnostic Intelligence")
         description_label.setObjectName("description")
         description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         description_label.setWordWrap(True)
@@ -317,7 +317,7 @@ def _show_enhanced_about(window):
         layout.addWidget(separator)
         
         # Copyright
-        copyright_label = QLabel("© 2025 sagax1 Team. All rights reserved.")
+        copyright_label = QLabel("© 2025 My1ai Team. All rights reserved.")
         copyright_label.setObjectName("copyright")
         copyright_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(copyright_label)
@@ -350,7 +350,7 @@ def _enhance_status_bar(window):
         status_bar = window.statusBar()
         
         # Set a default message with application information
-        status_bar.showMessage("sagax1 - Ready")
+        status_bar.showMessage("My1ai - Ready")
         
         # Add permanent widgets to the right side
         api_status = QLabel()

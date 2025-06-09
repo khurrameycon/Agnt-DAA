@@ -10,7 +10,24 @@ from typing import Dict, Any, Optional
 
 DEFAULT_CONFIG = {
     "api_keys": {
-        "huggingface": ""
+        "huggingface": "",
+        "openai": "",
+        "gemini": "",
+        "groq": ""
+    },
+    "api_providers": {
+        "openai": {
+            "default_model": "gpt-4o-mini",
+            "base_url": "https://api.openai.com/v1"
+        },
+        "gemini": {
+            "default_model": "gemini-2.0-flash-exp",
+            "base_url": "https://generativelanguage.googleapis.com/v1beta"
+        },
+        "groq": {
+            "default_model": "llama-3.3-70b-versatile",
+            "base_url": "https://api.groq.com/openai/v1"
+        }
     },
     "models": {
         "default_model": "meta-llama/Llama-3.2-3B-Instruct",
@@ -146,3 +163,21 @@ class ConfigManager:
     def save(self) -> None:
         """Save the current configuration to file"""
         self._save_config(self.config)
+
+    def get_openai_api_key(self) -> Optional[str]:
+        return os.environ.get("OPENAI_API_KEY") or self.get("api_keys.openai")
+
+    def get_gemini_api_key(self) -> Optional[str]:
+        return os.environ.get("GEMINI_API_KEY") or self.get("api_keys.gemini")
+
+    def get_groq_api_key(self) -> Optional[str]:
+        return os.environ.get("GROQ_API_KEY") or self.get("api_keys.groq")
+
+    def set_openai_api_key(self, api_key: str) -> None:
+        self.set("api_keys.openai", api_key)
+
+    def set_gemini_api_key(self, api_key: str) -> None:
+        self.set("api_keys.gemini", api_key)
+
+    def set_groq_api_key(self, api_key: str) -> None:
+        self.set("api_keys.groq", api_key)
