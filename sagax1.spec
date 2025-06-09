@@ -35,7 +35,9 @@ packages_to_collect = [
     'langchain', 'langchain_community', 'langchain_huggingface', 'langchain_core',
     'faiss', 'unidecode', 'sklearn', 'sentence_transformers',
     # New additions for PyQt6-WebEngine
-    'PyQt6.QtWebEngineWidgets', 'PyQt6.QtWebEngineCore'
+    'PyQt6.QtWebEngineWidgets', 'PyQt6.QtWebEngineCore',
+    # NEW API PROVIDERS - ADD THESE LINES:
+    'openai', 'google.genai', 'groq'
 ]
 
 # Add data files for packages that need them
@@ -60,7 +62,7 @@ for package in packages_to_collect:
 metadata_packages = [
     'certifi', 'gradio_client', 'httpx', 'requests', 'duckduckgo_search',
     # RAG-related packages metadata
-    'faiss', 'langchain', 'langchain_community', 'langchain_huggingface', 'sklearn'
+    'faiss', 'langchain', 'langchain_community', 'langchain_huggingface', 'sklearn', 'openai', 'google.genai', 'groq'
 ]
 for package in metadata_packages:
     try:
@@ -145,7 +147,20 @@ hidden_imports = [
     # New PyQt6-WebEngine imports
     'PyQt6.QtWebEngineWidgets',
     'PyQt6.QtWebEngineCore',
-    'PyQt6.QtWebEngineWidgets.QWebEngineView'
+    'PyQt6.QtWebEngineWidgets.QWebEngineView',
+
+    # NEW API PROVIDERS - ADD THESE LINES:
+    'openai',
+    'openai.types',
+    'openai.types.chat',
+    'google.genai',
+    'google.genai.types',
+    'groq',
+    'groq.types',
+    
+    # NEW UTILS MODULE - ADD THIS:
+    'app.utils.api_providers',
+    
 ]
 
 # Add sentence transformers related imports
@@ -266,6 +281,40 @@ from PyInstaller.utils.hooks import collect_all
 
 # Collect all packages, data files, and binaries
 datas, binaries, hiddenimports = collect_all('PyQt6.QtWebEngineWidgets')
+''')
+
+
+# Add hook for OpenAI
+with open('hooks/hook-openai.py', 'w') as f:
+    f.write('''
+# hooks/hook-openai.py
+from PyInstaller.utils.hooks import collect_all
+
+# Collect all packages, data files, and binaries
+datas, binaries, hiddenimports = collect_all('openai')
+hiddenimports.extend(['openai.types', 'openai.types.chat'])
+''')
+
+# Add hook for Google GenAI
+with open('hooks/hook-google.genai.py', 'w') as f:
+    f.write('''
+# hooks/hook-google.genai.py
+from PyInstaller.utils.hooks import collect_all
+
+# Collect all packages, data files, and binaries
+datas, binaries, hiddenimports = collect_all('google.genai')
+hiddenimports.extend(['google.genai.types'])
+''')
+
+# Add hook for Groq
+with open('hooks/hook-groq.py', 'w') as f:
+    f.write('''
+# hooks/hook-groq.py
+from PyInstaller.utils.hooks import collect_all
+
+# Collect all packages, data files, and binaries
+datas, binaries, hiddenimports = collect_all('groq')
+hiddenimports.extend(['groq.types'])
 ''')
 
 a = Analysis(

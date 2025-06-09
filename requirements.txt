@@ -30,3 +30,6 @@ chromadb
 unidecode
 langchain
 PyQt6-WebEngine
+openai
+google-genai
+groq
